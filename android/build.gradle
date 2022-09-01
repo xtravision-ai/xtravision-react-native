@@ -1,0 +1,65 @@
+buildscript {
+    if (project == rootProject) {
+        repositories {
+            google()
+            jcenter()
+        }
+
+        dependencies {
+            classpath 'com.android.tools.build:gradle:3.5.3'
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+    compileSdkVersion safeExtGet('ReactNativeXtraVision_compileSdkVersion', 30)
+    ndkVersion = "22.0.7026061"
+    defaultConfig {
+        minSdkVersion safeExtGet('ReactNativeXtraVision_minSdkVersion', 21)
+        targetSdkVersion safeExtGet('ReactNativeXtraVision_targetSdkVersion', 31)
+        versionCode 1
+        versionName "1.0"
+        
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    lintOptions {
+        disable 'GradleCompatible'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+//        url("$rootDir/../node_modules/react-native/android")
+      url("$rootDir/../node_modules/react-native/android")
+    }
+    google()
+    // jcenter()
+}
+
+dependencies {
+    //noinspection GradleDynamicVersion
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+    api project(":react-native-vision-camera")
+    implementation "androidx.camera:camera-core:1.1.0-alpha06"
+    implementation 'com.google.mlkit:pose-detection:18.0.0-beta2'
+    
+    implementation 'com.squareup.okhttp3:okhttp:3.14.6'
+}

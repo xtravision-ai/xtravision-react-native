@@ -503,7 +503,7 @@
     "@babel/helper-simple-access" "^7.18.6"
     babel-plugin-dynamic-import-node "^2.3.3"
 
-"@babel/plugin-transform-object-assign@^7.0.0", "@babel/plugin-transform-object-assign@^7.10.4":
+"@babel/plugin-transform-object-assign@^7.0.0", "@babel/plugin-transform-object-assign@^7.16.7":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-object-assign/-/plugin-transform-object-assign-7.18.6.tgz#7830b4b6f83e1374a5afb9f6111bcfaea872cdd2"
   integrity sha512-mQisZ3JfqWh2gVXvfqYCAAyRs6+7oev+myBsTwW5RnPhYXOTuCEw2oe3YgxlXMViXUS53lG8koulI7mJ+8JE+A==
@@ -639,7 +639,7 @@
     "@babel/helper-validator-option" "^7.18.6"
     "@babel/plugin-transform-flow-strip-types" "^7.18.6"
 
-"@babel/preset-typescript@^7.1.0":
+"@babel/preset-typescript@^7.1.0", "@babel/preset-typescript@^7.16.7":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.18.6.tgz#ce64be3e63eddc44240c6358daefac17b3186399"
   integrity sha512-s9ik86kXBAnD760aybBucdpnLsAt0jK1xqJn2juOn9lkOvSHV60os5hxoVJsPzMQxvnUJFAlkont2DvvaYEBtQ==
@@ -964,6 +964,11 @@
   integrity sha512-anKkLmZZ+xm4p8JWBf4hElkM4XR+EZeA2M9BAkkTldmcyDY4mbdIJnRghDJH3Ov5ooY7/UAoENtmdMSkaAd7Cw==
   dependencies:
     "@types/node" "*"
+
+"@types/invariant@^2.2.35":
+  version "2.2.35"
+  resolved "https://registry.yarnpkg.com/@types/invariant/-/invariant-2.2.35.tgz#cd3ebf581a6557452735688d8daba6cf0bd5a3be"
+  integrity sha512-DxX1V9P8zdJPYQat1gHyY0xj3efl8gnMVjiM9iCY6y27lj+PoQWkgjt8jDqmovPqULkKVpKRg8J36iQiA+EtEg==
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.4"
@@ -2961,11 +2966,6 @@ mkdirp@^0.5.1:
   dependencies:
     minimist "^1.2.6"
 
-mockdate@^3.0.2:
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/mockdate/-/mockdate-3.0.5.tgz#789be686deb3149e7df2b663d2bc4392bc3284fb"
-  integrity sha512-iniQP4rj1FhBdBYS/+eQv7j1tadJ9lJtdzgOpvsOHng/GbcDh2Fhdeq+ZRldrPYdXvCyfFUmFeEwEGXZB5I/AQ==
-
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -3362,11 +3362,6 @@ react-devtools-core@^4.13.0:
     shell-quote "^1.6.1"
     ws "^7"
 
-react-freeze@^1.0.0:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.3.tgz#5e3ca90e682fed1d73a7cb50c2c7402b3e85618d"
-  integrity sha512-ZnXwLQnGzrDpHBHiC56TXFXvmolPeMjTn1UOm610M4EXGzbEDR7oOIyS2ZiItgbs6eZc4oU/a0hpk8PrcKvv5g==
-
 react-is@^16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
@@ -3386,35 +3381,28 @@ react-native-codegen@^0.0.7:
     jscodeshift "^0.11.0"
     nullthrows "^1.1.1"
 
-react-native-reanimated@2.3.0-beta.2:
-  version "2.3.0-beta.2"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-2.3.0-beta.2.tgz#6c62422fe25d76336464b990ea2e648f2241494c"
-  integrity sha512-J0cBgOh0O05fNtGgHgrWfKtsYtzcAIhdNju6GVbRo6mVPp1jnuNmNQ2Dd7yXAF54+waj4w4h4pfP9D5J6EixkQ==
+react-native-reanimated@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-2.10.0.tgz#ed53be66bbb553b5b5e93e93ef4217c87b8c73db"
+  integrity sha512-jKm3xz5nX7ABtHzzuuLmawP0pFWP77lXNdIC6AWOceBs23OHUaJ29p4prxr/7Sb588GwTbkPsYkDqVFaE3ezNQ==
   dependencies:
-    "@babel/plugin-transform-object-assign" "^7.10.4"
+    "@babel/plugin-transform-object-assign" "^7.16.7"
+    "@babel/preset-typescript" "^7.16.7"
+    "@types/invariant" "^2.2.35"
     invariant "^2.2.4"
     lodash.isequal "^4.5.0"
-    mockdate "^3.0.2"
-    react-native-screens "^3.4.0"
+    setimmediate "^1.0.5"
     string-hash-64 "^1.0.3"
 
-react-native-screens@^3.4.0:
-  version "3.17.0"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-3.17.0.tgz#b099b3ec9d46de07c857f14d713c293024c7c842"
-  integrity sha512-OZCQU7+3neHNaM19jBkYRjL50kXz7p7MUgWQTCcdRoshcCiolf8aXs4eRVQKGK6m1RmoB8UL0//m5R9KoR+41w==
-  dependencies:
-    react-freeze "^1.0.0"
-    warn-once "^0.1.0"
+react-native-vision-camera@2.14.1:
+  version "2.14.1"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-2.14.1.tgz#6b9fecd5c5976167b8e8752455be24cd12c3d84f"
+  integrity sha512-zs8HAuD3pL+T/ngaDUxbvhoqR90b85ab3nm4tO4OCSBDUFhzgDoDXDm+BDhsyQaF0p05Kaskf+rkqCVBI0WEgg==
 
-react-native-vision-camera@2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-2.9.0.tgz#904b9695359c1b913b6bda70188dbb76d43070d5"
-  integrity sha512-1bk+ayF+MP0hcGNVodAftmqp9tLRUq1gW37G/A5hzh/5yPtUkIibhvnMD30/idLlHBjTVnFw4egbXg40BKpQCg==
-
-react-native@0.66.0:
-  version "0.66.0"
-  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.66.0.tgz#99bdd83a9a612a71b94242767989d666d445b007"
-  integrity sha512-m26TKwzsfHVdZ1hDG+7mZ4M4ftxFFZrhtiT0OXuwfBzmNtB3xhsJtYszPeizw33c9YNp8rvehKT3c4ldDCW6kA==
+react-native@0.66.3:
+  version "0.66.3"
+  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.66.3.tgz#25c7c4c7d81867326b3eb7a36f0fe6a61fa4104e"
+  integrity sha512-B/dQpuvta9YvF5MihDWefoGlTvxzUHK5X5RjdrXHAu/ihTehJXxEA+m6z/tufp1ZUMDjU+tMZK6gnehzCuYfzw==
   dependencies:
     "@jest/create-cache-key-function" "^27.0.1"
     "@react-native-community/cli" "^6.0.0"
@@ -3734,6 +3722,11 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-extendable "^0.1.1"
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
+
+setimmediate@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+  integrity sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==
 
 setprototypeof@1.2.0:
   version "1.2.0"
@@ -4192,11 +4185,6 @@ walker@^1.0.7, walker@~1.0.5:
   integrity sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==
   dependencies:
     makeerror "1.0.12"
-
-warn-once@^0.1.0:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/warn-once/-/warn-once-0.1.1.tgz#952088f4fb56896e73fd4e6a3767272a3fccce43"
-  integrity sha512-VkQZJbO8zVImzYFteBXvBOZEl1qL175WH8VmZcxF2fZAoudNhNDvHi+doCaAEdU2l2vtcIwa2zn0QK5+I1HQ3Q==
 
 wcwidth@^1.0.1:
   version "1.0.1"

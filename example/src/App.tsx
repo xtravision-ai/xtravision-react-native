@@ -61,12 +61,12 @@ export default function App() {
   );
 }
 
-{
-  /* <Camera
-      style={StyleSheet.absoluteFill}
-      device={device}
-      isActive={true}
-      frameProcessor={frameProcessor}
-      frameProcessorFps={5}
-    /> */
-}
+// {
+//   /* <Camera
+//       style={StyleSheet.absoluteFill}
+//       device={device}
+//       isActive={true}
+//       frameProcessor={frameProcessor}
+//       frameProcessorFps={5}
+//     /> */
+// }

@@ -6,13 +6,13 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start"
+    "start": "react-native start --reset-cache"
   },
   "dependencies": {
     "react": "17.0.2",
-    "react-native": "0.66.0",
-    "react-native-reanimated": "2.3.0-beta.2",
-    "react-native-vision-camera": "2.9.0"
+    "react-native": "0.66.3",
+    "react-native-reanimated": "^2.10.0",
+    "react-native-vision-camera": "2.14.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

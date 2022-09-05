@@ -1,6 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import * as React from 'react';
-import { runOnJS } from 'react-native-reanimated';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import useWebSocket from 'react-native-use-websocket';
+import { WS_URL } from './utils/constants';
+import _ from 'lodash';
 
 import { StyleSheet, Text } from 'react-native';
 import {
@@ -13,8 +16,8 @@ import { scanPose } from 'react-native-xtravision';
 // import { scanPose,  } from 'react-native-xtravision';
 
 const AUTH_TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjMwN2JkZi0yNjVmLTQxM2ItODU2ZC1mMDcyODVhMzc3NjkiLCJhcHBJZCI6Ijk1ZWFjZDQ1LTgyZjUtMTFlYy1hOWY1LWE0YmI2ZDZlZGM0ZSIsIm9yZ0lkIjoiZGQ4MzA1OWMtODJmMy0xMWVjLWE5ZjUtYTRiYjZkNmVkYzRlIiwiaWF0IjoxNjU4Mjk1MjA5LCJleHAiOjE2NTgzMDI0MDl9.P8cvuHOmQfqykXk3Zmks4wMeSVqvb-w5qv8AnBnc-h4';
-const ASSESSMENT = 'ENDURANCE_FLAMINGO_FRONT';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjMwN2JkZi0yNjVmLTQxM2ItODU2ZC1mMDcyODVhMzc3NjkiLCJhcHBJZCI6Ijk1ZWFjZDQ1LTgyZjUtMTFlYy1hOWY1LWE0YmI2ZDZlZGM0ZSIsIm9yZ0lkIjoiZGQ4MzA1OWMtODJmMy0xMWVjLWE5ZjUtYTRiYjZkNmVkYzRlIiwiaWF0IjoxNjYwMDQzNzAxLCJleHAiOjE2OTE2MDEzMDF9.czzQWj22X6FY9wjTkWCDPvvDUgBWT-UgpjLfCKGxbRE';
+const ASSESSMENT = 'BANDED_ALTERNATING_DIAGNOLS';
 
 export default function App() {
   const [hasPermission, setHasPermission] = React.useState(false);
@@ -22,11 +25,15 @@ export default function App() {
 
   const devices = useCameraDevices();
   const device = devices.front;
+  const isEduScreen = false;
 
   const poseParams = {
     authToken: AUTH_TOKEN,
     ASSESSMENT: ASSESSMENT,
   };
+
+  const poseTempRef = React.useRef<any>({});
+  const temp = useSharedValue<any>({ pose: {} });
 
   // React.useEffect(() => {
   //   console.log(faces);
@@ -39,14 +46,54 @@ export default function App() {
     })();
   }, []);
 
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
+    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}`,
+    {
+      shouldReconnect: (e) => true, // will attempt to reconnect on all close events
+    }
+  );
+
+  const foo = useCallback((pose: any) => {
+    console.log('pose: ', pose);
+    poseTempRef.current[Date.now()] = { pose };
+    // console.log('poseTempRef: ', poseTempRef.current);
+  }, []);
+
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet';
     // const scannedFaces = scanPose(frame);
-    const pose = scanPose(frame, poseParams);
-    console.log('pose > ', pose);
-    // runOnJS(setFaces)(scannedFaces);
+    const pose: any = scanPose(frame, poseParams);
+    // console.log('pose: ', pose);
+
+    runOnJS(foo)(pose);
   }, []);
+
   console.log('here...');
+
+  React.useEffect(() => {
+    let interval: any;
+    const cleanUp = () => interval && clearInterval(interval);
+    interval = setInterval(() => {
+      if (poseTempRef.current !== undefined) {
+        const keyPoints = Object.assign(poseTempRef.current, {});
+        // console.log('keyPoints: ', keyPoints);
+        poseTempRef.current = {};
+        if (!_.isEmpty(keyPoints)) {
+          // WS SEND Kps -> 1s
+          sendJsonMessage({
+            timestamp: Date.now(),
+            user_keypoints: keyPoints,
+            isprejoin: isEduScreen,
+          });
+        }
+      }
+    }, 1000);
+
+    return () => {
+      cleanUp();
+    };
+  }, [sendJsonMessage]);
+  console.log('lastJsonMessage: ', lastJsonMessage);
 
   return device != null && hasPermission ? (
     <Camera

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import React, { useCallback } from 'react';
+import { runOnJS } from 'react-native-reanimated';
 import useWebSocket from 'react-native-use-websocket';
 import { WS_URL } from './utils/constants';
 import _ from 'lodash';
@@ -33,11 +33,50 @@ export default function App() {
   };
 
   const poseTempRef = React.useRef<any>({});
-  const temp = useSharedValue<any>({ pose: {} });
 
-  // React.useEffect(() => {
-  //   console.log(faces);
-  // }, [faces]);
+  const processPoseFrame = (data: any, frame: any) => {
+    return [
+      createNormalisedDictionary(data.nose, frame),
+      createNormalisedDictionary(data.leftEyeInner, frame),
+      createNormalisedDictionary(data.leftEye, frame),
+      createNormalisedDictionary(data.leftEyeOuter, frame),
+      createNormalisedDictionary(data.rightEyeInner, frame),
+      createNormalisedDictionary(data.rightEye, frame),
+      createNormalisedDictionary(data.rightEyeOuter, frame),
+      createNormalisedDictionary(data.leftEar, frame),
+      createNormalisedDictionary(data.rightEar, frame),
+      createNormalisedDictionary(data.mouthLeft, frame),
+      createNormalisedDictionary(data.mouthRight, frame),
+      createNormalisedDictionary(data.leftShoulder, frame),
+      createNormalisedDictionary(data.rightShoulder, frame),
+      createNormalisedDictionary(data.leftElbow, frame),
+      createNormalisedDictionary(data.rightElbow, frame),
+      createNormalisedDictionary(data.leftWrist, frame),
+      createNormalisedDictionary(data.rightWrist, frame),
+      // createNormalisedDictionary(data.leftPinky, frame),
+      createNormalisedDictionary(data.leftPinkyFinger, frame),
+      // createNormalisedDictionary(data.rightPinky, frame),
+      createNormalisedDictionary(data.rightPinkyFinger, frame),
+      // createNormalisedDictionary(data.leftIndex, frame),
+      createNormalisedDictionary(data.leftIndexFinger, frame),
+      // createNormalisedDictionary(data.rightIndex, frame),
+      createNormalisedDictionary(data.rightIndexFinger, frame),
+      createNormalisedDictionary(data.leftThumb, frame),
+      createNormalisedDictionary(data.rightThumb, frame),
+      createNormalisedDictionary(data.leftHip, frame),
+      createNormalisedDictionary(data.rightHip, frame),
+      createNormalisedDictionary(data.leftKnee, frame),
+      createNormalisedDictionary(data.rightKnee, frame),
+      createNormalisedDictionary(data.leftAnkle, frame),
+      createNormalisedDictionary(data.rightAnkle, frame),
+      createNormalisedDictionary(data.leftHeel, frame),
+      createNormalisedDictionary(data.rightHeel, frame),
+      // createNormalisedDictionary(data.leftFootIndex, frame),
+      createNormalisedDictionary(data.leftToe, frame),
+      // createNormalisedDictionary(data.rightFootIndex, frame),
+      createNormalisedDictionary(data.rightToe, frame),
+    ];
+  };
 
   React.useEffect(() => {
     (async () => {
@@ -53,19 +92,33 @@ export default function App() {
     }
   );
 
-  const foo = useCallback((pose: any) => {
-    console.log('pose: ', pose);
-    poseTempRef.current[Date.now()] = { pose };
-    // console.log('poseTempRef: ', poseTempRef.current);
+  const createNormalisedDictionary = (keypoint: any, frame: any) => {
+    if (keypoint !== undefined) {
+      if (keypoint! || keypoint.visibility < 0.3) {
+        return { x: 0, y: 0, z: 0, visibility: 0.0 };
+      }
+      return {
+        x: keypoint.x / frame.width,
+        y: keypoint.y / frame.height,
+        z: keypoint.z / frame.width,
+        visibility: keypoint.visibility,
+      };
+    }
+    return;
+  };
+
+  const poseFrameHandler = useCallback((pose: any, frame: any) => {
+    const landmarks = processPoseFrame(pose, frame);
+
+    const curTime = Date.now();
+    poseTempRef.current[curTime] = { landmarks };
   }, []);
 
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet';
-    // const scannedFaces = scanPose(frame);
     const pose: any = scanPose(frame, poseParams);
-    // console.log('pose: ', pose);
 
-    runOnJS(foo)(pose);
+    runOnJS(poseFrameHandler)(pose, frame);
   }, []);
 
   console.log('here...');
@@ -76,7 +129,6 @@ export default function App() {
     interval = setInterval(() => {
       if (poseTempRef.current !== undefined) {
         const keyPoints = Object.assign(poseTempRef.current, {});
-        // console.log('keyPoints: ', keyPoints);
         poseTempRef.current = {};
         if (!_.isEmpty(keyPoints)) {
           // WS SEND Kps -> 1s
@@ -93,6 +145,7 @@ export default function App() {
       cleanUp();
     };
   }, [sendJsonMessage]);
+
   console.log('lastJsonMessage: ', lastJsonMessage);
 
   return device != null && hasPermission ? (
@@ -107,13 +160,3 @@ export default function App() {
     <Text>No devices</Text>
   );
 }
-
-// {
-//   /* <Camera
-//       style={StyleSheet.absoluteFill}
-//       device={device}
-//       isActive={true}
-//       frameProcessor={frameProcessor}
-//       frameProcessorFps={5}
-//     /> */
-// }

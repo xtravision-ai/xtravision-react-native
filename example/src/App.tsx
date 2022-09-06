@@ -92,18 +92,15 @@ export default function App() {
   );
 
   const createNormalisedDictionary = (keypoint: any, frame: any) => {
-    if (keypoint !== undefined) {
-      if (keypoint! || keypoint.visibility < 0.3) {
-        return { x: 0, y: 0, z: 0, visibility: 0.0 };
-      }
-      return {
-        x: keypoint.x / frame.width,
-        y: keypoint.y / frame.height,
-        z: keypoint.z / frame.width,
-        visibility: keypoint.visibility,
-      };
+    if (keypoint !== undefined || keypoint.visibility < 0.3) {
+      return { x: 0, y: 0, z: 0, visibility: 0.0 };
     }
-    return;
+    return {
+      x: keypoint.x / frame.width,
+      y: keypoint.y / frame.height,
+      z: keypoint.z / frame.width,
+      visibility: keypoint.visibility,
+    };
   };
 
   const poseFrameHandler = useCallback((pose: any, frame: any) => {

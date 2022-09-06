@@ -15,8 +15,7 @@ import { Camera } from 'react-native-vision-camera';
 import { scanPose } from 'react-native-xtravision';
 // import { scanPose,  } from 'react-native-xtravision';
 
-const AUTH_TOKEN =
-  '_Auth_Token';
+const AUTH_TOKEN = '_AUTH_TOKEN_';
 const ASSESSMENT = 'BANDED_ALTERNATING_DIAGNOLS';
 
 export default function App() {

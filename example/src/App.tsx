@@ -14,13 +14,8 @@ import { Camera } from 'react-native-vision-camera';
 import { scanPose } from 'react-native-xtravision';
 // import { scanPose,  } from 'react-native-xtravision';
 
-// const AUTH_TOKEN = '_AUTH_TOKEN_';
-// const ASSESSMENT = '_ASSESSMENT_NAME_';
-
-const AUTH_TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjMwN2JkZi0yNjVmLTQxM2ItODU2ZC1mMDcyODVhMzc3NjkiLCJhcHBJZCI6Ijk1ZWFjZDQ1LTgyZjUtMTFlYy1hOWY1LWE0YmI2ZDZlZGM0ZSIsIm9yZ0lkIjoiZGQ4MzA1OWMtODJmMy0xMWVjLWE5ZjUtYTRiYjZkNmVkYzRlIiwiaWF0IjoxNjYwMDQzNzAxLCJleHAiOjE2OTE2MDEzMDF9.czzQWj22X6FY9wjTkWCDPvvDUgBWT-UgpjLfCKGxbRE';
-
-const ASSESSMENT = 'PUSH_UPS';
+const AUTH_TOKEN = '_AUTH_TOKEN_';
+const ASSESSMENT = '_ASSESSMENT_NAME_';
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(false);

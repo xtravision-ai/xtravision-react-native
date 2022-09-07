@@ -28,7 +28,7 @@ Do the below changes in App.tsx manually (example/src/App.tsx):
 // Your Auth Token
 const AUTH_TOKEN = '_AUTH_TOKEN_';
 // assessment name you want to test
-const ASSESSMENT = '_ASSESSMENT_NAME_';
+const ASSESSMENT = '_ASSESSMENT_NAME_'; // Plz refer Assessment list 
 ```
 
 Once above changes are completed then you can run below command in `example` directory.
@@ -40,6 +40,10 @@ yarn run android
 ```
 
 After successful installation, you can see Xtra Server response in metro server terminal. 
+
+### Assessment List
+1. PUSH_UPS
+2. SIT_UPS
 
 -------
 

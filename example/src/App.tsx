@@ -16,7 +16,10 @@ import { scanPose } from 'react-native-xtravision';
 // import { scanPose,  } from 'react-native-xtravision';
 
 const AUTH_TOKEN = '_AUTH_TOKEN_';
-const ASSESSMENT = 'BANDED_ALTERNATING_DIAGNOLS';
+const ASSESSMENT = 'PUSH_UPS';
+
+// add your height here for Standing Broad Jump
+const height = null; 
 
 export default function App() {
   const [hasPermission, setHasPermission] = React.useState(false);
@@ -29,6 +32,10 @@ export default function App() {
   const poseParams = {
     authToken: AUTH_TOKEN,
     ASSESSMENT: ASSESSMENT,
+  };
+
+  const userProfile = {
+    height,
   };
 
   const poseTempRef = React.useRef<any>({});
@@ -85,14 +92,14 @@ export default function App() {
   }, []);
 
   const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}`,
+    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userProfile=${userProfile} `,
     {
       shouldReconnect: (e) => true, // will attempt to reconnect on all close events
     }
   );
 
   const createNormalisedDictionary = (keypoint: any, frame: any) => {
-    if (keypoint !== undefined || keypoint.visibility < 0.3) {
+    if (keypoint === undefined || keypoint.visibility < 0.3) {
       return { x: 0, y: 0, z: 0, visibility: 0.0 };
     }
     return {
@@ -142,6 +149,7 @@ export default function App() {
     };
   }, [sendJsonMessage]);
 
+  console.log('timestamp: ', Date.now());
   console.log('lastJsonMessage: ', lastJsonMessage);
 
   return device != null && hasPermission ? (

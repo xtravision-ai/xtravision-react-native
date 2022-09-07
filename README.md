@@ -14,6 +14,10 @@ It is an sdk for fitness related data assessments like calories, rep-count, yoga
 
 cd into the example folder and run
 
+# For Standing Broad Jump 
+
+set the height variable in the code
+
 `yarn start or npm run start`
 and in another terminal run
 `yarn run android or npm run android`

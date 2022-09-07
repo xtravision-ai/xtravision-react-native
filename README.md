@@ -44,6 +44,7 @@ After successful installation, you can see Xtra Server response in metro server 
 ### Assessment List
 1. PUSH_UPS
 2. SIT_UPS
+3. V_SIT_AND_REACH
 
 -------
 

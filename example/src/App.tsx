@@ -16,7 +16,7 @@ import { scanPose } from 'react-native-xtravision';
 // import { scanPose,  } from 'react-native-xtravision';
 
 const AUTH_TOKEN = '_AUTH_TOKEN_';
-const ASSESSMENT = 'PUSH_UPS';
+const ASSESSMENT = '_ASSESSMENT_NAME_';
 
 // add your height here for Standing Broad Jump
 const height = null; 
@@ -26,7 +26,7 @@ export default function App() {
   // const [faces, setFaces] = React.useState<any /* Face[] */>();
 
   const devices = useCameraDevices();
-  const device = devices.front;
+  const device = devices.front; // Camera front or back
   const isEduScreen = false;
 
   const poseParams = {
@@ -99,7 +99,7 @@ export default function App() {
   );
 
   const createNormalisedDictionary = (keypoint: any, frame: any) => {
-    if (keypoint === undefined || keypoint.visibility < 0.3) {
+    if (_.isEmpty(keypoint) || keypoint.visibility < 0.3) {
       return { x: 0, y: 0, z: 0, visibility: 0.0 };
     }
     return {

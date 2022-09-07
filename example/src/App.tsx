@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { runOnJS } from 'react-native-reanimated';
 import useWebSocket from 'react-native-use-websocket';
 import { WS_URL } from './utils/constants';
 import _ from 'lodash';
-
-import { StyleSheet, Text } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import {
   useCameraDevices,
   useFrameProcessor,
@@ -19,11 +18,17 @@ const AUTH_TOKEN = '_AUTH_TOKEN_';
 const ASSESSMENT = '_ASSESSMENT_NAME_';
 
 // add your height here for Standing Broad Jump
-const height = null; 
+const userHeight = 'null';
 
 export default function App() {
-  const [hasPermission, setHasPermission] = React.useState(false);
-  // const [faces, setFaces] = React.useState<any /* Face[] */>();
+  const [hasPermission, setHasPermission] = useState(false);
+  // const [faces, setFaces] = useState<any /* Face[] */>();
+
+  const [orientation, setOrientation] = useState({
+    mode: 'PORTRAIT',
+    width: 400,
+    height: 800,
+  });
 
   const devices = useCameraDevices();
   const device = devices.front; // Camera front or back
@@ -35,7 +40,7 @@ export default function App() {
   };
 
   const userProfile = {
-    height,
+    height: userHeight,
   };
 
   const poseTempRef = React.useRef<any>({});
@@ -84,7 +89,24 @@ export default function App() {
     ];
   };
 
-  React.useEffect(() => {
+  const getAndSetOrientation = () => {
+    const { width, height } = Dimensions.get('window');
+    if (width > height) {
+      setOrientation({ mode: 'LANDSCAPE', width, height });
+    } else setOrientation({ mode: 'PORTRAIT', width, height });
+  };
+
+  useEffect(() => {
+    getAndSetOrientation();
+    const orientationSubscription = Dimensions.addEventListener(
+      'change',
+      getAndSetOrientation
+    );
+
+    return () => orientationSubscription.remove();
+  }, []);
+
+  useEffect(() => {
     (async () => {
       const status = await Camera.requestCameraPermission();
       setHasPermission(status === 'authorized');
@@ -92,7 +114,7 @@ export default function App() {
   }, []);
 
   const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userProfile=${userProfile} `,
+    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userProfile=${userProfile}`,
     {
       shouldReconnect: (e) => true, // will attempt to reconnect on all close events
     }
@@ -126,7 +148,7 @@ export default function App() {
 
   console.log('here...');
 
-  React.useEffect(() => {
+  useEffect(() => {
     let interval: any;
     const cleanUp = () => interval && clearInterval(interval);
     interval = setInterval(() => {
@@ -153,14 +175,34 @@ export default function App() {
   console.log('lastJsonMessage: ', lastJsonMessage);
 
   return device != null && hasPermission ? (
-    <Camera
-      style={StyleSheet.absoluteFill}
-      device={device}
-      isActive={true}
-      frameProcessor={frameProcessor}
-      frameProcessorFps={5}
-    />
+    <>
+      <Camera
+        style={StyleSheet.absoluteFill}
+        device={device}
+        isActive={true}
+        frameProcessor={frameProcessor}
+        frameProcessorFps={5}
+      />
+      <View style={styles(orientation).point} />
+    </>
   ) : (
     <Text>No devices</Text>
   );
 }
+
+const styles = (orientation: any) =>
+  StyleSheet.create({
+    point: {
+      width: 10,
+      height: 10,
+      top:
+        orientation.mode === 'PORTRAIT'
+          ? orientation.height - 200
+          : orientation.height - 100,
+      left:
+        orientation.mode === 'PORTRAIT'
+          ? orientation.width - 350
+          : orientation.width - 650,
+      backgroundColor: '#fc0505',
+    },
+  });

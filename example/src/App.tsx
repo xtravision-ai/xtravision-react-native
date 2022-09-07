@@ -38,8 +38,6 @@ export default function App() {
 
   // add your height here for Standing Broad Jump
   const userHeight = 'null';
-  const standX = 10;
-  const standY = 10;
 
   const poseTempRef = React.useRef<any>({});
 
@@ -90,11 +88,12 @@ export default function App() {
   const getAndSetOrientation = () => {
     const { width, height } = Dimensions.get('window');
     if (width > height) {
-      setOrientation({ mode: 'LANDSCAPE', width, height });
-    } else setOrientation({ mode: 'PORTRAIT', width, height });
+      setOrientation({ mode: 'LANDSCAPE', width: width - 650, height: height - 100 });
+    } else setOrientation({ mode: 'PORTRAIT', width: width - 350 , height: height - 200 });
   };
 
   useEffect(() => {
+    // run first to know the initial orientation values
     getAndSetOrientation();
     const orientationSubscription = Dimensions.addEventListener(
       'change',
@@ -112,7 +111,7 @@ export default function App() {
   }, []);
 
   const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userHeight=${userHeight}&stand_x=${standX}&stand_y=${standY}`,
+    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userHeight=${userHeight}&stand_x=${orientation.width}&stand_y=${orientation.height}`,
     {
       shouldReconnect: (e) => true, // will attempt to reconnect on all close events
     }
@@ -169,7 +168,6 @@ export default function App() {
     };
   }, [sendJsonMessage]);
 
-  console.log('orientation: ', orientation);
   console.log('timestamp: ', Date.now());
   console.log('lastJsonMessage: ', lastJsonMessage);
 
@@ -194,14 +192,8 @@ const styles = (orientation: any) =>
     point: {
       width: 10,
       height: 10,
-      top:
-        orientation.mode === 'PORTRAIT'
-          ? orientation.height - 200
-          : orientation.height - 100,
-      left:
-        orientation.mode === 'PORTRAIT'
-          ? orientation.width - 350
-          : orientation.width - 650,
+      top: orientation.height,
+      left: orientation.width,
       backgroundColor: '#fc0505',
     },
   });

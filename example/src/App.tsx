@@ -22,19 +22,21 @@ export default function App() {
   }, []);
 
   return (
-      <View style={styles.container}>
-        { hasPermission ? (
+    <View  style={styles.container}> 
+      { hasPermission ? 
+        (
           <>
-            <Text>Device has Permission</Text>
-            <Assessment></Assessment> 
+            <Text>App has Permission</Text>
+            <Assessment cameraPosition={'front'}></Assessment> 
           </>
         ) : (
           <>
-          <Text>Device don't have Permission</Text>
-        </>
-        )}
-      </View>
-    );
+            <Text>App don't have Permission</Text>
+          </>
+        )
+      }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -42,10 +44,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
+  }
 });

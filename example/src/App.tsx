@@ -21,7 +21,6 @@ export default function App() {
   // const [faces, setFaces] = useState<any /* Face[] */>();
 
   const [orientation, setOrientation] = useState({
-    // mode: 'PORTRAIT',
     width: 400,
     height: 800,
     image_height: 720,
@@ -90,36 +89,14 @@ export default function App() {
     const { width, height } = Dimensions.get('window');
     setOrientation((prev) => ({
       ...prev,
-      // mode: 'LANDSCAPE',
       width: width - 100,
       height: height - 200,
     }));
-    // if (width > height) {
-    //   setOrientation((prev) => ({
-    //     ...prev,
-    //     // mode: 'LANDSCAPE',
-    //     width: width - 650,
-    //     height: height - 100,
-    //   }));
-    // } else
-    //   setOrientation((prev) => ({
-    //     ...prev,
-    //     // mode: 'PORTRAIT',
-    //     width: width - 350,
-    //     height: height - 200,
-    //   }));
   };
 
   useEffect(() => {
     // run first to know the initial orientation values
     getAndSetOrientation();
-
-    // const orientationSubscription = Dimensions.addEventListener(
-    //   'change',
-    //   getAndSetOrientation
-    // );
-
-    // return () => orientationSubscription.remove();
   }, []);
 
   useEffect(() => {

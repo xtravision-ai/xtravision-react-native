@@ -45,6 +45,7 @@ After successful installation, you can see Xtra Server response in metro server 
 1. PUSH_UPS
 2. SIT_UPS
 3. V_SIT_AND_REACH
+4. STANDING_BROAD_JUMP
 
 -------
 
@@ -64,3 +65,5 @@ cd .. && yarn run android
 # For Standing Broad Jump 
 
 set the height variable in the code
+turn off auto rotation, turn it right and use the red dot on the screen as the starting point
+

@@ -38,7 +38,7 @@ export default function App() {
   };
 
   // add your height here for Standing Broad Jump
-  const userHeight = 'null';
+  const userHeight = 180;
 
   const poseTempRef = React.useRef<any>({});
 

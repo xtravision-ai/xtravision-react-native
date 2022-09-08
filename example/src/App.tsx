@@ -8,9 +8,8 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import {
   useCameraDevices,
   useFrameProcessor,
+  Camera,
 } from 'react-native-vision-camera';
-
-import { Camera } from 'react-native-vision-camera';
 import { scanPose } from 'react-native-xtravision';
 // import { scanPose,  } from 'react-native-xtravision';
 
@@ -22,9 +21,11 @@ export default function App() {
   // const [faces, setFaces] = useState<any /* Face[] */>();
 
   const [orientation, setOrientation] = useState({
-    mode: 'PORTRAIT',
+    // mode: 'PORTRAIT',
     width: 400,
     height: 800,
+    image_height: 720,
+    image_width: 1280,
   });
 
   const devices = useCameraDevices();
@@ -38,8 +39,6 @@ export default function App() {
 
   // add your height here for Standing Broad Jump
   const userHeight = 'null';
-  const standX = 10;
-  const standY = 10;
 
   const poseTempRef = React.useRef<any>({});
 
@@ -89,19 +88,38 @@ export default function App() {
 
   const getAndSetOrientation = () => {
     const { width, height } = Dimensions.get('window');
-    if (width > height) {
-      setOrientation({ mode: 'LANDSCAPE', width, height });
-    } else setOrientation({ mode: 'PORTRAIT', width, height });
+    setOrientation((prev) => ({
+      ...prev,
+      // mode: 'LANDSCAPE',
+      width: width - 100,
+      height: height - 200,
+    }));
+    // if (width > height) {
+    //   setOrientation((prev) => ({
+    //     ...prev,
+    //     // mode: 'LANDSCAPE',
+    //     width: width - 650,
+    //     height: height - 100,
+    //   }));
+    // } else
+    //   setOrientation((prev) => ({
+    //     ...prev,
+    //     // mode: 'PORTRAIT',
+    //     width: width - 350,
+    //     height: height - 200,
+    //   }));
   };
 
   useEffect(() => {
+    // run first to know the initial orientation values
     getAndSetOrientation();
-    const orientationSubscription = Dimensions.addEventListener(
-      'change',
-      getAndSetOrientation
-    );
 
-    return () => orientationSubscription.remove();
+    // const orientationSubscription = Dimensions.addEventListener(
+    //   'change',
+    //   getAndSetOrientation
+    // );
+
+    // return () => orientationSubscription.remove();
   }, []);
 
   useEffect(() => {
@@ -112,7 +130,7 @@ export default function App() {
   }, []);
 
   const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userHeight=${userHeight}&stand_x=${standX}&stand_y=${standY}`,
+    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userHeight=${userHeight}&stand_x=${orientation.width}&stand_y=${orientation.height}&image_height=${orientation.image_height}&image_width=${orientation.image_width}`,
     {
       shouldReconnect: (e) => true, // will attempt to reconnect on all close events
     }
@@ -133,6 +151,11 @@ export default function App() {
   const poseFrameHandler = useCallback((pose: any, frame: any) => {
     const landmarks = processPoseFrame(pose, frame);
 
+    setOrientation((prev) => ({
+      ...prev,
+      image_height: frame.height,
+      image_width: frame.width,
+    }));
     const curTime = Date.now();
     poseTempRef.current[curTime] = { landmarks };
   }, []);
@@ -170,7 +193,8 @@ export default function App() {
   }, [sendJsonMessage]);
 
   console.log('orientation: ', orientation);
-  console.log('timestamp: ', Date.now());
+  console.log('assessment: ', ASSESSMENT);
+  console.log('request sent timestamp: ', Date.now());
   console.log('lastJsonMessage: ', lastJsonMessage);
 
   return device != null && hasPermission ? (
@@ -182,7 +206,9 @@ export default function App() {
         frameProcessor={frameProcessor}
         frameProcessorFps={5}
       />
-      <View style={styles(orientation).point} />
+      {ASSESSMENT === 'STANDING_BROAD_JUMP' && (
+        <View style={styles(orientation).point} />
+      )}
     </>
   ) : (
     <Text>No devices</Text>
@@ -194,14 +220,9 @@ const styles = (orientation: any) =>
     point: {
       width: 10,
       height: 10,
-      top:
-        orientation.mode === 'PORTRAIT'
-          ? orientation.height - 200
-          : orientation.height - 100,
-      left:
-        orientation.mode === 'PORTRAIT'
-          ? orientation.width - 350
-          : orientation.width - 650,
+      top: orientation.height,
+      left: orientation.width,
       backgroundColor: '#fc0505',
+      borderRadius: 10,
     },
   });

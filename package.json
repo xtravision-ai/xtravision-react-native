@@ -28,7 +28,7 @@
     "prepare": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
-    "bootstrap": "yarn example && yarn && yarn example pods"
+    "bootstrap": "yarn example && yarn "
   },
   "keywords": [
     "react-native",
@@ -72,7 +72,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-reanimated": "^2.10.0",
+    "react-native-vision-camera": "^2.14.1"
   },
   "jest": {
     "preset": "react-native",
@@ -147,5 +149,9 @@
         }
       ]
     ]
+  },
+  "dependencies": {
+    "react-native-reanimated": "^2.10.0",
+    "react-native-vision-camera": "^2.14.1"
   }
 }

@@ -65,5 +65,5 @@ cd .. && yarn run android
 # For Standing Broad Jump 
 
 set the height variable in the code
-turn off auto rotation, turn it right and use the red dot on the screen as the starting point
+turn off auto rotation, turn the phone left and use the red dot on the screen as the starting point
 

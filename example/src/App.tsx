@@ -89,8 +89,8 @@ export default function App() {
     const { width, height } = Dimensions.get('window');
     setOrientation((prev) => ({
       ...prev,
-      width: width - 100,
-      height: height - 200,
+      width: width - (width - width / 10),
+      height: height / (height / 100),
     }));
   };
 
@@ -105,13 +105,6 @@ export default function App() {
       setHasPermission(status === 'authorized');
     })();
   }, []);
-
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userHeight=${userHeight}&stand_x=${orientation.width}&stand_y=${orientation.height}&image_height=${orientation.image_height}&image_width=${orientation.image_width}`,
-    {
-      shouldReconnect: (e) => true, // will attempt to reconnect on all close events
-    }
-  );
 
   const createNormalisedDictionary = (keypoint: any, frame: any) => {
     if (_.isEmpty(keypoint) || keypoint.visibility < 0.3) {
@@ -146,6 +139,13 @@ export default function App() {
 
   console.log('here...');
 
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
+    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}&userHeight=${userHeight}&stand_x=${orientation.width}&stand_y=${orientation.height}&image_height=${orientation.image_height}&image_width=${orientation.image_width}`,
+    {
+      shouldReconnect: (e) => true, // will attempt to reconnect on all close events
+    }
+  );
+
   useEffect(() => {
     let interval: any;
     const cleanUp = () => interval && clearInterval(interval);
@@ -169,10 +169,10 @@ export default function App() {
     };
   }, [sendJsonMessage]);
 
-  console.log('orientation: ', orientation);
   console.log('assessment: ', ASSESSMENT);
   console.log('request sent timestamp: ', Date.now());
   console.log('lastJsonMessage: ', lastJsonMessage);
+  // console.log('orientation: ', orientation);
 
   return device != null && hasPermission ? (
     <>

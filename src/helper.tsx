@@ -5,6 +5,7 @@ import { Camera } from 'react-native-vision-camera';
 
 export function scanPoseLandmarks(frame: Frame) {
     'worklet';
+
     // @ts-expect-error Frame Processors are not typed.
     return __scanPoseLandmarks(frame);
   }

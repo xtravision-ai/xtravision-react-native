@@ -10,11 +10,12 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
 import com.example.xtravisionreactnative.newarchitecture.MainApplicationReactNativeHost;
+import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.xtravisionreactnative.XtraVisionPosePluginPluginPackage;
-
 
 public class MainApplication extends Application implements ReactApplication {
 

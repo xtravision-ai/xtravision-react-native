@@ -80,6 +80,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 project.ext.react = [
     enableHermes: true,  // clean and rebuild if changing
+    entryFile: "index.tsx",
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -112,6 +113,8 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+
+
 /**
  * Whether to enable the Hermes VM.
  *
@@ -133,6 +136,11 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
+
+    compileOptions {
+                   sourceCompatibility 1.8
+                   targetCompatibility 1.8
+               }
 
     defaultConfig {
         applicationId "com.example.xtravisionreactnative"
@@ -288,7 +296,7 @@ dependencies {
         implementation jscFlavor
     }
 
-  implementation project(':xtravisionreactnative')
+     implementation project(':xtravisionreactnative')
 
 }
 

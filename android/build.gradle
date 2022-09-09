@@ -6,7 +6,7 @@ buildscript {
         }
 
         dependencies {
-            classpath 'com.android.tools.build:gradle:4.2.1'
+            classpath 'com.android.tools.build:gradle:7.1.2'
         }
     }
 }
@@ -18,11 +18,11 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet('XtraVisionReactNative_compileSdkVersion', 30)
+    compileSdkVersion safeExtGet('XtraVisionReactNative_compileSdkVersion', 31)
     ndkVersion "22.0.7026061"
     defaultConfig {
         minSdkVersion safeExtGet('XtraVisionReactNative_minSdkVersion', 21)
-        targetSdkVersion safeExtGet('XtraVisionReactNative_targetSdkVersion', 30)
+        targetSdkVersion safeExtGet('XtraVisionReactNative_targetSdkVersion', 31)
         versionCode 1
         versionName "1.0"
 
@@ -58,5 +58,5 @@ dependencies {
     api project(":react-native-vision-camera")
     implementation "androidx.camera:camera-core:1.1.0-alpha06"
     implementation 'com.google.mlkit:pose-detection:18.0.0-beta2'
-
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 }

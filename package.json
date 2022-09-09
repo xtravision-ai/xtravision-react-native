@@ -53,7 +53,9 @@
     "@react-native-community/eslint-config": "^3.0.2",
     "@release-it/conventional-changelog": "^5.0.0",
     "@types/jest": "^28.1.2",
+    "@types/lodash": "^4.14.184",
     "@types/react": "~17.0.21",
+    "@types/react-dom": "^18.0.6",
     "@types/react-native": "0.68.0",
     "commitlint": "^17.0.2",
     "eslint": "^8.4.1",
@@ -62,9 +64,9 @@
     "jest": "^28.1.1",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
-    "react-native-builder-bob": "^0.18.3",
     "react": "^18.2.0",
     "react-native": "0.68.2",
+    "react-native-builder-bob": "^0.18.3",
     "react-native-reanimated": "^2.10.0",
     "react-native-vision-camera": "2.13.0",
     "release-it": "^15.0.0",
@@ -154,6 +156,6 @@
     ]
   },
   "dependencies": {
-    
+    "lodash": "^4.17.21"
   }
 }

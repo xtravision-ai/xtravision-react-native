@@ -1,29 +1,94 @@
 # xtravision-react-native
-xtravision-react-native
-## Installation
+"xtravision-react-native" SDK allows you to quickly and easily use the [xtravision.ai](https://xtravision.ai/) APIs via React Native.
 
+
+## Installation
+Use the following command to install SDK and its dependencies.
 ```sh
-npm install xtravision-react-native
+yarn add react-native-reanimated@2.10.0 react-native-vision-camera@2.13.0 @xtravision/xtravision-react-native
 ```
+
+Add the required plugin to your babel.config.js:
+```js
+module.exports = {
+    plugins: [
+        [
+            'react-native-reanimated/plugin',
+            {
+                globals: ['__scanPoseLandmarks'],
+            },
+        ],
+        // others
+    ]
+}
+```
+> Note: You have to restart metro-bundler for changes in the babel.config.js file to take effect.
+
 
 ## Usage
 
 ```js
-import { multiply } from "xtravision-react-native";
+// Import required things
+import { RequestCameraPermission, Assessment} from '@xtravision/xtravision-react-native';
+import {CameraPermissionStatus} from '@xtravision/xtravision-react-native';
 
-// ...
+export default function App() {
+  const [hasPermission, setHasPermission] = React.useState(false);
 
-const result = await multiply(3, 7);
+  React.useEffect(() => {
+    (async () => {
+      const status = await RequestCameraPermission();
+      setHasPermission(status === CameraPermissionStatus.AUTHORIZED);
+    })();
+  }, []);
+
+  
+  // Callback to handle server response
+  function onServerResponse(serverResponse: any): void {
+    if (serverResponse.errors.length) {
+      console.error('Server Error Response:', serverResponse.errors);
+      return;
+    }
+
+    console.log('Server Data:', serverResponse.data);
+  }
+
+  // required prop:
+  const authToken = '__AUTH-TOKEN__';
+  const assessmentName = '__ASSESSMENT_NAME__';
+  const cameraPosition = 'back'; // front or back
+
+  return (
+    <View style={styles.container}>
+      {hasPermission ? (
+        <>
+          <Assessment
+            cameraPosition={cameraPosition}
+            connection={{authToken, queryParams: {}}}
+            assessment={assessmentName}
+            isEducationScreen={false}
+            onServerResponse={onServerResponse}
+          />
+        </>
+      ) : (
+        <>
+          <Text>App don't have Camera Permission</Text>
+        </>
+      )}
+    </View>
+  );
+}
 ```
 
-## Contributing
 
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+### Assessment List
+1. PUSH_UPS
+2. SIT_UPS
+3. V_SIT_AND_REACH
+
+> Tested with Node:v16.10.0 and react-native: v0.68.2
 
 ## License
-
 MIT
 
 ---
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)

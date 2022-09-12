@@ -1,5 +1,5 @@
 {
-  "name": "xtravision-react-native",
+  "name": "@xtravision/xtravision-react-native",
   "version": "0.1.0",
   "description": "test",
   "main": "lib/commonjs/index",
@@ -37,7 +37,10 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/xtravision-ai/xtravision-react-native.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xtravision-ai/xtravision-react-native.git"
+  },
   "author": "Team XtraVision <info@xtravision.ai> (https://XtraVision.ai)",
   "license": "MIT",
   "bugs": {
@@ -159,5 +162,9 @@
   "dependencies": {
     "lodash": "^4.17.21",
     "react-native-use-websocket": "^0.2.6"
+  },
+  "directories": {
+    "example": "example",
+    "lib": "lib"
   }
 }

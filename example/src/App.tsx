@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-import { RequestCameraPermission, Assessment } from 'xtravision-react-native';
-import { CameraPermissionStatus } from 'xtravision-react-native';
+// @ts-expect-error: ignore vs code error, this module loaded by metro config
+import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
+// @ts-expect-error: ignore vs code error, this module loaded by metro config
+import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
 
 export default function App() {
   const [hasPermission, setHasPermission] = React.useState(false);

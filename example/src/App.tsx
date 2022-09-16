@@ -1,13 +1,28 @@
 import * as React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 
-// @ts-expect-error: ignore vs code error, this module loaded by metro config
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
-// @ts-expect-error: ignore vs code error, this module loaded by metro config
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
+import { useCallback, useEffect, useState } from 'react';
+
 
 export default function App() {
   const [hasPermission, setHasPermission] = React.useState(false);
+
+  // TODO: Patching work. Cleanup required
+  // Starting point of standing broad jump
+  // (width, height) = Coordinates (x,y)
+  const { width, height } = Dimensions.get('window');
+
+
+
+  const stand_x = width - (width - width / 10) //100
+  const stand_y = height/(height / 300) //- 100
+
+
+  console.log("=======>  {x, y}", {width, height})
+  console.log("=======>  {stand_x, stand_y}", {stand_x, stand_y})
+
 
   React.useEffect(() => {
     (async () => {
@@ -19,7 +34,7 @@ export default function App() {
   const [inPose, setInPose] = React.useState(false);
   const [repsCounter, setRepsCounter] = React.useState(0);
   // required prop:
-  function onServerResponse(serverResponse: any): void {
+  const onServerResponse = useCallback ((serverResponse: any) => {
     if (serverResponse.errors.length){
       console.error('Server Error Response:', serverResponse.errors);
       return ;
@@ -29,25 +44,50 @@ export default function App() {
 
     setRepsCounter(serverResponse.data?.reps);
     setInPose(serverResponse.data?.in_pose);
+  }, [repsCounter, inPose])
+
+  const authToken = "__AUTH-TOKEN__";
+  const assessmentName = 'SQUATS'; //STANDING_BROAD_JUMP, SQUATS
+  const cameraPosition = 'back'; // back or front
+  let queryParams:any = {}
+
+  if (assessmentName == 'STANDING_BROAD_JUMP'){
+    queryParams.userHeight = 180 // in Centimeter
+    // Coordinates of start point
+    queryParams.stand_x = stand_x * 2;
+    queryParams.stand_y = stand_y* 2 
+  
+
   }
 
-  const authToken = '__AUTH-TOKEN__';
-  const assessmentName = '__ASSESSMENT-NAME__';
-  const cameraPosition = 'back';
-
   return (
-    <View style={styles.container}>
+    <View style={styles({}).container}>
       {hasPermission ? (
         <>
           {/* <Text>App has Permission</Text> */}
           <Assessment
             cameraPosition={cameraPosition}
-            connection={{ authToken, queryParams: {} }}
+            connection={{ authToken, queryParams }}
             assessment={assessmentName}
             isEducationScreen={false}
-            onServerResponse={onServerResponse}
+            onServerResponse={ onServerResponse}
           />
-          <Text>In-Pose: {inPose} ; Reps Counter: {repsCounter}</Text>
+        {
+        assessmentName== "STANDING_BROAD_JUMP" && 
+          (
+            <>
+              <View style={styles({stand_x, stand_y}).point} />
+              <Text style={styles({stand_x, stand_y}).startPoint}>Start Point</Text>
+            </>
+
+          // <View >
+          //   <View style={styles({stand_x, stand_y}).point} />
+          //   {/* <Text style={styles.verticalText}>Start Point</Text> */}
+          // </View>
+          )
+        }
+
+          <Text style={{textAlign: 'center'}}>In-Pose: {inPose} ; Reps Counter: {repsCounter}</Text>
         </>
       ) : (
         <>
@@ -58,14 +98,36 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (orientation: any) => StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative', //overlap on the camera
+
   },
-  camera: {
-    flex: 1,
-    width: '100%',
+  verticalText : {
+    transform:  [{ rotate: '270deg' }],
+    color: 'red',
+    fontWeight: 'bold'
   },
+  point: {
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    backgroundColor: '#fc0505',
+    top: orientation?.stand_y,   // y axis
+    left: orientation?.stand_x,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  startPoint: {
+    // width: 20,
+    // height: 20,
+    // borderRadius: 20,
+    // backgroundColor: '#fc0505',
+    top: orientation?.stand_y + 20,   // y axis
+    left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable
+    position: 'absolute',
+  }
 });

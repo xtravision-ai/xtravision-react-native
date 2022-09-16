@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text } from 'react-native';
-import React, { useCallback, useEffect } from 'react';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Camera,
   useCameraDevices,
@@ -28,16 +28,28 @@ export interface AssessmentProp {
   onServerResponse(serverResponse: any): void;
 }
 
-// const WS_BASE_URL = 'ws://localhost:8000/wss';
+//const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
 const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
 
 export function Assessment(props: AssessmentProp) {
+
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.assessment}`;
 
-  let queryParams = { authToken: props.connection.authToken };
+  let queryParams: {[key:string]: any} = { authToken: props.connection.authToken };
   if (props.connection.queryParams) {
     queryParams = { ...queryParams, ...props.connection.queryParams };
   }
+
+  // add some extra params
+  if (props.assessment === 'STANDING_BROAD_JUMP'){
+    // TODO: hardcoded part. auto calculate by frame or remove it
+    const orientationData = {
+      "image_height": 720, //orientation.image_height,
+      "image_width": 1280 //orientation.image_width
+    }
+
+    queryParams = {...queryParams, ...orientationData }
+ }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   const {
@@ -67,6 +79,18 @@ export function Assessment(props: AssessmentProp) {
       // console.log('Pose is empty!',)
       return;
     }
+
+    // console.log("frame.height----------", frame.height)
+    // console.log("frame.width-----------", frame.width)
+
+    // // update image height and width
+    // setOrientation(prev => ({
+    //   ...prev,
+    //   image_height: frame.height,
+    //   image_width: frame.width,
+    // }));
+
+
     // normalized frames into landmarks
     const landmarks = getNormalizedArray(pose, frame);
     // store landmarks with current millis in temp variable
@@ -131,14 +155,16 @@ export function Assessment(props: AssessmentProp) {
   }
 
   return (
-    <Camera
-      style={styles.camera}
-      device={device}
-      isActive={true}
-      // isActive={isAppForeground}
-      frameProcessor={true?frameProcessor: undefined}
-      frameProcessorFps={3}
-    />
+    <>
+      <Camera
+        style={styles.camera}
+        device={device}
+        isActive={true}
+        // isActive={isAppForeground}
+        frameProcessor={true?frameProcessor: undefined}
+        frameProcessorFps={3}
+      />
+     </>
   );
 }
 
@@ -147,4 +173,42 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
+  container: {
+    // flex: 1,
+    // justifyContent: "center",
+   // alignItems: "center",
+    //backgroundColor: "#e5e5e5",
+    position: 'absolute', //overlap on the camera
+    left: 280,     // x axis // TODO: make is configurable
+    top: 650, // y axis
+
+  },
+  verticalText : {
+    transform:  [{ rotate: '270deg' }],
+    color: 'red',
+    fontWeight: 'bold'
+  },
+  point: {
+    width: 20,
+    height: 20,
+    backgroundColor: '#fc0505',
+    borderRadius: 20,
+    // position: 'absolute', //overlap on the camera
+    // left: 280,     // x axis // TODO: make is configurable
+    top: 20,   // y axis
+  },
 });
+
+
+const markerStyles = (orientation: any) =>
+  StyleSheet.create({
+    point: {
+      width: 20,
+      height: 20,
+      backgroundColor: '#fc0505',
+      borderRadius: 20,
+      position: 'absolute', //overlap on the camera
+      left: 280,     // x axis // TODO: make is configurable
+      top: 650,   // y axis
+    },
+  });

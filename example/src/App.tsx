@@ -51,8 +51,6 @@ export default function App() {
     // Coordinates of start point
     queryParams.stand_x = stand_x * 2;
     queryParams.stand_y = stand_y* 2 
-  
-
   }
 
   return (

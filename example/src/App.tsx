@@ -19,11 +19,6 @@ export default function App() {
   const stand_x = width - (width - width / 10) //100
   const stand_y = height/(height / 300) //- 100
 
-
-  console.log("=======>  {x, y}", {width, height})
-  console.log("=======>  {stand_x, stand_y}", {stand_x, stand_y})
-
-
   React.useEffect(() => {
     (async () => {
       const status = await RequestCameraPermission();
@@ -34,7 +29,7 @@ export default function App() {
   const [inPose, setInPose] = React.useState(false);
   const [repsCounter, setRepsCounter] = React.useState(0);
   // required prop:
-  const onServerResponse = useCallback ((serverResponse: any) => {
+  const onServerResponse = (serverResponse: any) => {
     if (serverResponse.errors.length){
       console.error('Server Error Response:', serverResponse.errors);
       return ;
@@ -44,7 +39,7 @@ export default function App() {
 
     setRepsCounter(serverResponse.data?.reps);
     setInPose(serverResponse.data?.in_pose);
-  }, [repsCounter, inPose])
+  } ; 
 
   const authToken = "__AUTH-TOKEN__";
   const assessmentName = 'SQUATS'; //STANDING_BROAD_JUMP, SQUATS
@@ -70,7 +65,7 @@ export default function App() {
             connection={{ authToken, queryParams }}
             assessment={assessmentName}
             isEducationScreen={false}
-            onServerResponse={ onServerResponse}
+            onServerResponse={(res)=>onServerResponse(res)}
           />
         {
         assessmentName== "STANDING_BROAD_JUMP" && 

@@ -33,9 +33,11 @@
     "//clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd .."
   },
   "keywords": [
+    "xtravision",
+    "pose-detection",
+    "android",
     "react-native",
-    "ios",
-    "android"
+    "xtravision.ai"
   ],
   "repository": {
     "type": "git",

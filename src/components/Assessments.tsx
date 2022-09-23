@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, Text } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
 import {
   Camera,
   useCameraDevices,

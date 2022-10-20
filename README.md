@@ -1,63 +1,94 @@
 # xtravision-react-native
+"xtravision-react-native" SDK allows you to quickly and easily use the [xtravision.ai](https://xtravision.ai/) APIs via React Native.
 
-React Native SDK for XtraVision
 
-# What is XtraVision-react?
-
-It is an sdk for fitness related data assessments like calories, rep-count, yoga pose-matching etc
-
-# Example
-
-[Example](https://github.com/xtravision-ai/xtravision-react-native/tree/main)
-
-# How to run `example` app. 
-Clone the git repo:
+## Installation
+Use the following command to install SDK and its dependencies.
 ```sh
-# Clone repo
-git clone https://github.com/xtravision-ai/xtravision-react-native.git
-# Jump in to repo
-cd xtravision-react-native
-# Install all dependencies and build the package 
-yarn
-# Now jump into example folder to start testing
-cd example
+yarn add react-native-reanimated@2.10.0 react-native-vision-camera@2.13.0 @xtravision/xtravision-react-native
 ```
 
-Do the below changes in App.tsx manually (example/src/App.tsx):  
-```java
-// Your Auth Token
-const AUTH_TOKEN = '_AUTH_TOKEN_';
-// assessment name you want to test
-const ASSESSMENT = '_ASSESSMENT_NAME_'; // Plz refer Assessment list 
+Add the required plugin to your babel.config.js:
+```js
+module.exports = {
+    plugins: [
+        [
+            'react-native-reanimated/plugin',
+            {
+                globals: ['__scanPoseLandmarks'],
+            },
+        ],
+        // others
+    ]
+}
+```
+> Note: You have to restart metro-bundler for changes in the babel.config.js file to take effect.
+
+
+## Usage
+
+```js
+// Import required things
+import { RequestCameraPermission, Assessment} from '@xtravision/xtravision-react-native';
+import {CameraPermissionStatus} from '@xtravision/xtravision-react-native';
+
+export default function App() {
+  const [hasPermission, setHasPermission] = React.useState(false);
+
+  React.useEffect(() => {
+    (async () => {
+      const status = await RequestCameraPermission();
+      setHasPermission(status === CameraPermissionStatus.AUTHORIZED);
+    })();
+  }, []);
+
+  
+  // Callback to handle server response
+  function onServerResponse(serverResponse: any): void {
+    if (serverResponse.errors.length) {
+      console.error('Server Error Response:', serverResponse.errors);
+      return;
+    }
+
+    console.log('Server Data:', serverResponse.data);
+  }
+
+  // required prop:
+  const authToken = '__AUTH-TOKEN__';
+  const assessmentName = '__ASSESSMENT_NAME__';
+  const cameraPosition = 'back'; // front or back
+
+  return (
+    <View style={styles.container}>
+      {hasPermission ? (
+        <>
+          <Assessment
+            cameraPosition={cameraPosition}
+            connection={{authToken, queryParams: {}}}
+            assessment={assessmentName}
+            isEducationScreen={false}
+            onServerResponse={onServerResponse}
+          />
+        </>
+      ) : (
+        <>
+          <Text>App don't have Camera Permission</Text>
+        </>
+      )}
+    </View>
+  );
+}
 ```
 
-Once above changes are completed then you can run below command in `example` directory.
-```sh
-# Install all dependencies and build the package 
-yarn
-# It will start your metro server (to see live logs), create android build and install in your connected Android Phone. Plz make sure your phone is already connected with your laptop with usb debugging mode. (Check with `adb devices` command)  
-yarn run android
-```
-
-After successful installation, you can see Xtra Server response in metro server terminal. 
 
 ### Assessment List
 1. PUSH_UPS
 2. SIT_UPS
 3. V_SIT_AND_REACH
 
--------
+> Tested with Node:v16.10.0 and react-native: v0.68.2
 
-## Note:
-- Change Camera as per your need:  
-```java
-  //Camera front or back
-  const device = devices.back; // devices.back
-```
-- Sometimes build will not work, then you need to clean android project using below command in example directory
-```sh
-cd android && ./gradlew clean
-# back to to root dir and create android build
-cd .. && yarn run android
-```
+## License
+MIT
 
+---

@@ -1,158 +1,126 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, { useCallback } from 'react';
-import { runOnJS } from 'react-native-reanimated';
-import useWebSocket from 'react-native-use-websocket';
-import { WS_URL } from './utils/constants';
-import _ from 'lodash';
+import * as React from 'react';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 
-import { StyleSheet, Text } from 'react-native';
-import {
-  useCameraDevices,
-  useFrameProcessor,
-} from 'react-native-vision-camera';
+import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
+import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
+import { useCallback, useEffect, useState } from 'react';
 
-import { Camera } from 'react-native-vision-camera';
-import { scanPose } from 'react-native-xtravision';
-// import { scanPose,  } from 'react-native-xtravision';
-
-const AUTH_TOKEN = '_AUTH_TOKEN_';
-const ASSESSMENT = '_ASSESSMENT_NAME_';
 
 export default function App() {
   const [hasPermission, setHasPermission] = React.useState(false);
-  // const [faces, setFaces] = React.useState<any /* Face[] */>();
 
-  const devices = useCameraDevices();
-  const device = devices.front; // Camera front or back
-  const isEduScreen = false;
+  // TODO: Patching work. Cleanup required
+  // Starting point of standing broad jump
+  // (width, height) = Coordinates (x,y)
+  const { width, height } = Dimensions.get('window');
 
-  const poseParams = {
-    authToken: AUTH_TOKEN,
-    ASSESSMENT: ASSESSMENT,
-  };
 
-  const poseTempRef = React.useRef<any>({});
 
-  const processPoseFrame = (data: any, frame: any) => {
-    return [
-      createNormalisedDictionary(data.nose, frame),
-      createNormalisedDictionary(data.leftEyeInner, frame),
-      createNormalisedDictionary(data.leftEye, frame),
-      createNormalisedDictionary(data.leftEyeOuter, frame),
-      createNormalisedDictionary(data.rightEyeInner, frame),
-      createNormalisedDictionary(data.rightEye, frame),
-      createNormalisedDictionary(data.rightEyeOuter, frame),
-      createNormalisedDictionary(data.leftEar, frame),
-      createNormalisedDictionary(data.rightEar, frame),
-      createNormalisedDictionary(data.mouthLeft, frame),
-      createNormalisedDictionary(data.mouthRight, frame),
-      createNormalisedDictionary(data.leftShoulder, frame),
-      createNormalisedDictionary(data.rightShoulder, frame),
-      createNormalisedDictionary(data.leftElbow, frame),
-      createNormalisedDictionary(data.rightElbow, frame),
-      createNormalisedDictionary(data.leftWrist, frame),
-      createNormalisedDictionary(data.rightWrist, frame),
-      // createNormalisedDictionary(data.leftPinky, frame),
-      createNormalisedDictionary(data.leftPinkyFinger, frame),
-      // createNormalisedDictionary(data.rightPinky, frame),
-      createNormalisedDictionary(data.rightPinkyFinger, frame),
-      // createNormalisedDictionary(data.leftIndex, frame),
-      createNormalisedDictionary(data.leftIndexFinger, frame),
-      // createNormalisedDictionary(data.rightIndex, frame),
-      createNormalisedDictionary(data.rightIndexFinger, frame),
-      createNormalisedDictionary(data.leftThumb, frame),
-      createNormalisedDictionary(data.rightThumb, frame),
-      createNormalisedDictionary(data.leftHip, frame),
-      createNormalisedDictionary(data.rightHip, frame),
-      createNormalisedDictionary(data.leftKnee, frame),
-      createNormalisedDictionary(data.rightKnee, frame),
-      createNormalisedDictionary(data.leftAnkle, frame),
-      createNormalisedDictionary(data.rightAnkle, frame),
-      createNormalisedDictionary(data.leftHeel, frame),
-      createNormalisedDictionary(data.rightHeel, frame),
-      // createNormalisedDictionary(data.leftFootIndex, frame),
-      createNormalisedDictionary(data.leftToe, frame),
-      // createNormalisedDictionary(data.rightFootIndex, frame),
-      createNormalisedDictionary(data.rightToe, frame),
-    ];
-  };
+  const stand_x = width - (width - width / 10) //100
+  const stand_y = height/(height / 300) //- 100
 
   React.useEffect(() => {
     (async () => {
-      const status = await Camera.requestCameraPermission();
-      setHasPermission(status === 'authorized');
+      const status = await RequestCameraPermission();
+      setHasPermission(status === CameraPermissionStatus.AUTHORIZED);
     })();
   }, []);
 
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket(
-    `${WS_URL}/assessment/fitness/${ASSESSMENT}?authToken=${AUTH_TOKEN}`,
-    {
-      shouldReconnect: (e) => true, // will attempt to reconnect on all close events
+  const [inPose, setInPose] = React.useState(false);
+  const [repsCounter, setRepsCounter] = React.useState(0);
+  // required prop:
+  const onServerResponse = (serverResponse: any) => {
+    if (serverResponse.errors.length){
+      console.error('Server Error Response:', serverResponse.errors);
+      return ;
     }
-  );
+   
+    console.log('Server Data:', serverResponse.data);
 
-  const createNormalisedDictionary = (keypoint: any, frame: any) => {
-    if (_.isEmpty(keypoint) || keypoint.visibility < 0.3) {
-      return { x: 0, y: 0, z: 0, visibility: 0.0 };
-    }
-    return {
-      x: keypoint.x / frame.width,
-      y: keypoint.y / frame.height,
-      z: keypoint.z / frame.width,
-      visibility: keypoint.visibility,
-    };
-  };
+    setRepsCounter(serverResponse.data?.reps);
+    setInPose(serverResponse.data?.in_pose);
+  } ; 
 
-  const poseFrameHandler = useCallback((pose: any, frame: any) => {
-    const landmarks = processPoseFrame(pose, frame);
+  const authToken = "__AUTH-TOKEN__";
+  const assessmentName = 'SQUATS'; //STANDING_BROAD_JUMP, SQUATS
+  const cameraPosition = 'back'; // back or front
+  let queryParams:any = {}
 
-    const curTime = Date.now();
-    poseTempRef.current[curTime] = { landmarks };
-  }, []);
+  if (assessmentName == 'STANDING_BROAD_JUMP'){
+    queryParams.userHeight = 180 // in Centimeter
+    // Coordinates of start point
+    queryParams.stand_x = stand_x * 2;
+    queryParams.stand_y = stand_y* 2 
+  }
 
-  const frameProcessor = useFrameProcessor((frame) => {
-    'worklet';
-    const pose: any = scanPose(frame, poseParams);
+  return (
+    <View style={styles({}).container}>
+      {hasPermission ? (
+        <>
+          {/* <Text>App has Permission</Text> */}
+          <Assessment
+            cameraPosition={cameraPosition}
+            connection={{ authToken, queryParams }}
+            assessment={assessmentName}
+            isEducationScreen={false}
+            onServerResponse={(res)=>onServerResponse(res)}
+          />
+        {
+        assessmentName== "STANDING_BROAD_JUMP" && 
+          (
+            <>
+              <View style={styles({stand_x, stand_y}).point} />
+              <Text style={styles({stand_x, stand_y}).startPoint}>Start Point</Text>
+            </>
 
-    runOnJS(poseFrameHandler)(pose, frame);
-  }, []);
-
-  console.log('here...');
-
-  React.useEffect(() => {
-    let interval: any;
-    const cleanUp = () => interval && clearInterval(interval);
-    interval = setInterval(() => {
-      if (poseTempRef.current !== undefined) {
-        const keyPoints = Object.assign(poseTempRef.current, {});
-        poseTempRef.current = {};
-        if (!_.isEmpty(keyPoints)) {
-          // WS SEND Kps -> 1s
-          sendJsonMessage({
-            timestamp: Date.now(),
-            user_keypoints: keyPoints,
-            isprejoin: isEduScreen,
-          });
+          // <View >
+          //   <View style={styles({stand_x, stand_y}).point} />
+          //   {/* <Text style={styles.verticalText}>Start Point</Text> */}
+          // </View>
+          )
         }
-      }
-    }, 1000);
 
-    return () => {
-      cleanUp();
-    };
-  }, [sendJsonMessage]);
-
-  console.log('lastJsonMessage: ', lastJsonMessage);
-
-  return device != null && hasPermission ? (
-    <Camera
-      style={StyleSheet.absoluteFill}
-      device={device}
-      isActive={true}
-      frameProcessor={frameProcessor}
-      frameProcessorFps={5}
-    />
-  ) : (
-    <Text>No devices</Text>
+          <Text style={{textAlign: 'center'}}>In-Pose: {inPose} ; Reps Counter: {repsCounter}</Text>
+        </>
+      ) : (
+        <>
+          <Text>App don't have Permission</Text>
+        </>
+      )}
+    </View>
   );
 }
+
+const styles = (orientation: any) => StyleSheet.create({
+  container: {
+    flex: 1,
+    // alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative', //overlap on the camera
+
+  },
+  verticalText : {
+    transform:  [{ rotate: '270deg' }],
+    color: 'red',
+    fontWeight: 'bold'
+  },
+  point: {
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    backgroundColor: '#fc0505',
+    top: orientation?.stand_y,   // y axis
+    left: orientation?.stand_x,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  startPoint: {
+    // width: 20,
+    // height: 20,
+    // borderRadius: 20,
+    // backgroundColor: '#fc0505',
+    top: orientation?.stand_y + 20,   // y axis
+    left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable
+    position: 'absolute',
+  }
+});

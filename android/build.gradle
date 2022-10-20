@@ -6,7 +6,7 @@ buildscript {
         }
 
         dependencies {
-            classpath 'com.android.tools.build:gradle:3.5.3'
+            classpath 'com.android.tools.build:gradle:7.1.2'
         }
     }
 }
@@ -18,14 +18,13 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet('ReactNativeXtraVision_compileSdkVersion', 30)
-    ndkVersion = "22.0.7026061"
+    compileSdkVersion safeExtGet('XtraVisionReactNative_compileSdkVersion', 31)
+    ndkVersion "22.0.7026061"
     defaultConfig {
-        minSdkVersion safeExtGet('ReactNativeXtraVision_minSdkVersion', 21)
-        targetSdkVersion safeExtGet('ReactNativeXtraVision_targetSdkVersion', 31)
+        minSdkVersion safeExtGet('XtraVisionReactNative_minSdkVersion', 21)
+        targetSdkVersion safeExtGet('XtraVisionReactNative_targetSdkVersion', 31)
         versionCode 1
         versionName "1.0"
-        
 
     }
 
@@ -47,11 +46,10 @@ repositories {
     mavenLocal()
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-//        url("$rootDir/../node_modules/react-native/android")
-      url("$rootDir/../node_modules/react-native/android")
+        url("$rootDir/../node_modules/react-native/android")
     }
     google()
-    // jcenter()
+    jcenter()
 }
 
 dependencies {
@@ -60,6 +58,5 @@ dependencies {
     api project(":react-native-vision-camera")
     implementation "androidx.camera:camera-core:1.1.0-alpha06"
     implementation 'com.google.mlkit:pose-detection:18.0.0-beta2'
-    
-    implementation 'com.squareup.okhttp3:okhttp:3.14.6'
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 }

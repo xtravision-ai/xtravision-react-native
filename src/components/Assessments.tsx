@@ -49,6 +49,8 @@ export function Assessment(props: AssessmentProp) {
     }
 
     queryParams = {...queryParams, ...orientationData }
+
+    console.log("queryParams: ", queryParams);
  }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme

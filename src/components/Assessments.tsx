@@ -16,16 +16,6 @@ import _ from 'lodash';
 import useWebSocket from 'react-native-use-websocket';
 
 export interface AssessmentProp {
-  // connection: {
-  //   auth_token: string;
-  //   queryParams?: {
-  //     [key: string]: string | number;
-  //   };
-  // };
-  // cameraPosition: 'front' | 'back';
-  // assessment_name: string;
-  // isEducationScreen?: boolean;
-  // onServerResponse(serverResponse: any): void;
   connectionData: {
     assessment_name: string;
     auth_token: string;
@@ -60,11 +50,6 @@ export function Assessment(props: AssessmentProp) {
   }
 
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
-
-  // let queryParams: { [key: string]: any } = { authToken: props.connectionData.auth_token };
-  // if (props.connection.queryParams) {
-  //   queryParams = { ...queryParams, ...props.connection.queryParams };
-  // }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
 
@@ -214,17 +199,3 @@ const styles = StyleSheet.create({
     top: 20,   // y axis
   },
 });
-
-
-// const markerStyles = (orientation: any) =>
-//   StyleSheet.create({
-//     point: {
-//       width: 20,
-//       height: 20,
-//       backgroundColor: '#fc0505',
-//       borderRadius: 20,
-//       position: 'absolute', //overlap on the camera
-//       left: 280,     // x axis // TODO: make is configurable
-//       top: 650,   // y axis
-//     },
-//   });

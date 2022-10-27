@@ -56,18 +56,36 @@ export default function App() {
   // required prop:
   const authToken = '__AUTH-TOKEN__';
   const assessmentName = '__ASSESSMENT_NAME__';
-  const cameraPosition = 'back'; // front or back
+  const cameraPosition = 'back' as "front" | "back"; //  which camara you want to use
+  let assessment_config = {} as any;
+  let user_config = {} as any;
+
+  // add the required parameters for the test you want
+
+  const connectionData = {
+    assessment_name,
+    auth_token,
+    assessment_config,
+    user_config,
+  };
+
+  const requestData = {
+    isPreJoin: false
+  }
+
+  const libData = {
+    onServerResponse,
+    cameraPosition,
+  }
 
   return (
     <View style={styles.container}>
       {hasPermission ? (
         <>
           <Assessment
-            cameraPosition={cameraPosition}
-            connection={{authToken, queryParams: {}}}
-            assessment={assessmentName}
-            isEducationScreen={false}
-            onServerResponse={onServerResponse}
+            connectionData={connectionData}
+            requestData={requestData}
+            libData={libData}
           />
         </>
       ) : (

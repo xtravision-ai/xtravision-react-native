@@ -46,7 +46,6 @@ export default function App() {
   let assessment_config = {} as any;
   let user_config = {} as any;
 
-  // change back to STANDING_BROAD_JUMP testing
   if (assessment_name == 'STANDING_BROAD_JUMP') {
     user_config.userHeight = 180; // in Centimeter
     // Coordinates of start point

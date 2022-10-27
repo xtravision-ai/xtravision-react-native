@@ -163,7 +163,7 @@ export function Assessment(props: AssessmentProp) {
         isActive={true}
         // isActive={isAppForeground}
         frameProcessor={true ? frameProcessor : undefined}
-        frameProcessorFps={3}
+        frameProcessorFps={60}
       />
     </>
   );

@@ -200,15 +200,15 @@ const styles = StyleSheet.create({
 });
 
 
-const markerStyles = (orientation: any) =>
-  StyleSheet.create({
-    point: {
-      width: 20,
-      height: 20,
-      backgroundColor: '#fc0505',
-      borderRadius: 20,
-      position: 'absolute', //overlap on the camera
-      left: 280,     // x axis // TODO: make is configurable
-      top: 650,   // y axis
-    },
-  });
+// const markerStyles = (orientation: any) =>
+//   StyleSheet.create({
+//     point: {
+//       width: 20,
+//       height: 20,
+//       backgroundColor: '#fc0505',
+//       borderRadius: 20,
+//       position: 'absolute', //overlap on the camera
+//       left: 280,     // x axis // TODO: make is configurable
+//       top: 650,   // y axis
+//     },
+//   });

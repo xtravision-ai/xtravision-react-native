@@ -16,43 +16,42 @@ import _ from 'lodash';
 import useWebSocket from 'react-native-use-websocket';
 
 export interface AssessmentProp {
-  connectionData: {
-    assessment_name: string;
-    auth_token: string;
-    assessment_config?: object;
-    user_config?: object;
+  connection: {
+    authToken: string;
+    queryParams?: {
+      [key: string]: string | number;
+    };
   };
-  requestData: {
-    isPreJoin?: boolean;
-  };
-  libData: {
-    onServerResponse(serverResponse: any): void;
-    cameraPosition: 'front' | 'back';
-  }
+  cameraPosition: 'front' | 'back';
+  assessment: string;
+  isEducationScreen?: boolean;
+  onServerResponse(serverResponse: any): void;
 }
 
-// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
-
+//const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
 
 export function Assessment(props: AssessmentProp) {
 
-  let queryParams: { [key: string]: any } = {};
+  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.assessment}`;
 
-  queryParams['auth_token'] = props.connectionData.auth_token;
-
-  if (props.connectionData.user_config) {
-    queryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
+  let queryParams: {[key:string]: any} = { authToken: props.connection.authToken };
+  if (props.connection.queryParams) {
+    queryParams = { ...queryParams, ...props.connection.queryParams };
   }
 
-  if (props.connectionData.assessment_config) {
-    queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
-  }
+  // add some extra params
+  if (props.assessment === 'STANDING_BROAD_JUMP'){
+    // TODO: hardcoded part. auto calculate by frame or remove it
+    const orientationData = {
+      "image_height": 720, //orientation.image_height,
+      "image_width": 1280 //orientation.image_width
+    }
 
-  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+    queryParams = {...queryParams, ...orientationData }
+ }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
-
   const {
     sendJsonMessage,
     lastJsonMessage,
@@ -71,7 +70,7 @@ export function Assessment(props: AssessmentProp) {
   const landmarksTempRef = React.useRef<any>({});
 
   const devices = useCameraDevices();
-  const device = devices[props.libData.cameraPosition];
+  const device = devices[props.cameraPosition];
 
 
   // Step-2: after extracting landmarks store unto temp variable
@@ -133,7 +132,7 @@ export function Assessment(props: AssessmentProp) {
       sendJsonMessage({
         timestamp,
         user_keypoints: keyPoints,
-        isprejoin: !!props.requestData.isPreJoin,
+        isprejoin: !!props.isEducationScreen,
       });
     }, 1000);
 
@@ -144,7 +143,7 @@ export function Assessment(props: AssessmentProp) {
   }, []);
 
   // step-4
-  !_.isEmpty(lastJsonMessage) && props.libData.onServerResponse(lastJsonMessage);
+  !_.isEmpty(lastJsonMessage) && props.onServerResponse(lastJsonMessage);
 
   // if no camera found (front or back)
   if (device == null) {
@@ -162,10 +161,10 @@ export function Assessment(props: AssessmentProp) {
         device={device}
         isActive={true}
         // isActive={isAppForeground}
-        frameProcessor={true ? frameProcessor : undefined}
+        frameProcessor={true?frameProcessor: undefined}
         frameProcessorFps={60}
       />
-    </>
+     </>
   );
 }
 
@@ -177,15 +176,15 @@ const styles = StyleSheet.create({
   container: {
     // flex: 1,
     // justifyContent: "center",
-    // alignItems: "center",
+   // alignItems: "center",
     //backgroundColor: "#e5e5e5",
     position: 'absolute', //overlap on the camera
     left: 280,     // x axis // TODO: make is configurable
     top: 650, // y axis
 
   },
-  verticalText: {
-    transform: [{ rotate: '270deg' }],
+  verticalText : {
+    transform:  [{ rotate: '270deg' }],
     color: 'red',
     fontWeight: 'bold'
   },
@@ -199,3 +198,17 @@ const styles = StyleSheet.create({
     top: 20,   // y axis
   },
 });
+
+
+const markerStyles = (orientation: any) =>
+  StyleSheet.create({
+    point: {
+      width: 20,
+      height: 20,
+      backgroundColor: '#fc0505',
+      borderRadius: 20,
+      position: 'absolute', //overlap on the camera
+      left: 280,     // x axis // TODO: make is configurable
+      top: 650,   // y axis
+    },
+  });

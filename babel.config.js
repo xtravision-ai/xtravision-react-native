@@ -1,16 +1,10 @@
 module.exports = {
-  presets: [['module:metro-react-native-babel-preset', { useTransformReactJSXExperimental: true }]],
+  presets: ['module:metro-react-native-babel-preset'],
   plugins: [
     [
       'react-native-reanimated/plugin',
       {
         globals: ['__scanPoseLandmarks'],
-      },
-    ],
-    [
-      '@babel/plugin-transform-react-jsx',
-      {
-        runtime: 'automatic',
       },
     ],
   ],

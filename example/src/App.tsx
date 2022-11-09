@@ -47,7 +47,7 @@ export default function App() {
 
     /* @ts-ignore:next-line */
     if ("SIDE_FLAMINGO" == assessmentName) {
-      setDisplayText( `In-Pose: ${serverResponse.data.in_pose}; BL: ${serverResponse.data.balance_loss} ; RT: ${serverResponse.data.remaining_time};`)
+      setDisplayText( `In-Pose: ${serverResponse.data.in_pose}; Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
     }else {
       setDisplayText( `In-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
 

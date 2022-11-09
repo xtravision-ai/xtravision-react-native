@@ -3,17 +3,25 @@ import { StyleSheet, View, Text, Dimensions } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
-import { useCallback, useEffect, useState } from 'react';
+
+// Disable all warning and error on screen
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();
 
 
 export default function App() {
+
+  const authToken = "__AUTH_TOKEN__";
+  const assessmentName = 'PUSH_UPS'; //, SIDE_FLAMINGO, PUSH_UPS
+  const cameraPosition = 'front'; // back or front
+  let queryParams:any = {}
+
   const [hasPermission, setHasPermission] = React.useState(false);
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump
   // (width, height) = Coordinates (x,y)
   const { width, height } = Dimensions.get('window');
-
 
 
   const stand_x = width - (width - width / 10) //100
@@ -26,10 +34,10 @@ export default function App() {
     })();
   }, []);
 
-  const [inPose, setInPose] = React.useState(false);
-  const [repsCounter, setRepsCounter] = React.useState(0);
+  const [displayText, setDisplayText] = React.useState('Waiting for server....');
+
   // required prop:
-  const onServerResponse = (serverResponse: any) => {
+  const onServerResponse = function (serverResponse: any) {
     if (serverResponse.errors.length){
       console.error('Server Error Response:', serverResponse.errors);
       return ;
@@ -37,15 +45,18 @@ export default function App() {
    
     console.log('Server Data:', serverResponse.data);
 
-    setRepsCounter(serverResponse.data?.reps);
-    setInPose(serverResponse.data?.in_pose);
-  } ; 
+    /* @ts-ignore:next-line */
+    if ("SIDE_FLAMINGO" == assessmentName) {
+      setDisplayText( `In-Pose: ${serverResponse.data.in_pose}; BL: ${serverResponse.data.balance_loss} ; RT: ${serverResponse.data.remaining_time};`)
+    }else {
+      setDisplayText( `In-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
 
-  const authToken = "__AUTH-TOKEN__";
-  const assessmentName = 'SQUATS'; //STANDING_BROAD_JUMP, SQUATS
-  const cameraPosition = 'back'; // back or front
-  let queryParams:any = {}
+    }
 
+  };
+
+
+  // @ts-ignore:next-line
   if (assessmentName == 'STANDING_BROAD_JUMP'){
     queryParams.userHeight = 180 // in Centimeter
     // Coordinates of start point
@@ -66,6 +77,7 @@ export default function App() {
             onServerResponse={(res)=>onServerResponse(res)}
           />
         {
+           // @ts-ignore:next-line
         assessmentName== "STANDING_BROAD_JUMP" && 
           (
             <>
@@ -80,7 +92,10 @@ export default function App() {
           )
         }
 
-          <Text style={{textAlign: 'center'}}>In-Pose: {inPose} ; Reps Counter: {repsCounter}</Text>
+          {/* <Text style={{textAlign: 'center'}}>In-Pose: {inPose} ; Reps Counter: {repsCounter}</Text> */}
+
+          <Text style={{textAlign: 'center', fontWeight: "bold", color:"blue"}}>{displayText}</Text>
+
         </>
       ) : (
         <>

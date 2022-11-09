@@ -24,7 +24,7 @@ import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseDetection;
 import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.PoseLandmark;
-import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
+import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
 
 import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
 
@@ -32,9 +32,9 @@ import java.util.List;
 
 public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
 
-  PoseDetectorOptions options =
-    new PoseDetectorOptions.Builder()
-      .setDetectorMode(PoseDetectorOptions.STREAM_MODE)
+  AccuratePoseDetectorOptions options =
+    new AccuratePoseDetectorOptions.Builder()
+      .setDetectorMode(AccuratePoseDetectorOptions.STREAM_MODE)
       .build();
   PoseDetector poseDetector = PoseDetection.getClient(options);
 

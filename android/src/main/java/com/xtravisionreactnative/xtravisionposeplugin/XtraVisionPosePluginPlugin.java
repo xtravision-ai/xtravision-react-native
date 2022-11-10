@@ -1,20 +1,13 @@
 package com.xtravisionreactnative.xtravisionposeplugin;
 
 import android.annotation.SuppressLint;
-import android.graphics.Point;
 import android.media.Image;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.camera.core.ImageProxy;
 
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.facebook.react.bridge.WritableNativeArray;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
@@ -32,6 +25,8 @@ import java.util.List;
 
 public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
 
+  static final String TAG = "XtraVisionPosePluginPlugin";
+
   PoseDetectorOptions options =
     new PoseDetectorOptions.Builder()
       .setDetectorMode(PoseDetectorOptions.STREAM_MODE)
@@ -44,22 +39,16 @@ public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
     @SuppressLint("UnsafeOptInUsageError")
     Image mediaImage = frame.getImage();
     WritableMap map =  new WritableNativeMap();
-    Log.d("pose params", "pose params >> : " + params);
-    System.out.println(params);
+//    Log.d("pose params", "pose params >> : " + params);
+//    System.out.println(params);
 
     if (mediaImage != null) {
       InputImage image = InputImage.fromMediaImage(mediaImage, frame.getImageInfo().getRotationDegrees());
       Task<Pose> task = poseDetector.process(image);
       try {
-// /////----//////
         Pose pose = Tasks.await(task);
         List<PoseLandmark> landmarks = pose.getAllPoseLandmarks();
-//        List
-//        map.putMap("landmarks", landmarks);
         for(PoseLandmark landmark: landmarks) {
-//          Point p = landmark.getPosition()
-//            p.
-//            landmarks.add(PoseLandmark(landmark.getX(), ldmrk.getY(),ldmrk.getZ(),ldmrk.visibility))
           WritableMap result = new WritableNativeMap();
           String type = getTypeLabel(landmark.getLandmarkType());
           PointF3D point = landmark.getPosition3D();
@@ -71,6 +60,7 @@ public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
           map.putMap(type, result);
         }
       } catch (Exception e) {
+        Log.e(XtraVisionPosePluginPlugin.TAG, "Something is going wrong: " + e.getMessage());
         e.printStackTrace();
       }
     }

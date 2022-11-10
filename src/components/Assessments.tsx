@@ -1,5 +1,5 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import {
   Camera,
@@ -72,6 +72,8 @@ export function Assessment(props: AssessmentProp) {
   const devices = useCameraDevices();
   const device = devices[props.cameraPosition];
 
+  const dimensions = useWindowDimensions();
+
 
   // Step-2: after extracting landmarks store unto temp variable
   const poseFrameHandler = useCallback((pose: any, frame: any) => {
@@ -80,21 +82,13 @@ export function Assessment(props: AssessmentProp) {
       return;
     }
 
-    // console.log("frame.height----------", frame.height)
-    // console.log("frame.width-----------", frame.width)
-
-    // // update image height and width
-    // setOrientation(prev => ({
-    //   ...prev,
-    //   image_height: frame.height,
-    //   image_width: frame.width,
-    // }));
-
-
     // normalized frames into landmarks
-    const landmarks = getNormalizedArray(pose, frame);
+
+
     // store landmarks with current millis in temp variable
     const now = Date.now();
+    const landmarks = getNormalizedArray(pose, frame, dimensions);
+    
     landmarksTempRef.current[now] = { landmarks };
   }, []);
 
@@ -162,7 +156,9 @@ export function Assessment(props: AssessmentProp) {
         isActive={true}
         // isActive={isAppForeground}
         frameProcessor={true?frameProcessor: undefined}
-        frameProcessorFps={60}
+        fps = {30}
+        //frameProcessorFps={15}
+
       />
      </>
   );

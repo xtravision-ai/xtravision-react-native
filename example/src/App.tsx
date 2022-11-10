@@ -13,7 +13,7 @@ export default function App() {
 
   const authToken = "__AUTH_TOKEN_"; 
   const assessmentName = 'PUSH_UPS'; //, SIDE_FLAMINGO, PUSH_UPS
-  const cameraPosition = 'back'; // back or front
+  const cameraPosition = 'front'; // back or front
   let queryParams:any = {}
 
   const [hasPermission, setHasPermission] = React.useState(false);

@@ -11,9 +11,9 @@ LogBox.ignoreAllLogs();
 
 export default function App() {
 
-  const authToken = "__AUTH_TOKEN__";
+  const authToken = "__AUTH_TOKEN_"; 
   const assessmentName = 'PUSH_UPS'; //, SIDE_FLAMINGO, PUSH_UPS
-  const cameraPosition = 'front'; // back or front
+  const cameraPosition = 'back'; // back or front
   let queryParams:any = {}
 
   const [hasPermission, setHasPermission] = React.useState(false);
@@ -22,7 +22,6 @@ export default function App() {
   // Starting point of standing broad jump
   // (width, height) = Coordinates (x,y)
   const { width, height } = Dimensions.get('window');
-
 
   const stand_x = width - (width - width / 10) //100
   const stand_y = height/(height / 300) //- 100
@@ -43,16 +42,15 @@ export default function App() {
       return ;
     }
    
+    //console.log(Date() + ' Server Data:', serverResponse.data);
     console.log('Server Data:', serverResponse.data);
 
     /* @ts-ignore:next-line */
     if ("SIDE_FLAMINGO" == assessmentName) {
-      setDisplayText( `In-Pose: ${serverResponse.data.in_pose}; Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
+      setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
     }else {
-      setDisplayText( `In-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
-
+      setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
     }
-
   };
 
 
@@ -85,17 +83,9 @@ export default function App() {
               <Text style={styles({stand_x, stand_y}).startPoint}>Start Point</Text>
             </>
 
-          // <View >
-          //   <View style={styles({stand_x, stand_y}).point} />
-          //   {/* <Text style={styles.verticalText}>Start Point</Text> */}
-          // </View>
           )
         }
-
-          {/* <Text style={{textAlign: 'center'}}>In-Pose: {inPose} ; Reps Counter: {repsCounter}</Text> */}
-
-          <Text style={{textAlign: 'center', fontWeight: "bold", color:"blue"}}>{displayText}</Text>
-
+          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color:"black", fontSize:20 }}>{displayText}</Text>
         </>
       ) : (
         <>

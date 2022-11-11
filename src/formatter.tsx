@@ -52,7 +52,7 @@ export function getNormalizedArray(poseKeyPoints: any, frame: Frame, dimensions:
 }
 
 /* @ts-ignore:next-line  */
-function createNormalizedArray(keyPoint: any, frame: any, factors: any = null){
+function createNormalizedArray(keyPoint: any, frame: Frame, factors: any = null){
 
     if (_.isEmpty(keyPoint) || keyPoint.visibility < 0.3) {
       return { x: 0, y: 0, z: 0, visibility: 0.0 };

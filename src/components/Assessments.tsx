@@ -82,10 +82,7 @@ export function Assessment(props: AssessmentProp) {
       return;
     }
 
-    // normalized frames into landmarks
-
-
-    // store landmarks with current millis in temp variable
+    // normalized frames into landmarks and store landmarks with current millis in temp variable
     const now = Date.now();
     const landmarks = getNormalizedArray(pose, frame, dimensions);
     

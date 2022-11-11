@@ -12,8 +12,8 @@ LogBox.ignoreAllLogs();
 export default function App() {
 
   const authToken = "__AUTH_TOKEN_"; 
-  const assessmentName = 'PUSH_UPS'; //, SIDE_FLAMINGO, PUSH_UPS
-  const cameraPosition = 'back'; // back or front
+  const assessmentName = 'PLATE_TAPPING_COORDINATION'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION
+  const cameraPosition = 'front'; // back or front
   let queryParams:any = {}
 
   const [hasPermission, setHasPermission] = React.useState(false);
@@ -46,11 +46,20 @@ export default function App() {
     console.log('Server Data:', serverResponse.data);
 
     /* @ts-ignore:next-line */
-    if ("SIDE_FLAMINGO" == assessmentName) {
-      setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
-    }else {
-      setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
+    switch(assessmentName) {
+    
+      /* @ts-ignore:next-line */
+      case "SIDE_FLAMINGO" :
+        setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
+        break;
+      /* @ts-ignore:next-line */
+      case "git" :
+        setDisplayText( ` Total Cycles: ${serverResponse.data.reps};`)
+        break;
+      default:
+        setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
     }
+    
   };
 
 

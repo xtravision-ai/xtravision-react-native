@@ -11,7 +11,7 @@ LogBox.ignoreAllLogs();
 
 export default function App() {
 
-  const authToken = "__AUTH_TOKEN_"; 
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ODQ3ZDE3NC1jNjQ0LTQyYjUtOThkMi00OTk3ZDZlZTA4NmMiLCJhcHBJZCI6IjAwZTViZmNhLTJlMWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiZmMxMzk2NTItMmUxOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYyNDkyNjY4LCJleHAiOjE2OTQwNTAyNjh9.xn07CAkw3BPTSj2IIwkzzwQUTM1CXj5GJkOelS4scl8"; 
   const assessmentName = 'PLATE_TAPPING_COORDINATION'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION
   const cameraPosition = 'front'; // back or front
   let queryParams:any = {}
@@ -53,7 +53,7 @@ export default function App() {
         setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
         break;
       /* @ts-ignore:next-line */
-      case "git" :
+      case "PLATE_TAPPING_COORDINATION" :
         setDisplayText( ` Total Cycles: ${serverResponse.data.reps};`)
         break;
       default:

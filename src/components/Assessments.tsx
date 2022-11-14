@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text, useWindowDimensions } from 'react-native';
-import React, { useCallback, useEffect } from 'react';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Camera,
   useCameraDevices,
@@ -11,6 +11,8 @@ import { scanPoseLandmarks } from '../helper';
 import { runOnJS } from 'react-native-reanimated';
 import { getNormalizedArray } from '../formatter';
 import _ from 'lodash';
+// testing
+import Canvas from 'react-native-canvas';
 
 // TODO: create custom webhook for WS connection
 import useWebSocket from 'react-native-use-websocket';
@@ -26,6 +28,7 @@ export interface AssessmentProp {
   assessment: string;
   isEducationScreen?: boolean;
   onServerResponse(serverResponse: any): void;
+  showSkeleton: boolean;
 }
 
 //const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
@@ -35,21 +38,21 @@ export function Assessment(props: AssessmentProp) {
 
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.assessment}`;
 
-  let queryParams: {[key:string]: any} = { authToken: props.connection.authToken };
+  let queryParams: { [key: string]: any } = { authToken: props.connection.authToken };
   if (props.connection.queryParams) {
     queryParams = { ...queryParams, ...props.connection.queryParams };
   }
 
   // add some extra params
-  if (props.assessment === 'STANDING_BROAD_JUMP'){
+  if (props.assessment === 'STANDING_BROAD_JUMP') {
     // TODO: hardcoded part. auto calculate by frame or remove it
     const orientationData = {
       "image_height": 720, //orientation.image_height,
       "image_width": 1280 //orientation.image_width
     }
 
-    queryParams = {...queryParams, ...orientationData }
- }
+    queryParams = { ...queryParams, ...orientationData }
+  }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   const {
@@ -74,6 +77,10 @@ export function Assessment(props: AssessmentProp) {
 
   const dimensions = useWindowDimensions();
 
+  // testing canvas
+  const canvasRef = useRef(null);
+
+  console.log("showSkeleton: ", props.showSkeleton);
 
   // Step-2: after extracting landmarks store unto temp variable
   const poseFrameHandler = useCallback((pose: any, frame: any) => {
@@ -85,7 +92,7 @@ export function Assessment(props: AssessmentProp) {
     // normalized frames into landmarks and store landmarks with current millis in temp variable
     const now = Date.now();
     const landmarks = getNormalizedArray(pose, frame, dimensions);
-    
+
     landmarksTempRef.current[now] = { landmarks };
   }, []);
 
@@ -152,12 +159,18 @@ export function Assessment(props: AssessmentProp) {
         device={device}
         isActive={true}
         // isActive={isAppForeground}
-        frameProcessor={true?frameProcessor: undefined}
-        fps = {30}
-        //frameProcessorFps={15}
+        frameProcessor={true ? frameProcessor : undefined}
+        fps={30}
+      //frameProcessorFps={15}
 
       />
-     </>
+      {props.showSkeleton && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <Canvas style={{ width: '100%', height: '100%', }} ref={canvasRef} />
+        </View>
+      )}
+
+    </>
   );
 }
 
@@ -169,15 +182,15 @@ const styles = StyleSheet.create({
   container: {
     // flex: 1,
     // justifyContent: "center",
-   // alignItems: "center",
+    // alignItems: "center",
     //backgroundColor: "#e5e5e5",
     position: 'absolute', //overlap on the camera
     left: 280,     // x axis // TODO: make is configurable
     top: 650, // y axis
 
   },
-  verticalText : {
-    transform:  [{ rotate: '270deg' }],
+  verticalText: {
+    transform: [{ rotate: '270deg' }],
     color: 'red',
     fontWeight: 'bold'
   },

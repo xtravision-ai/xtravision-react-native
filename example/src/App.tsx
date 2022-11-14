@@ -1,22 +1,24 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, Dimensions } from 'react-native';
-
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
-
 // Disable all warning and error on screen
 import { LogBox } from 'react-native';
+import Dialog from "react-native-dialog";
 LogBox.ignoreAllLogs();
 
 
 export default function App() {
 
-  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ODQ3ZDE3NC1jNjQ0LTQyYjUtOThkMi00OTk3ZDZlZTA4NmMiLCJhcHBJZCI6IjAwZTViZmNhLTJlMWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiZmMxMzk2NTItMmUxOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYyNDkyNjY4LCJleHAiOjE2OTQwNTAyNjh9.xn07CAkw3BPTSj2IIwkzzwQUTM1CXj5GJkOelS4scl8"; 
-  const assessmentName = 'PLATE_TAPPING_COORDINATION'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ODQ3ZDE3NC1jNjQ0LTQyYjUtOThkMi00OTk3ZDZlZTA4NmMiLCJhcHBJZCI6IjAwZTViZmNhLTJlMWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiZmMxMzk2NTItMmUxOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYyNDkyNjY4LCJleHAiOjE2OTQwNTAyNjh9.xn07CAkw3BPTSj2IIwkzzwQUTM1CXj5GJkOelS4scl8";
+  const assessmentName = 'PUSH_UPS'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION
   const cameraPosition = 'front'; // back or front
-  let queryParams:any = {}
+  let queryParams: any = {}
 
-  const [hasPermission, setHasPermission] = React.useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(true);
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump
@@ -24,9 +26,9 @@ export default function App() {
   const { width, height } = Dimensions.get('window');
 
   const stand_x = width - (width - width / 10) //100
-  const stand_y = height/(height / 300) //- 100
+  const stand_y = height / (height / 300) //- 100
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       const status = await RequestCameraPermission();
       setHasPermission(status === CameraPermissionStatus.AUTHORIZED);
@@ -37,38 +39,59 @@ export default function App() {
 
   // required prop:
   const onServerResponse = function (serverResponse: any) {
-    if (serverResponse.errors.length){
+    if (serverResponse.errors.length) {
       console.error('Server Error Response:', serverResponse.errors);
-      return ;
+      return;
     }
-   
+
     //console.log(Date() + ' Server Data:', serverResponse.data);
     console.log('Server Data:', serverResponse.data);
 
     /* @ts-ignore:next-line */
-    switch(assessmentName) {
-    
+    switch (assessmentName) {
+
       /* @ts-ignore:next-line */
-      case "SIDE_FLAMINGO" :
-        setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
+      case "SIDE_FLAMINGO":
+        setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
         break;
       /* @ts-ignore:next-line */
-      case "PLATE_TAPPING_COORDINATION" :
-        setDisplayText( ` Total Cycles: ${serverResponse.data.reps};`)
+      case "PLATE_TAPPING_COORDINATION":
+        setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
         break;
       default:
-        setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
+        setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
     }
-    
+
   };
 
 
   // @ts-ignore:next-line
-  if (assessmentName == 'STANDING_BROAD_JUMP'){
+  if (assessmentName == 'STANDING_BROAD_JUMP') {
     queryParams.userHeight = 180 // in Centimeter
     // Coordinates of start point
     queryParams.stand_x = stand_x * 2;
-    queryParams.stand_y = stand_y* 2 
+    queryParams.stand_y = stand_y * 2
+  }
+
+  const DialogBox = () => {
+    return (
+      <View>
+        <Dialog.Container visible={dialogOpen}>
+          <Dialog.Title>Test Options</Dialog.Title>
+          <Dialog.Description>
+            Do you want to Enable skeleton?
+          </Dialog.Description>
+          <Dialog.Button label="Yes" onPress={() => {
+            setShowSkeleton(true);
+            setDialogOpen(false);
+          }} />
+          <Dialog.Button label="No" onPress={() => {
+            setShowSkeleton(false);
+            setDialogOpen(false);
+          }} />
+        </Dialog.Container>
+      </View>
+    )
   }
 
   return (
@@ -76,25 +99,28 @@ export default function App() {
       {hasPermission ? (
         <>
           {/* <Text>App has Permission</Text> */}
+          <DialogBox />
           <Assessment
             cameraPosition={cameraPosition}
             connection={{ authToken, queryParams }}
             assessment={assessmentName}
             isEducationScreen={false}
-            onServerResponse={(res)=>onServerResponse(res)}
+            onServerResponse={(res) => onServerResponse(res)}
+            showSkeleton={showSkeleton}
           />
-        {
-           // @ts-ignore:next-line
-        assessmentName== "STANDING_BROAD_JUMP" && 
-          (
-            <>
-              <View style={styles({stand_x, stand_y}).point} />
-              <Text style={styles({stand_x, stand_y}).startPoint}>Start Point</Text>
-            </>
 
-          )
-        }
-          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color:"black", fontSize:20 }}>{displayText}</Text>
+          {
+            // @ts-ignore:next-line
+            assessmentName == "STANDING_BROAD_JUMP" &&
+            (
+              <>
+                <View style={styles({ stand_x, stand_y }).point} />
+                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+              </>
+
+            )
+          }
+          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>{displayText}</Text>
         </>
       ) : (
         <>
@@ -113,8 +139,8 @@ const styles = (orientation: any) => StyleSheet.create({
     position: 'relative', //overlap on the camera
 
   },
-  verticalText : {
-    transform:  [{ rotate: '270deg' }],
+  verticalText: {
+    transform: [{ rotate: '270deg' }],
     color: 'red',
     fontWeight: 'bold'
   },

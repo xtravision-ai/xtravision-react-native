@@ -38,12 +38,11 @@ export default function App() {
   // required prop:
   const onServerResponse = function (serverResponse: any) {
     if (serverResponse.errors.length){
-      console.error('Server Error Response:', serverResponse.errors);
+      console.error(Date() + ' Server Error Response:', serverResponse.errors);
       return ;
     }
    
-    //console.log(Date() + ' Server Data:', serverResponse.data);
-    console.log('Server Data:', serverResponse.data);
+    console.log(Date() + ' Server Data:', serverResponse.data);
 
     /* @ts-ignore:next-line */
     switch(assessmentName) {

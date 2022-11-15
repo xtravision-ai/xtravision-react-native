@@ -1,5 +1,5 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text, useWindowDimensions } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import {
   Camera,
@@ -9,7 +9,7 @@ import {
 import type { Frame } from 'react-native-vision-camera';
 import { scanPoseLandmarks } from '../helper';
 import { runOnJS } from 'react-native-reanimated';
-import { getNormalizedArray } from '../formatter';
+import { getDefaultObject} from '../formatter';
 import _ from 'lodash';
 
 // TODO: create custom webhook for WS connection
@@ -72,31 +72,53 @@ export function Assessment(props: AssessmentProp) {
   const devices = useCameraDevices();
   const device = devices[props.cameraPosition];
 
-  const dimensions = useWindowDimensions();
+  // const dimensions = useWindowDimensions();
 
-
-  // Step-2: after extracting landmarks store unto temp variable
-  const poseFrameHandler = useCallback((pose: any, frame: any) => {
-    if (_.isEmpty(pose)) {
-      // console.log('Pose is empty!',)
-      return;
-    }
-
-    // normalized frames into landmarks and store landmarks with current millis in temp variable
-    const now = Date.now();
-    const landmarks = getNormalizedArray(pose, frame, dimensions);
-    
+  const updateData = useCallback((now: any, landmarks: any) => {
     landmarksTempRef.current[now] = { landmarks };
-  }, []);
+   },[])
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
-    const pose: any = scanPoseLandmarks(frame);
-    // IMP: DO NOT PUT ANY JS CODE HERE
-    // store landmarks into temp object
-    runOnJS(poseFrameHandler)(pose, frame);
-  }, []);
+    const pose = scanPoseLandmarks(frame);
+
+    if (Object.keys(pose).length == 0) {
+      console.warn(Date()+" "+"Body is not visible!")
+      return;
+    }
+
+    __DEV__ && console.log(Date()+" "+"Body is visible.")
+
+    // Step-2: after extracting landmarks store unto temp variable
+    const now = Date.now();
+    // normalize pose: process to convert pose object to required formate
+    const poseCopy: any = getDefaultObject();
+
+    Object.keys(poseCopy).forEach(v => {
+      // do nothing, on specific any specific part is not visible
+      if (!pose[v] || pose[v].visibility < 0.3){
+         return;
+      }
+      poseCopy[v] = {
+        x: pose[v].x / frame.width,
+        y: pose[v].y /frame.width,
+        z: pose[v].z / frame.width,
+        visibility: pose[v].visibility,
+      };
+    });
+
+    runOnJS(updateData)(now, Object.values(poseCopy))
+
+  },[]);
+
+  
+
+  const onError = function(error: any){
+    // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
+    console.error(Date() + "  " + error.message)
+
+  }
 
   // step-3: send data to server
   useEffect(() => {
@@ -118,7 +140,7 @@ export function Assessment(props: AssessmentProp) {
       landmarksTempRef.current = {};
       const timestamp = Date.now();
 
-      __DEV__ && console.log('message send', timestamp);
+      __DEV__ && console.log(Date() + ' Message send to Server on timestamp: ', timestamp);
       // WS SEND Kps -> 1s
       sendJsonMessage({
         timestamp,
@@ -153,9 +175,8 @@ export function Assessment(props: AssessmentProp) {
         isActive={true}
         // isActive={isAppForeground}
         frameProcessor={true?frameProcessor: undefined}
-        fps = {30}
-        //frameProcessorFps={15}
-
+        fps = {10}
+        onError = {onError}
       />
      </>
   );

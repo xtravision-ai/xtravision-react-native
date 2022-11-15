@@ -5,7 +5,34 @@ import * as _ from "lodash"
 import type { Frame } from "react-native-vision-camera";
 
 
-export function getNormalizedArray(poseKeyPoints: any, frame: Frame, dimensions: any){
+
+/* @ts-ignore:next-line  */
+export function createNormalizedArray(keyPoint: any, frame: Frame, factors: any ){
+  'worklet';
+
+    if (!keyPoint  || keyPoint.visibility < 0.3) {
+      return { x: 0, y: 0, z: 0, visibility: 0.0 };
+    }
+    // if (_.isEmpty(keyPoint) || keyPoint.visibility < 0.3) {
+    //   return { x: 0, y: 0, z: 0, visibility: 0.0 };
+    // }
+    // return {
+    //   x: keyPoint.x * factors.xFactor,
+    //   y: keyPoint.y * factors.xFactor,
+    //   z: keyPoint.z * factors.xFactor,
+    //   visibility: keyPoint.visibility,
+    // };
+
+    return {
+      x: keyPoint.x / frame.width,
+      y: keyPoint.y / frame.height,
+      z: keyPoint.z/ frame.width,
+      visibility: keyPoint.visibility,
+    };
+}
+
+export function getNormalizedArray(poseKeyPoints: any, frame: any, dimensions: any){
+
 
     // 
     const xFactor = dimensions.width / frame.width;
@@ -51,23 +78,42 @@ export function getNormalizedArray(poseKeyPoints: any, frame: Frame, dimensions:
 
 }
 
-/* @ts-ignore:next-line  */
-function createNormalizedArray(keyPoint: any, frame: Frame, factors: any = null){
-
-    if (_.isEmpty(keyPoint) || keyPoint.visibility < 0.3) {
-      return { x: 0, y: 0, z: 0, visibility: 0.0 };
-    }
-    // return {
-    //   x: keyPoint.x * factors.xFactor,
-    //   y: keyPoint.y * factors.xFactor,
-    //   z: keyPoint.z * factors.xFactor,
-    //   visibility: keyPoint.visibility,
-    // };
-
-    return {
-      x: keyPoint.x / frame.width,
-      y: keyPoint.y / frame.height,
-      z: keyPoint.z/ frame.width,
-      visibility: keyPoint.visibility,
-    };
+export function getDefaultObject(){
+  'worklet';
+  // IMP: DO NOT change any sequence
+  return {
+    nose: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftEye: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightEye: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftEar: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightEar: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    mouthLeft: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    mouthRight: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftElbow: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightElbow: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftWrist: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightWrist: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftThumb: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightThumb: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftHip: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightHip: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftKnee: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightKnee: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftHeel: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightHeel: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    leftToe: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    rightToe: { x: 0, y: 0, z: 0, visibility: 0.0 }
+  }
 }

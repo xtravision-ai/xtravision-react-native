@@ -8,11 +8,10 @@ import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
-
 export default function App() {
 
-  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ODQ3ZDE3NC1jNjQ0LTQyYjUtOThkMi00OTk3ZDZlZTA4NmMiLCJhcHBJZCI6IjAwZTViZmNhLTJlMWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiZmMxMzk2NTItMmUxOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYyNDkyNjY4LCJleHAiOjE2OTQwNTAyNjh9.xn07CAkw3BPTSj2IIwkzzwQUTM1CXj5GJkOelS4scl8"; 
-  const assessmentName = 'PLATE_TAPPING_COORDINATION'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION
+  const authToken = "__AUTH_TOKEN__"; 
+  const assessmentName = 'PUSH_UPS'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = 'front'; // back or front
   let queryParams:any = {}
 

@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import React, { useCallback, useEffect, useRef } from 'react';
+import { StyleSheet, Text, useWindowDimensions, } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
 import {
   Camera,
   useCameraDevices,
@@ -8,14 +8,16 @@ import {
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
 import { scanPoseLandmarks } from '../helper';
-import { runOnJS } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { getNormalizedArray } from '../formatter';
 import _ from 'lodash';
-// testing
-import Canvas from 'react-native-canvas';
+// import Canvas from 'react-native-canvas';
 
 // TODO: create custom webhook for WS connection
 import useWebSocket from 'react-native-use-websocket';
+import { Line, Svg } from 'react-native-svg';
+
+const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
 
 export interface AssessmentProp {
   connection: {
@@ -33,6 +35,34 @@ export interface AssessmentProp {
 
 //const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
 const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
+
+
+const defaultPose = {
+  leftShoulder: { x: 0, y: 0 },
+  rightShoulder: { x: 0, y: 0 },
+  leftElbow: { x: 0, y: 0 },
+  rightElbow: { x: 0, y: 0 },
+  leftWrist: { x: 0, y: 0 },
+  rightWrist: { x: 0, y: 0 },
+  leftHip: { x: 0, y: 0 },
+  rightHip: { x: 0, y: 0 },
+  leftKnee: { x: 0, y: 0 },
+  rightKnee: { x: 0, y: 0 },
+  leftAnkle: { x: 0, y: 0 },
+  rightAnkle: { x: 0, y: 0 },
+};
+
+const usePosition = (pose: any, valueName1: any, valueName2: any) => {
+  return useAnimatedStyle(
+    () => ({
+      x1: pose.value[valueName1].x,
+      y1: pose.value[valueName1].y,
+      x2: pose.value[valueName2].x,
+      y2: pose.value[valueName2].y,
+    } as any),
+    [pose],
+  );
+};
 
 export function Assessment(props: AssessmentProp) {
 
@@ -77,17 +107,63 @@ export function Assessment(props: AssessmentProp) {
 
   const dimensions = useWindowDimensions();
 
-  // testing canvas
-  const canvasRef = useRef(null);
+  // testing
+  // const canvasRef = useRef(null);
 
-  console.log("showSkeleton: ", props.showSkeleton);
+
+  // testing 
+  // https://medium.com/dogtronic/real-time-pose-detection-in-react-native-using-mlkit-e1819847c340
+
+  const pose = useSharedValue(defaultPose);
+
+  const leftWristToElbowPosition = usePosition(pose, 'leftWrist', 'leftElbow');
+  const leftElbowToShoulderPosition = usePosition(pose, 'leftElbow', 'leftShoulder');
+  const leftShoulderToHipPosition = usePosition(pose, 'leftShoulder', 'leftHip');
+  const leftHipToKneePosition = usePosition(pose, 'leftHip', 'leftKnee');
+  const leftKneeToAnklePosition = usePosition(pose, 'leftKnee', 'leftAnkle');
+
+  const rightWristToElbowPosition = usePosition(pose, 'rightWrist', 'rightElbow');
+  const rightElbowToShoulderPosition = usePosition(pose, 'rightElbow', 'rightShoulder');
+  const rightShoulderToHipPosition = usePosition(pose, 'rightShoulder', 'rightHip');
+  const rightHipToKneePosition = usePosition(pose, 'rightHip', 'rightKnee');
+  const rightKneeToAnklePosition = usePosition(pose, 'rightKnee', 'rightAnkle');
+
+  const shoulderToShoulderPosition = usePosition(pose, 'leftShoulder', 'rightShoulder');
+  const hipToHipPosition = usePosition(pose, 'leftHip', 'rightHip');
 
   // Step-2: after extracting landmarks store unto temp variable
-  const poseFrameHandler = useCallback((pose: any, frame: any) => {
-    if (_.isEmpty(pose)) {
+  const poseFrameHandler = useCallback((pose1: any, frame: any) => {
+    if (_.isEmpty(pose1)) {
       // console.log('Pose is empty!',)
       return;
     }
+
+    const xFactor = 1280;
+    const yFactor = 720;
+
+    const poseCopy = {
+      leftShoulder: { x: 0, y: 0 },
+      rightShoulder: { x: 0, y: 0 },
+      leftElbow: { x: 0, y: 0 },
+      rightElbow: { x: 0, y: 0 },
+      leftWrist: { x: 0, y: 0 },
+      rightWrist: { x: 0, y: 0 },
+      leftHip: { x: 0, y: 0 },
+      rightHip: { x: 0, y: 0 },
+      leftKnee: { x: 0, y: 0 },
+      rightKnee: { x: 0, y: 0 },
+      leftAnkle: { x: 0, y: 0 },
+      rightAnkle: { x: 0, y: 0 },
+    };
+
+    Object.keys(pose).forEach(v => {
+      pose1[v] = {
+        x: pose1[v].x * xFactor,
+        y: pose1[v].y * yFactor,
+      };
+    });
+
+    pose.value = poseCopy;
 
     // normalized frames into landmarks and store landmarks with current millis in temp variable
     const now = Date.now();
@@ -99,10 +175,10 @@ export function Assessment(props: AssessmentProp) {
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
-    const pose: any = scanPoseLandmarks(frame);
+    const pose1: any = scanPoseLandmarks(frame);
     // IMP: DO NOT PUT ANY JS CODE HERE
     // store landmarks into temp object
-    runOnJS(poseFrameHandler)(pose, frame);
+    runOnJS(poseFrameHandler)(pose1, frame);
   }, []);
 
   // step-3: send data to server
@@ -146,6 +222,7 @@ export function Assessment(props: AssessmentProp) {
   // if no camera found (front or back)
   if (device == null) {
     return (
+      //@ts-ignore
       <Text style={{ color: 'red', fontWeight: 'bold' }}>
         Unable to detect camera.
       </Text>
@@ -154,6 +231,7 @@ export function Assessment(props: AssessmentProp) {
 
   return (
     <>
+    {/* @ts-ignore */}
       <Camera
         style={styles.camera}
         device={device}
@@ -164,10 +242,29 @@ export function Assessment(props: AssessmentProp) {
       //frameProcessorFps={15}
 
       />
-      {props.showSkeleton && (
+      {/* {props.showSkeleton && (
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
           <Canvas style={{ width: '100%', height: '100%', }} ref={canvasRef} />
         </View>
+      )} */}
+      {props.showSkeleton && (
+        <Svg
+          height='720px'
+          width='1280px'
+          style={styles.linesContainer}>
+          <AnimatedLine animatedProps={leftWristToElbowPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftElbowToShoulderPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftShoulderToHipPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftHipToKneePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftKneeToAnklePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightWristToElbowPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightElbowToShoulderPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightShoulderToHipPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightHipToKneePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightKneeToAnklePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={shoulderToShoulderPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={hipToHipPosition} stroke="red" strokeWidth="2" />
+        </Svg>
       )}
 
     </>
@@ -202,6 +299,13 @@ const styles = StyleSheet.create({
     // position: 'absolute', //overlap on the camera
     // left: 280,     // x axis // TODO: make is configurable
     top: 20,   // y axis
+  },
+  linesContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: '720px',
+    width: '1280px',
   },
 });
 

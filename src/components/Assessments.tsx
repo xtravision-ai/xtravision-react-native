@@ -30,6 +30,7 @@ export interface AssessmentProp {
 
 //const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
 const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
+//const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v1';
 
 export function Assessment(props: AssessmentProp) {
 
@@ -176,6 +177,7 @@ export function Assessment(props: AssessmentProp) {
         // isActive={isAppForeground}
         frameProcessor={true?frameProcessor: undefined}
         fps = {10}
+        frameProcessorFps = {10}
         onError = {onError}
       />
      </>

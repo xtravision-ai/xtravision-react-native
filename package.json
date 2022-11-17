@@ -30,7 +30,8 @@
     "example": "yarn --cwd example",
     "android": "cd example && yarn android",
     "bootstrap": "yarn install && yarn example && yarn install && yarn android ",
-    "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd .."
+    "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
+    "ln": "react-native link react-native-svg"
   },
   "keywords": [
     "xtravision",
@@ -164,7 +165,7 @@
   "dependencies": {
     "lodash": "^4.17.21",
     "react-native-canvas": "^0.1.38",
-    "react-native-svg": "12.3.0",
+    "react-native-svg": "^13.6.0",
     "react-native-use-websocket": "^0.2.6",
     "react-native-webview": "^11.23.1"
   },

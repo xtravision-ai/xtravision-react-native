@@ -10,10 +10,10 @@ LogBox.ignoreAllLogs();
 
 
 export default function App() {
-
-  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ODQ3ZDE3NC1jNjQ0LTQyYjUtOThkMi00OTk3ZDZlZTA4NmMiLCJhcHBJZCI6IjAwZTViZmNhLTJlMWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiZmMxMzk2NTItMmUxOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYyNDkyNjY4LCJleHAiOjE2OTQwNTAyNjh9.xn07CAkw3BPTSj2IIwkzzwQUTM1CXj5GJkOelS4scl8";
-  const assessmentName = 'PUSH_UPS'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION
-  const cameraPosition = 'front'; // back or front
+  // remove later
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
+  const assessmentName = 'PLATE_TAPPING_COORDINATION'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION
+  const cameraPosition = 'back'; // back or front
   let queryParams: any = {}
 
   const [hasPermission, setHasPermission] = useState(false);
@@ -45,7 +45,8 @@ export default function App() {
     }
 
     //console.log(Date() + ' Server Data:', serverResponse.data);
-    console.log('Server Data:', serverResponse.data);
+    // testing
+    // console.log('Server Data:', serverResponse.data);
 
     /* @ts-ignore:next-line */
     switch (assessmentName) {

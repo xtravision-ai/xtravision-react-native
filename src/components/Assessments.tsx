@@ -1,5 +1,5 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text, useWindowDimensions, } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, Dimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import {
   Camera,
@@ -19,6 +19,8 @@ import { Line, Svg } from 'react-native-svg';
 
 const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
 
+const { width, height } = Dimensions.get('window');
+
 export interface AssessmentProp {
   connection: {
     authToken: string;
@@ -36,7 +38,6 @@ export interface AssessmentProp {
 //const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
 const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
 
-
 const defaultPose = {
   leftShoulder: { x: 0, y: 0 },
   rightShoulder: { x: 0, y: 0 },
@@ -53,7 +54,7 @@ const defaultPose = {
 };
 
 const usePosition = (pose: any, valueName1: any, valueName2: any) => {
-  return useAnimatedStyle(
+  const res = useAnimatedStyle(
     () => ({
       x1: pose.value[valueName1].x,
       y1: pose.value[valueName1].y,
@@ -62,6 +63,8 @@ const usePosition = (pose: any, valueName1: any, valueName2: any) => {
     } as any),
     [pose],
   );
+  console.log("pose.value[valueName1].x", pose.value[valueName1].x)
+  return res;
 };
 
 export function Assessment(props: AssessmentProp) {
@@ -107,11 +110,6 @@ export function Assessment(props: AssessmentProp) {
 
   const dimensions = useWindowDimensions();
 
-  // testing
-  // const canvasRef = useRef(null);
-
-
-  // testing 
   // https://medium.com/dogtronic/real-time-pose-detection-in-react-native-using-mlkit-e1819847c340
 
   const pose = useSharedValue(defaultPose);
@@ -138,8 +136,8 @@ export function Assessment(props: AssessmentProp) {
       return;
     }
 
-    const xFactor = 1280;
-    const yFactor = 720;
+    const xFactor = width/frame.width;
+    const yFactor = height/frame.height;
 
     const poseCopy = {
       leftShoulder: { x: 0, y: 0 },
@@ -156,18 +154,21 @@ export function Assessment(props: AssessmentProp) {
       rightAnkle: { x: 0, y: 0 },
     };
 
-    Object.keys(pose).forEach(v => {
-      pose1[v] = {
-        x: pose1[v].x * xFactor,
-        y: pose1[v].y * yFactor,
-      };
-    });
+    // [TypeError: Cannot read property 'x' of undefined]
+    try {
+      Object.keys(pose).forEach(v => {
+        pose1[v] = {
+          x: pose1[v].x * xFactor,
+          y: pose1[v].y * yFactor,
+        };
+      });
+    } catch (e) {}
 
     pose.value = poseCopy;
 
     // normalized frames into landmarks and store landmarks with current millis in temp variable
     const now = Date.now();
-    const landmarks = getNormalizedArray(pose, frame, dimensions);
+    const landmarks = getNormalizedArray(pose1, frame, dimensions);
 
     landmarksTempRef.current[now] = { landmarks };
   }, []);
@@ -202,6 +203,7 @@ export function Assessment(props: AssessmentProp) {
       const timestamp = Date.now();
 
       __DEV__ && console.log('message send', timestamp);
+
       // WS SEND Kps -> 1s
       sendJsonMessage({
         timestamp,
@@ -231,7 +233,7 @@ export function Assessment(props: AssessmentProp) {
 
   return (
     <>
-    {/* @ts-ignore */}
+      {/* @ts-ignore */}
       <Camera
         style={styles.camera}
         device={device}
@@ -248,9 +250,10 @@ export function Assessment(props: AssessmentProp) {
         </View>
       )} */}
       {props.showSkeleton && (
+        //@ts-ignore
         <Svg
-          height='720px'
-          width='1280px'
+          height={height}
+          width={width}
           style={styles.linesContainer}>
           <AnimatedLine animatedProps={leftWristToElbowPosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={leftElbowToShoulderPosition} stroke="red" strokeWidth="2" />

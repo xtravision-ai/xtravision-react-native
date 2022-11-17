@@ -41,16 +41,16 @@ export function Assessment(props: AssessmentProp) {
     queryParams = { ...queryParams, ...props.connection.queryParams };
   }
 
-  // add some extra params
-  if (props.assessment === 'STANDING_BROAD_JUMP'){
-    // TODO: hardcoded part. auto calculate by frame or remove it
-    const orientationData = {
-      "image_height": 720, //orientation.image_height,
-      "image_width": 1280 //orientation.image_width
-    }
+//   // add some extra params
+//   if (props.assessment === 'STANDING_BROAD_JUMP'){
+//     // TODO: hardcoded part. auto calculate by frame or remove it
+//     const orientationData = {
+//       "image_height": 720, //orientation.image_height,
+//       "image_width": 1280 //orientation.image_width
+//     }
 
-    queryParams = {...queryParams, ...orientationData }
- }
+//     queryParams = {...queryParams, ...orientationData }
+//  }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   const {
@@ -85,11 +85,11 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      console.warn(Date()+" "+"Body is not visible!")
+      console.warn(Date()+" Body is not visible!")
       return;
     }
 
-    __DEV__ && console.log(Date()+" "+"Body is visible.")
+    __DEV__ && console.log(Date()+" Body is visible.")
 
     // Step-2: after extracting landmarks store unto temp variable
     const now = Date.now();
@@ -123,7 +123,6 @@ export function Assessment(props: AssessmentProp) {
 
   // step-3: send data to server
   useEffect(() => {
-    // TODO: use timeout instead of interval and recall same method
 
     let intervalInstance: any;
     // clear interval instance, if already set

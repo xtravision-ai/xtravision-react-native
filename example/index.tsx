@@ -4,6 +4,7 @@ import { AppRegistry } from 'react-native';
     require('basil-ws-flipper').wsDebugPlugin;
   }
 
-import App from './src/App';
+// import App from './src/App';
+import MyStack from './src/App';
 
-AppRegistry.registerComponent('main', () => App);
+AppRegistry.registerComponent('main', () => MyStack);

@@ -44,9 +44,8 @@ export default function App() {
       return;
     }
 
-    //console.log(Date() + ' Server Data:', serverResponse.data);
-    // testing
-    // console.log('Server Data:', serverResponse.data);
+    console.log(Date() + ' Server Data:', serverResponse.data);
+    console.log('Server Data:', serverResponse.data);
 
     /* @ts-ignore:next-line */
     switch (assessmentName) {

@@ -11,7 +11,6 @@ import { scanPoseLandmarks } from '../helper';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { getNormalizedArray } from '../formatter';
 import _ from 'lodash';
-// import Canvas from 'react-native-canvas';
 
 // TODO: create custom webhook for WS connection
 import useWebSocket from 'react-native-use-websocket';
@@ -54,7 +53,7 @@ const defaultPose = {
 };
 
 const usePosition = (pose: any, valueName1: any, valueName2: any) => {
-  const res = useAnimatedStyle(
+  return useAnimatedStyle(
     () => ({
       x1: pose.value[valueName1].x,
       y1: pose.value[valueName1].y,
@@ -62,9 +61,7 @@ const usePosition = (pose: any, valueName1: any, valueName2: any) => {
       y2: pose.value[valueName2].y,
     } as any),
     [pose],
-  );
-  console.log("pose.value[valueName1].x", pose.value[valueName1].x)
-  return res;
+  );;
 };
 
 export function Assessment(props: AssessmentProp) {
@@ -80,8 +77,8 @@ export function Assessment(props: AssessmentProp) {
   if (props.assessment === 'STANDING_BROAD_JUMP') {
     // TODO: hardcoded part. auto calculate by frame or remove it
     const orientationData = {
-      "image_height": 720, //orientation.image_height,
-      "image_width": 1280 //orientation.image_width
+      "image_height": height, //orientation.image_height,
+      "image_width": width //orientation.image_width
     }
 
     queryParams = { ...queryParams, ...orientationData }
@@ -112,7 +109,7 @@ export function Assessment(props: AssessmentProp) {
 
   // https://medium.com/dogtronic/real-time-pose-detection-in-react-native-using-mlkit-e1819847c340
 
-  const pose = useSharedValue(defaultPose);
+  const pose: any = useSharedValue(defaultPose);
 
   const leftWristToElbowPosition = usePosition(pose, 'leftWrist', 'leftElbow');
   const leftElbowToShoulderPosition = usePosition(pose, 'leftElbow', 'leftShoulder');
@@ -136,10 +133,10 @@ export function Assessment(props: AssessmentProp) {
       return;
     }
 
-    const xFactor = width/frame.width;
-    const yFactor = height/frame.height;
+    const xFactor = width / frame.height;
+    const yFactor = height / frame.width;
 
-    const poseCopy = {
+    const poseCopy: any = {
       leftShoulder: { x: 0, y: 0 },
       rightShoulder: { x: 0, y: 0 },
       leftElbow: { x: 0, y: 0 },
@@ -156,13 +153,13 @@ export function Assessment(props: AssessmentProp) {
 
     // [TypeError: Cannot read property 'x' of undefined]
     try {
-      Object.keys(pose).forEach(v => {
-        pose1[v] = {
+      Object.keys(pose1).forEach(v => {
+        poseCopy[v] = {
           x: pose1[v].x * xFactor,
           y: pose1[v].y * yFactor,
         };
       });
-    } catch (e) {}
+    } catch (e) { }
 
     pose.value = poseCopy;
 
@@ -242,19 +239,14 @@ export function Assessment(props: AssessmentProp) {
         frameProcessor={true ? frameProcessor : undefined}
         fps={30}
       //frameProcessorFps={15}
-
       />
-      {/* {props.showSkeleton && (
-        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
-          <Canvas style={{ width: '100%', height: '100%', }} ref={canvasRef} />
-        </View>
-      )} */}
       {props.showSkeleton && (
         //@ts-ignore
         <Svg
           height={height}
           width={width}
-          style={styles.linesContainer}>
+          style={styles.linesContainer}
+        >
           <AnimatedLine animatedProps={leftWristToElbowPosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={leftElbowToShoulderPosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={leftShoulderToHipPosition} stroke="red" strokeWidth="2" />
@@ -307,8 +299,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    height: '720px',
-    width: '1280px',
+    height: height,
+    width: width,
   },
 });
 

@@ -112,24 +112,24 @@ export function Assessment(props: AssessmentProp) {
 
   // https://medium.com/dogtronic/real-time-pose-detection-in-react-native-using-mlkit-e1819847c340
 
-  const pose: any = useSharedValue(defaultPose);
+  const poseLine: any = useSharedValue(defaultPose);
 
-  const leftWristToElbowPosition = usePosition(pose, 'leftWrist', 'leftElbow');
-  const leftElbowToShoulderPosition = usePosition(pose, 'leftElbow', 'leftShoulder');
-  const leftShoulderToHipPosition = usePosition(pose, 'leftShoulder', 'leftHip');
-  const leftHipToKneePosition = usePosition(pose, 'leftHip', 'leftKnee');
-  const leftKneeToAnklePosition = usePosition(pose, 'leftKnee', 'leftAnkle');
+  const leftWristToElbowPosition = usePosition(poseLine, 'leftWrist', 'leftElbow');
+  const leftElbowToShoulderPosition = usePosition(poseLine, 'leftElbow', 'leftShoulder');
+  const leftShoulderToHipPosition = usePosition(poseLine, 'leftShoulder', 'leftHip');
+  const leftHipToKneePosition = usePosition(poseLine, 'leftHip', 'leftKnee');
+  const leftKneeToAnklePosition = usePosition(poseLine, 'leftKnee', 'leftAnkle');
 
-  const rightWristToElbowPosition = usePosition(pose, 'rightWrist', 'rightElbow');
-  const rightElbowToShoulderPosition = usePosition(pose, 'rightElbow', 'rightShoulder');
-  const rightShoulderToHipPosition = usePosition(pose, 'rightShoulder', 'rightHip');
-  const rightHipToKneePosition = usePosition(pose, 'rightHip', 'rightKnee');
-  const rightKneeToAnklePosition = usePosition(pose, 'rightKnee', 'rightAnkle');
+  const rightWristToElbowPosition = usePosition(poseLine, 'rightWrist', 'rightElbow');
+  const rightElbowToShoulderPosition = usePosition(poseLine, 'rightElbow', 'rightShoulder');
+  const rightShoulderToHipPosition = usePosition(poseLine, 'rightShoulder', 'rightHip');
+  const rightHipToKneePosition = usePosition(poseLine, 'rightHip', 'rightKnee');
+  const rightKneeToAnklePosition = usePosition(poseLine, 'rightKnee', 'rightAnkle');
 
-  const shoulderToShoulderPosition = usePosition(pose, 'leftShoulder', 'rightShoulder');
-  const hipToHipPosition = usePosition(pose, 'leftHip', 'rightHip');
+  const shoulderToShoulderPosition = usePosition(poseLine, 'leftShoulder', 'rightShoulder');
+  const hipToHipPosition = usePosition(poseLine, 'leftHip', 'rightHip');
 
-  const updateData = useCallback((now: any, landmarks: any, pose1: any, frame: any) => {
+  const updateData = useCallback((now: any, landmarks: any) => {
 
     // Step-2: after extracting landmarks store unto temp variable
     // const poseFrameHandler = useCallback((pose1: any, frame: any) => {
@@ -137,45 +137,30 @@ export function Assessment(props: AssessmentProp) {
     //     // console.log('Pose is empty!',)
     //     return;
     //   }
-
-    const xFactor = width / frame.height;
-    const yFactor = (height / frame.width)-0.05;
-
-    const poseCopy: any = {
-      leftShoulder: { x: 0, y: 0 },
-      rightShoulder: { x: 0, y: 0 },
-      leftElbow: { x: 0, y: 0 },
-      rightElbow: { x: 0, y: 0 },
-      leftWrist: { x: 0, y: 0 },
-      rightWrist: { x: 0, y: 0 },
-      leftHip: { x: 0, y: 0 },
-      rightHip: { x: 0, y: 0 },
-      leftKnee: { x: 0, y: 0 },
-      rightKnee: { x: 0, y: 0 },
-      leftAnkle: { x: 0, y: 0 },
-      rightAnkle: { x: 0, y: 0 },
-    };
-
-    // [TypeError: Cannot read property 'x' of undefined]
-    try {
-      Object.keys(pose1).forEach(v => {
-        poseCopy[v] = {
-          x: pose1[v].x * xFactor,
-          y: pose1[v].y * yFactor,
-        };
-      });
-    } catch (e) { }
-
-    // pose.value = landmarks;
-    pose.value = poseCopy;
-    console.log("pose.value: ", pose.value)
-
     // // normalized frames into landmarks and store landmarks with current millis in temp variable
     // const now = Date.now();
     // const landmarks = getNormalizedArray(pose1, frame, dimensions);
 
     landmarksTempRef.current[now] = { landmarks };
   }, [])
+
+  const calculatePose = (poseCopy: any, pose: any, frame: any) => {
+    'worklet';
+    const xFactor = (height / frame.width) - 0.05;
+    const yFactor = (width / frame.height);
+
+    // [TypeError: Cannot read property 'x' of undefined]
+    try {
+      Object.keys(pose).forEach(v => {
+        poseCopy[v] = {
+          x: pose[v].x * xFactor,
+          y: pose[v].y * yFactor,
+        };
+      });
+    } catch (e) { }
+
+    poseLine.value = poseCopy;
+  }
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -207,7 +192,8 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    runOnJS(updateData)(now, Object.values(poseCopy), pose, frame)
+    calculatePose(poseCopy, pose, frame);
+    runOnJS(updateData)(now, Object.values(poseCopy))
 
   }, []);
 

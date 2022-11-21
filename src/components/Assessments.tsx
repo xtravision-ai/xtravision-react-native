@@ -40,20 +40,7 @@ export interface AssessmentProp {
 const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
 //const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v1';
 
-const defaultPose = {
-  leftShoulder: { x: 0, y: 0 },
-  rightShoulder: { x: 0, y: 0 },
-  leftElbow: { x: 0, y: 0 },
-  rightElbow: { x: 0, y: 0 },
-  leftWrist: { x: 0, y: 0 },
-  rightWrist: { x: 0, y: 0 },
-  leftHip: { x: 0, y: 0 },
-  rightHip: { x: 0, y: 0 },
-  leftKnee: { x: 0, y: 0 },
-  rightKnee: { x: 0, y: 0 },
-  leftAnkle: { x: 0, y: 0 },
-  rightAnkle: { x: 0, y: 0 },
-};
+const defaultPose = getDefaultObject();
 
 const usePosition = (pose: any, valueName1: any, valueName2: any) => {
   return useAnimatedStyle(
@@ -64,7 +51,7 @@ const usePosition = (pose: any, valueName1: any, valueName2: any) => {
       y2: pose.value[valueName2].y,
     } as any),
     [pose],
-  );;
+  );
 };
 
 export function Assessment(props: AssessmentProp) {
@@ -114,17 +101,31 @@ export function Assessment(props: AssessmentProp) {
 
   const poseLine: any = useSharedValue(defaultPose);
 
+  const leftPinkyFingerToleftWristPosition = usePosition(poseLine, 'leftPinkyFinger', 'leftWrist');
+  const leftIndexFingerToleftWristPosition = usePosition(poseLine, 'leftIndexFinger', 'leftWrist');
   const leftWristToElbowPosition = usePosition(poseLine, 'leftWrist', 'leftElbow');
   const leftElbowToShoulderPosition = usePosition(poseLine, 'leftElbow', 'leftShoulder');
   const leftShoulderToHipPosition = usePosition(poseLine, 'leftShoulder', 'leftHip');
   const leftHipToKneePosition = usePosition(poseLine, 'leftHip', 'leftKnee');
   const leftKneeToAnklePosition = usePosition(poseLine, 'leftKnee', 'leftAnkle');
+  const leftAnkleToLeftHeel = usePosition(poseLine, 'leftAnkle', 'leftHeel');
+  const leftToeToLeftHeel = usePosition(poseLine, 'leftToe', 'leftHeel');
+  const leftThumbToLeftWrist = usePosition(poseLine, 'leftThumb', 'leftWrist');
+  const leftToeToLeftAnkle = usePosition(poseLine, 'leftToe', 'leftAnkle');
 
+
+  const rightPinkyFingerToRightWristPosition = usePosition(poseLine, 'rightPinkyFinger', 'rightWrist');
+  const rightIndexFingerToRightWristPosition = usePosition(poseLine, 'rightIndexFinger', 'rightWrist');
   const rightWristToElbowPosition = usePosition(poseLine, 'rightWrist', 'rightElbow');
   const rightElbowToShoulderPosition = usePosition(poseLine, 'rightElbow', 'rightShoulder');
   const rightShoulderToHipPosition = usePosition(poseLine, 'rightShoulder', 'rightHip');
   const rightHipToKneePosition = usePosition(poseLine, 'rightHip', 'rightKnee');
   const rightKneeToAnklePosition = usePosition(poseLine, 'rightKnee', 'rightAnkle');
+  const rightAnkleToRightHeel = usePosition(poseLine, 'rightAnkle', 'rightHeel');
+  const rightToeToRightHeel = usePosition(poseLine, 'rightToe', 'rightHeel');
+  const rightThumbToRightWrist = usePosition(poseLine, 'rightThumb', 'rightWrist');
+  const rightToeToRightAnkle = usePosition(poseLine, 'rightToe', 'rightAnkle');
+
 
   const shoulderToShoulderPosition = usePosition(poseLine, 'leftShoulder', 'rightShoulder');
   const hipToHipPosition = usePosition(poseLine, 'leftHip', 'rightHip');
@@ -272,6 +273,20 @@ export function Assessment(props: AssessmentProp) {
           width={width}
           style={styles.linesContainer}
         >
+          <AnimatedLine animatedProps={leftPinkyFingerToleftWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftAnkleToLeftHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightPinkyFingerToRightWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightAnkleToRightHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftIndexFingerToleftWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftToeToLeftHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightIndexFingerToRightWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightToeToRightHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftThumbToLeftWrist} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightThumbToRightWrist} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightToeToRightAnkle} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftToeToLeftAnkle} stroke="red" strokeWidth="2" />
+
+
           <AnimatedLine animatedProps={leftWristToElbowPosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={leftElbowToShoulderPosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={leftShoulderToHipPosition} stroke="red" strokeWidth="2" />

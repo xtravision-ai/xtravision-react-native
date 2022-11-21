@@ -34,6 +34,8 @@ export interface AssessmentProp {
   showSkeleton: boolean;
 }
 
+
+
 //const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
 const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
 //const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v1';
@@ -127,7 +129,7 @@ export function Assessment(props: AssessmentProp) {
   const shoulderToShoulderPosition = usePosition(pose, 'leftShoulder', 'rightShoulder');
   const hipToHipPosition = usePosition(pose, 'leftHip', 'rightHip');
 
-  const updateData = useCallback((now: any, landmarks: any) => {
+  const updateData = useCallback((now: any, landmarks: any, pose1: any, frame: any) => {
 
     // Step-2: after extracting landmarks store unto temp variable
     // const poseFrameHandler = useCallback((pose1: any, frame: any) => {
@@ -136,8 +138,8 @@ export function Assessment(props: AssessmentProp) {
     //     return;
     //   }
 
-    // const xFactor = width / frame.height;
-    // const yFactor = height / frame.width;
+    const xFactor = width / frame.height;
+    const yFactor = height / frame.width;
 
     const poseCopy: any = {
       leftShoulder: { x: 0, y: 0 },
@@ -155,16 +157,18 @@ export function Assessment(props: AssessmentProp) {
     };
 
     // [TypeError: Cannot read property 'x' of undefined]
-    // try {
-    //   Object.keys(landmarks).forEach(v => {
-    //     poseCopy[v] = {
-    //       x: landmarks[v].x * xFactor,
-    //       y: landmarks[v].y * yFactor,
-    //     };
-    //   });
-    // } catch (e) { }
+    try {
+      Object.keys(pose1).forEach(v => {
+        poseCopy[v] = {
+          x: pose1[v].x * xFactor,
+          y: pose1[v].y * yFactor,
+        };
+      });
+    } catch (e) { }
 
+    // pose.value = landmarks;
     pose.value = poseCopy;
+    console.log("pose.value: ", pose.value)
 
     // // normalized frames into landmarks and store landmarks with current millis in temp variable
     // const now = Date.now();
@@ -203,7 +207,7 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    runOnJS(updateData)(now, Object.values(poseCopy))
+    runOnJS(updateData)(now, Object.values(poseCopy), pose, frame)
 
   }, []);
 

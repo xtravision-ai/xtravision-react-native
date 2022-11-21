@@ -74,16 +74,16 @@ export function Assessment(props: AssessmentProp) {
     queryParams = { ...queryParams, ...props.connection.queryParams };
   }
 
-//   // add some extra params
-//   if (props.assessment === 'STANDING_BROAD_JUMP'){
-//     // TODO: hardcoded part. auto calculate by frame or remove it
-//     const orientationData = {
-//       "image_height": 720, //orientation.image_height,
-//       "image_width": 1280 //orientation.image_width
-//     }
+  //   // add some extra params
+  //   if (props.assessment === 'STANDING_BROAD_JUMP'){
+  //     // TODO: hardcoded part. auto calculate by frame or remove it
+  //     const orientationData = {
+  //       "image_height": 720, //orientation.image_height,
+  //       "image_width": 1280 //orientation.image_width
+  //     }
 
-//     queryParams = {...queryParams, ...orientationData }
-//  }
+  //     queryParams = {...queryParams, ...orientationData }
+  //  }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   const {
@@ -127,15 +127,14 @@ export function Assessment(props: AssessmentProp) {
   const shoulderToShoulderPosition = usePosition(pose, 'leftShoulder', 'rightShoulder');
   const hipToHipPosition = usePosition(pose, 'leftHip', 'rightHip');
 
-
   const updateData = useCallback((now: any, landmarks: any) => {
 
-  // Step-2: after extracting landmarks store unto temp variable
-  // const poseFrameHandler = useCallback((pose1: any, frame: any) => {
-  //   if (_.isEmpty(pose1)) {
-  //     // console.log('Pose is empty!',)
-  //     return;
-  //   }
+    // Step-2: after extracting landmarks store unto temp variable
+    // const poseFrameHandler = useCallback((pose1: any, frame: any) => {
+    //   if (_.isEmpty(pose1)) {
+    //     // console.log('Pose is empty!',)
+    //     return;
+    //   }
 
     // const xFactor = width / frame.height;
     // const yFactor = height / frame.width;
@@ -172,7 +171,7 @@ export function Assessment(props: AssessmentProp) {
     // const landmarks = getNormalizedArray(pose1, frame, dimensions);
 
     landmarksTempRef.current[now] = { landmarks };
-   },[])
+  }, [])
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -180,7 +179,7 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      console.warn(Date()+" Body is not visible!")
+      console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -193,12 +192,12 @@ export function Assessment(props: AssessmentProp) {
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible
-      if (!pose[v] || pose[v].visibility < 0.3){
-         return;
+      if (!pose[v] || pose[v].visibility < 0.3) {
+        return;
       }
       poseCopy[v] = {
         x: pose[v].x / frame.width,
-        y: pose[v].y /frame.width,
+        y: pose[v].y / frame.width,
         z: pose[v].z / frame.width,
         visibility: pose[v].visibility,
       };
@@ -206,11 +205,11 @@ export function Assessment(props: AssessmentProp) {
 
     runOnJS(updateData)(now, Object.values(poseCopy))
 
-  },[]);
+  }, []);
 
-  
 
-  const onError = function(error: any){
+
+  const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
     console.error(Date() + "  " + error.message)
 
@@ -271,10 +270,10 @@ export function Assessment(props: AssessmentProp) {
         device={device}
         isActive={true}
         // isActive={isAppForeground}
-        frameProcessor={true?frameProcessor: undefined}
-        fps = {10}
-        frameProcessorFps = {10}
-        onError = {onError}
+        frameProcessor={true ? frameProcessor : undefined}
+        fps={10}
+        frameProcessorFps={10}
+        onError={onError}
       />
       {props.showSkeleton && (
         //@ts-ignore

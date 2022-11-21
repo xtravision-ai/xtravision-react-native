@@ -10,10 +10,10 @@ LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ navigation, route }) {
 
-  const authToken = "__AUTH-Token__"; 
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
   const assessmentName = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  let queryParams:any = {}
+  const showSkeleton = route.params.showSkeleton // 'true' or 'false'; 
 
   // // TODO: Patching work. Cleanup required
   // // Starting point of standing broad jump
@@ -35,28 +35,28 @@ export default function AssessmentPage({ navigation, route }) {
 
   // required prop:
   const onServerResponse = function (serverResponse: any) {
-    if (serverResponse.errors.length){
+    if (serverResponse.errors.length) {
       console.error(Date() + ' Server Error Response:', serverResponse.errors);
-      return ;
+      return;
     }
-   
+
     console.log(Date() + ' Server Data:', serverResponse.data);
 
     /* @ts-ignore:next-line */
-    switch(assessmentName) {
-    
+    switch (assessmentName) {
+
       /* @ts-ignore:next-line */
-      case "SIDE_FLAMINGO" :
-        setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
+      case "SIDE_FLAMINGO":
+        setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
         break;
       /* @ts-ignore:next-line */
-      case "PLATE_TAPPING_COORDINATION" :
-        setDisplayText( ` Total Cycles: ${serverResponse.data.reps};`)
+      case "PLATE_TAPPING_COORDINATION":
+        setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
         break;
       default:
-        setDisplayText( `Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
+        setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
     }
-    
+
   };
 
 
@@ -68,6 +68,9 @@ export default function AssessmentPage({ navigation, route }) {
   //   queryParams.stand_y = stand_y* 2 
   // }
 
+  // testing
+  const queryParams = {}
+
   return (
     <View style={styles({}).container}>
       {hasPermission ? (
@@ -78,20 +81,21 @@ export default function AssessmentPage({ navigation, route }) {
             connection={{ authToken, queryParams }}
             assessment={assessmentName}
             isEducationScreen={false}
-            onServerResponse={(res)=>onServerResponse(res)}
+            onServerResponse={(res) => onServerResponse(res)}
+            showSkeleton={showSkeleton == 'true' ? true : false}
           />
-        {
-           // @ts-ignore:next-line
-        assessmentName== "STANDING_BROAD_JUMP" && 
-          (
-            <>
-              <View style={styles({stand_x, stand_y}).point} />
-              <Text style={styles({stand_x, stand_y}).startPoint}>Start Point</Text>
-            </>
+          {/* {
+            // @ts-ignore:next-line
+            assessmentName == "STANDING_BROAD_JUMP" &&
+            (
+              <>
+                <View style={styles({ stand_x, stand_y }).point} />
+                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+              </>
 
-          )
-        }
-          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color:"black", fontSize:20 }}>
+            )
+          } */}
+          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
             {displayText}
           </Text>
         </>
@@ -112,8 +116,8 @@ const styles = (orientation: any) => StyleSheet.create({
     position: 'relative', //overlap on the camera
 
   },
-  verticalText : {
-    transform:  [{ rotate: '270deg' }],
+  verticalText: {
+    transform: [{ rotate: '270deg' }],
     color: 'red',
     fontWeight: 'bold'
   },

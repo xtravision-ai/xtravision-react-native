@@ -139,7 +139,7 @@ export function Assessment(props: AssessmentProp) {
     //   }
 
     const xFactor = width / frame.height;
-    const yFactor = height / frame.width;
+    const yFactor = (height / frame.width)-0.05;
 
     const poseCopy: any = {
       leftShoulder: { x: 0, y: 0 },

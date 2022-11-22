@@ -7,13 +7,10 @@ import RadioForm from 'react-native-simple-radio-button';
 
 import { AssessmentList } from "./AssessmentList";
 
-
-export default function HomeScreen({ navigation }) {
-
+export default function HomeScreen({ navigation }: any) {
     const [assessmentName, setAssessmentName] = useState("");
     const [cameraOption, setCameraOption] = useState("front");
     const [showSkeleton, setShowSkeleton] = useState("true");
-
 
     var radio_props = [
         { label: 'Front', value: "front" },
@@ -25,9 +22,8 @@ export default function HomeScreen({ navigation }) {
         { label: 'Disable', value: "false" }
     ];
 
-
     const styles = StyleSheet.create({
-        component: { margin: 30, padding: 25,},
+        component: { margin: 30, padding: 25, },
         labelText: { fontSize: 25, fontWeight: "bold", color: 'black' },
         radioButtonWrap: {
             margin: 10,
@@ -44,34 +40,24 @@ export default function HomeScreen({ navigation }) {
     useEffect(() => {
         console.log("Assessment", { assessmentName, cameraOption, showSkeleton })
     })
-
     const updateAssessmentName = (value: any) => setAssessmentName(value) //console.log(value) // setAssessment(value)
-
 
     return (
         <>
             <View style={styles.component}>
-                <Text style={styles.labelText} >
-                    Choose Assessment
-                </Text>
-                <AssessmentList
-                    setSelectedOption={updateAssessmentName}
-                />
-
-                <Text style={styles.labelText} >
-                    Choose  Camera
-                </Text>
+                <Text style={styles.labelText}>Choose Assessment</Text>
+                <AssessmentList setSelectedOption={updateAssessmentName} />
+                <Text style={styles.labelText}>Choose  Camera </Text>
 
                 <View style={styles.radioButtonWrap}>
-
                     <RadioForm
                         radio_props={radio_props}
                         initial={0}
                         onPress={(value: any) => setCameraOption(value)}
                         formHorizontal={true}
                         animation={true}
-                        labelStyle={styles.radioButtonLabel}
-                        buttonSize={15}
+                        // labelStyle={styles.radioButtonLabel}
+                        // buttonSize={15}
                     />
                 </View>
 
@@ -80,15 +66,14 @@ export default function HomeScreen({ navigation }) {
                 </Text>
 
                 <View style={styles.radioButtonWrap}>
-
                     <RadioForm
                         radio_props={Skeleton_radio_props}
                         initial={0}
                         onPress={(value: any) => setShowSkeleton(value)}
                         formHorizontal={true}
                         animation={true}
-                        labelStyle={styles.radioButtonLabel}
-                        buttonSize={15}
+                        // labelStyle={styles.radioButtonLabel}
+                        // buttonSize={15}
                     />
                 </View>
 

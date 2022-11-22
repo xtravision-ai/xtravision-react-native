@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, Dimensions, AppState } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
@@ -8,12 +8,13 @@ import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
-export default function AssessmentPage({ navigation, route }) {
+export default function AssessmentPage({ route }: any) {
 
   const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
   const assessmentName = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = route.params.showSkeleton // 'true' or 'false'; 
+  const queryParams = {}
 
   // // TODO: Patching work. Cleanup required
   // // Starting point of standing broad jump
@@ -68,8 +69,6 @@ export default function AssessmentPage({ navigation, route }) {
   //   queryParams.stand_y = stand_y* 2 
   // }
 
-  // testing
-  const queryParams = {}
 
   return (
     <View style={styles({}).container}>

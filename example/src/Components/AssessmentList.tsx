@@ -4,8 +4,6 @@ import { SelectList } from 'react-native-dropdown-select-list'
 
 export const AssessmentList = (props: any) => {
 
-  const [selected, setSelected] = React.useState("");
-
   const data = [
     { key: "PARTIAL_CURL_UP", value: "PARTIAL_CURL_UP" },
     { key: "PUSH_UPS", value: "PUSH_UPS" },
@@ -19,10 +17,12 @@ export const AssessmentList = (props: any) => {
 
   return (
     <SelectList
+      boxStyles={{ backgroundColor: 'black'}}
+      dropdownStyles={{ backgroundColor: 'black'}}
       data={data}
       defaultOption={defaultOption}
       // setSelected={setSelected} //{(e) => props.setSelectedOption(e.value)}
-      setSelected={(value) => props.setSelectedOption(value)}
+      setSelected={(value: any) => props.setSelectedOption(value)}
       // onChange={(e) => props.setSelectedOption(e.target.value)}
       search={false}
     // setSelected={setSelected} 

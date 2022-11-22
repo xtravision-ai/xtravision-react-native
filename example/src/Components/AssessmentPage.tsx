@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
@@ -10,19 +10,21 @@ LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
 
-  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
-  const assessmentName = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
+  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
+  const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  const showSkeleton = route.params.showSkeleton // 'true' or 'false'; 
-  const queryParams = {}
+  const showSkeleton = route.params.showSkeleton == 'true' ? true : false // 'true' or 'false'; 
+  let assessment_config = {} as any;
+  let user_config = {} as any;
 
-  // // TODO: Patching work. Cleanup required
-  // // Starting point of standing broad jump
-  // // (width, height) = Coordinates (x,y)
-  // const { width, height } = Dimensions.get('window');
 
-  // const stand_x = width - (width - width / 10) //100
-  // const stand_y = height/(height / 300) //- 100
+  // TODO: Patching work. Cleanup required
+  // Starting point of standing broad jump
+  // (width, height) = Coordinates (x,y)
+  const { width, height } = Dimensions.get('window');
+
+  const stand_x = width - (width - width / 10) //100
+  const stand_y = height / (height / 300) //- 100
 
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
@@ -62,28 +64,45 @@ export default function AssessmentPage({ route }: any) {
 
 
   // // @ts-ignore:next-line
-  // if (assessmentName == 'STANDING_BROAD_JUMP'){
-  //   queryParams.userHeight = 180 // in Centimeter
-  //   // Coordinates of start point
-  //   queryParams.stand_x = stand_x * 2;
-  //   queryParams.stand_y = stand_y* 2 
-  // }
+  if (assessment_name == 'STANDING_BROAD_JUMP') {
+    user_config.userHeight = 180; // in Centimeter
+    // Coordinates of start point
+    assessment_config.stand_x = stand_x * 2;
+    assessment_config.stand_y = stand_y * 2;
+    // TODO: hardcoded part. auto calculate by frame or remove it
+    assessment_config.image_height = 720;
+    assessment_config.image_width = 1280;
+  }
+
+  const connectionData = {
+    assessment_name,
+    auth_token,
+    assessment_config,
+    user_config,
+  };
+
+  const requestData = {
+    isPreJoin: false
+  }
+
+  const libData = {
+    onServerResponse,
+    cameraPosition,
+    showSkeleton,
+}
 
 
-  return (
-    <View style={styles({}).container}>
-      {hasPermission ? (
-        <>
-          {/* <Text>App has Permission</Text> */}
-          <Assessment
-            cameraPosition={cameraPosition}
-            connection={{ authToken, queryParams }}
-            assessment={assessmentName}
-            isEducationScreen={false}
-            onServerResponse={(res) => onServerResponse(res)}
-            showSkeleton={showSkeleton == 'true' ? true : false}
-          />
-          {/* {
+return (
+  <View style={styles({}).container}>
+    {hasPermission ? (
+      <>
+        {/* <Text>App has Permission</Text> */}
+        <Assessment
+          connectionData={connectionData}
+          requestData={requestData}
+          libData={libData}
+        />
+        {/* {
             // @ts-ignore:next-line
             assessmentName == "STANDING_BROAD_JUMP" &&
             (
@@ -94,17 +113,17 @@ export default function AssessmentPage({ route }: any) {
 
             )
           } */}
-          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
-            {displayText}
-          </Text>
-        </>
-      ) : (
-        <>
-          <Text>App don't have Permission</Text>
-        </>
-      )}
-    </View>
-  );
+        <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
+          {displayText}
+        </Text>
+      </>
+    ) : (
+      <>
+        <Text>App don't have Permission</Text>
+      </>
+    )}
+  </View>
+);
 }
 
 const styles = (orientation: any) => StyleSheet.create({

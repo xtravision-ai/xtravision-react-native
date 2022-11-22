@@ -21,23 +21,24 @@ const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
 const { width, height } = Dimensions.get('window');
 
 export interface AssessmentProp {
-  connection: {
-    authToken: string;
-    queryParams?: {
-      [key: string]: string | number;
-    };
+  connectionData: {
+    assessment_name: string;
+    auth_token: string;
+    assessment_config?: object;
+    user_config?: object;
   };
-  cameraPosition: 'front' | 'back';
-  assessment: string;
-  isEducationScreen?: boolean;
-  onServerResponse(serverResponse: any): void;
-  showSkeleton: boolean;
+  requestData: {
+    isPreJoin?: boolean;
+  };
+  libData: {
+    onServerResponse(serverResponse: any): void;
+    cameraPosition: 'front' | 'back';
+    showSkeleton: boolean;
+  }
 }
 
-
-
 //const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v1';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 //const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v1';
 
 const defaultPose = getDefaultObject();
@@ -56,11 +57,21 @@ const usePosition = (pose: any, valueName1: any, valueName2: any) => {
 
 export function Assessment(props: AssessmentProp) {
 
-  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.assessment}`;
+  console.log("props: ", props)
 
-  let queryParams: { [key: string]: any } = { authToken: props.connection.authToken };
-  if (props.connection.queryParams) {
-    queryParams = { ...queryParams, ...props.connection.queryParams };
+  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+
+  let queryParams: { [key: string]: any } = { authToken: props.connectionData.auth_token };
+  // if (props.connection.queryParams) {
+  //   queryParams = { ...queryParams, ...props.connection.queryParams };
+  // }
+
+  if (props.connectionData.user_config) {
+    queryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
+  }
+
+  if (props.connectionData.assessment_config) {
+    queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 
   //   // add some extra params
@@ -93,9 +104,7 @@ export function Assessment(props: AssessmentProp) {
   const landmarksTempRef = React.useRef<any>({});
 
   const devices = useCameraDevices();
-  const device = devices[props.cameraPosition];
-
-  // const dimensions = useWindowDimensions();
+  const device = devices[props.libData.cameraPosition];
 
   // https://medium.com/dogtronic/real-time-pose-detection-in-react-native-using-mlkit-e1819847c340
 
@@ -230,7 +239,7 @@ export function Assessment(props: AssessmentProp) {
       sendJsonMessage({
         timestamp,
         user_keypoints: keyPoints,
-        isprejoin: !!props.isEducationScreen,
+        isprejoin: !!props.requestData.isPreJoin,
       });
     }, 1000);
 
@@ -241,7 +250,7 @@ export function Assessment(props: AssessmentProp) {
   }, []);
 
   // step-4
-  !_.isEmpty(lastJsonMessage) && props.onServerResponse(lastJsonMessage);
+  !_.isEmpty(lastJsonMessage) && props.libData.onServerResponse(lastJsonMessage);
 
   // if no camera found (front or back)
   if (device == null) {
@@ -266,7 +275,7 @@ export function Assessment(props: AssessmentProp) {
         frameProcessorFps={10}
         onError={onError}
       />
-      {props.showSkeleton && (
+      {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
           height={height}

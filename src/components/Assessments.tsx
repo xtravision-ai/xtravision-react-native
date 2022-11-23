@@ -8,16 +8,12 @@ import {
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
 import { scanPoseLandmarks } from '../helper';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { runOnJS } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
 
 // TODO: create custom webhook for WS connection
 import useWebSocket from 'react-native-use-websocket';
-import { Line, Svg } from 'react-native-svg';
-
-const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-// const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,44 +30,12 @@ export interface AssessmentProp {
   libData: {
     onServerResponse(serverResponse: any): void;
     cameraPosition: 'front' | 'back';
-    showSkeleton: boolean;
   }
 }
 
 //const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
 const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 //const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v1';
-
-const defaultPose = getDefaultObject();
-
-const usePositionLine = (pose: any, valueName1: any, valueName2: any) => {
-  if (_.isUndefined(pose.value)) {
-    return {}
-  }
-  return useAnimatedStyle(
-    () => ({
-      x1: pose.value[valueName1].x,
-      y1: pose.value[valueName1].y,
-      x2: pose.value[valueName2].x,
-      y2: pose.value[valueName2].y,
-    } as any),
-    [pose],
-  );
-};
-
-// const usePositionCircle = (pose: any, valueName1: any) => {
-//   if (_.isUndefined(pose.value)) {
-//     return {}
-//   }
-//   return useAnimatedStyle(
-//     () => ({
-//       cx: pose.value[valueName1].x,
-//       cy: pose.value[valueName1].y,
-//       r: 10
-//     } as any),
-//     [pose],
-//   );
-// };
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
@@ -121,58 +85,6 @@ export function Assessment(props: AssessmentProp) {
   const devices = useCameraDevices();
   const device = devices[props.libData.cameraPosition];
 
-  // https://medium.com/dogtronic/real-time-pose-detection-in-react-native-using-mlkit-e1819847c340
-
-  // drawing line
-  const poseLine: any = useSharedValue(defaultPose);
-
-  const leftPinkyFingerToleftWristPosition = usePositionLine(poseLine, 'leftPinkyFinger', 'leftWrist');
-  const leftIndexFingerToleftWristPosition = usePositionLine(poseLine, 'leftIndexFinger', 'leftWrist');
-  const leftWristToElbowPosition = usePositionLine(poseLine, 'leftWrist', 'leftElbow');
-  const leftElbowToShoulderPosition = usePositionLine(poseLine, 'leftElbow', 'leftShoulder');
-  const leftShoulderToHipPosition = usePositionLine(poseLine, 'leftShoulder', 'leftHip');
-  const leftHipToKneePosition = usePositionLine(poseLine, 'leftHip', 'leftKnee');
-  const leftKneeToAnklePosition = usePositionLine(poseLine, 'leftKnee', 'leftAnkle');
-  const leftAnkleToLeftHeel = usePositionLine(poseLine, 'leftAnkle', 'leftHeel');
-  const leftToeToLeftHeel = usePositionLine(poseLine, 'leftToe', 'leftHeel');
-  const leftThumbToLeftWrist = usePositionLine(poseLine, 'leftThumb', 'leftWrist');
-  const leftToeToLeftAnkle = usePositionLine(poseLine, 'leftToe', 'leftAnkle');
-
-  const rightPinkyFingerToRightWristPosition = usePositionLine(poseLine, 'rightPinkyFinger', 'rightWrist');
-  const rightIndexFingerToRightWristPosition = usePositionLine(poseLine, 'rightIndexFinger', 'rightWrist');
-  const rightWristToElbowPosition = usePositionLine(poseLine, 'rightWrist', 'rightElbow');
-  const rightElbowToShoulderPosition = usePositionLine(poseLine, 'rightElbow', 'rightShoulder');
-  const rightShoulderToHipPosition = usePositionLine(poseLine, 'rightShoulder', 'rightHip');
-  const rightHipToKneePosition = usePositionLine(poseLine, 'rightHip', 'rightKnee');
-  const rightKneeToAnklePosition = usePositionLine(poseLine, 'rightKnee', 'rightAnkle');
-  const rightAnkleToRightHeel = usePositionLine(poseLine, 'rightAnkle', 'rightHeel');
-  const rightToeToRightHeel = usePositionLine(poseLine, 'rightToe', 'rightHeel');
-  const rightThumbToRightWrist = usePositionLine(poseLine, 'rightThumb', 'rightWrist');
-  const rightToeToRightAnkle = usePositionLine(poseLine, 'rightToe', 'rightAnkle');
-
-  const shoulderToShoulderPosition = usePositionLine(poseLine, 'leftShoulder', 'rightShoulder');
-  const hipToHipPosition = usePositionLine(poseLine, 'leftHip', 'rightHip');
-
-  // draw circle
-  // const poseCircle: any = useSharedValue(defaultPose);
-
-  // const leftShoulder = usePositionCircle(poseCircle, 'leftShoulder');
-  // const rightShoulder = usePositionCircle(poseCircle, 'rightShoulder');
-  // const leftElbow = usePositionCircle(poseCircle, 'leftElbow');
-
-  // const rightElbow = usePositionCircle(poseCircle, 'rightElbow');
-  // const leftWrist = usePositionCircle(poseCircle, 'leftWrist');
-  // const rightWrist = usePositionCircle(poseCircle, 'rightWrist');
-
-  // const leftHip = usePositionCircle(poseCircle, 'leftHip ');
-  // const rightHip = usePositionCircle(poseCircle, 'rightHip');
-  // const leftKnee = usePositionCircle(poseCircle, 'leftKnee ');
-
-  // const rightKnee = usePositionCircle(poseCircle, 'rightKnee');
-  // const leftAnkle = usePositionCircle(poseCircle, 'leftAnkle ');
-  // const rightAnkle = usePositionCircle(poseCircle, 'rightAnkle');
-
-
   const updateData = useCallback((now: any, landmarks: any) => {
 
     // Step-2: after extracting landmarks store unto temp variable
@@ -188,23 +100,6 @@ export function Assessment(props: AssessmentProp) {
     landmarksTempRef.current[now] = { landmarks };
   }, [])
 
-  const calculatePose = (poseCopy: any, pose: any, frame: any) => {
-    'worklet';
-    const xFactor = (height / frame.width) - 0.05;
-    const yFactor = (width / frame.height);
-
-    // [TypeError: Cannot read property 'x' of undefined]
-    try {
-      Object.keys(pose).forEach(v => {
-        poseCopy[v] = {
-          x: pose[v].x * xFactor,
-          y: pose[v].y * yFactor,
-        };
-      });
-    } catch (e) { }
-
-    poseLine.value = poseCopy;
-  }
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -212,7 +107,7 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      // console.warn(Date() + " Body is not visible!")
+      console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -236,7 +131,6 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    calculatePose(poseCopy, pose, frame);
     runOnJS(updateData)(now, Object.values(poseCopy))
 
   }, []);
@@ -309,41 +203,6 @@ export function Assessment(props: AssessmentProp) {
         frameProcessorFps={10}
         onError={onError}
       />
-      {props.libData.showSkeleton && (
-        //@ts-ignore
-        <Svg
-          height={height}
-          width={width}
-          style={styles.linesContainer}
-        >
-          <AnimatedLine animatedProps={leftPinkyFingerToleftWristPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftAnkleToLeftHeel} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightPinkyFingerToRightWristPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightAnkleToRightHeel} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftIndexFingerToleftWristPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftToeToLeftHeel} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightIndexFingerToRightWristPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightToeToRightHeel} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftThumbToLeftWrist} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightThumbToRightWrist} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightToeToRightAnkle} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftToeToLeftAnkle} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftWristToElbowPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftElbowToShoulderPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftShoulderToHipPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftHipToKneePosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={leftKneeToAnklePosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightWristToElbowPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightElbowToShoulderPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightShoulderToHipPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightHipToKneePosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={rightKneeToAnklePosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={shoulderToShoulderPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={hipToHipPosition} stroke="red" strokeWidth="2" />
-
-        </Svg>
-      )}
-
     </>
   );
 }

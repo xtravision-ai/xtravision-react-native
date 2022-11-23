@@ -13,7 +13,6 @@ export default function AssessmentPage({ route }: any) {
   const auth_token = "_AUTH_TOKEN";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  const showSkeleton = route.params.showSkeleton == 'true' ? true : false // 'true' or 'false'; 
   let assessment_config = {} as any;
   let user_config = {} as any;
 
@@ -88,7 +87,6 @@ export default function AssessmentPage({ route }: any) {
   const libData = {
     onServerResponse,
     cameraPosition,
-    showSkeleton,
 }
 
 

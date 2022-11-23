@@ -56,8 +56,8 @@ export default function HomeScreen({ navigation }: any) {
                         onPress={(value: any) => setCameraOption(value)}
                         formHorizontal={true}
                         animation={true}
-                        // labelStyle={styles.radioButtonLabel}
-                        // buttonSize={15}
+                        labelStyle={styles.radioButtonLabel}
+                        buttonSize={15}
                     />
                 </View>
 
@@ -72,8 +72,8 @@ export default function HomeScreen({ navigation }: any) {
                         onPress={(value: any) => setShowSkeleton(value)}
                         formHorizontal={true}
                         animation={true}
-                        // labelStyle={styles.radioButtonLabel}
-                        // buttonSize={15}
+                        labelStyle={styles.radioButtonLabel}
+                        buttonSize={15}
                     />
                 </View>
 

@@ -15,6 +15,7 @@ import _ from 'lodash';
 // TODO: create custom webhook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 import { Line, Svg } from 'react-native-svg';
+import DrawLineComponent from './DrawLineComponent';
 
 const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
 
@@ -43,22 +44,19 @@ const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 
 const defaultPose = getDefaultObject();
 
-const usePosition = (pose: any, valueName1: any, valueName2: any) => {
-  return useAnimatedStyle(
-    () => ({
-      x1: pose.value[valueName1].x,
-      y1: pose.value[valueName1].y,
-      x2: pose.value[valueName2].x,
-      y2: pose.value[valueName2].y,
-    } as any),
-    [pose],
-  );
-};
+// const usePositionLine = (pose: any, valueName1: any, valueName2: any) => {
+//   return useAnimatedStyle(
+//     () => ({
+//       x1: pose.value[valueName1].x,
+//       y1: pose.value[valueName1].y,
+//       x2: pose.value[valueName2].x,
+//       y2: pose.value[valueName2].y,
+//     } as any),
+//     [pose],
+//   );
+// };
 
 export function Assessment(props: AssessmentProp) {
-
-  console.log("props: ", props)
-
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
 
   let queryParams: { [key: string]: any } = { authToken: props.connectionData.auth_token };
@@ -108,36 +106,39 @@ export function Assessment(props: AssessmentProp) {
 
   // https://medium.com/dogtronic/real-time-pose-detection-in-react-native-using-mlkit-e1819847c340
 
+  // drawing line
   const poseLine: any = useSharedValue(defaultPose);
+  const { lineCordinateData } = DrawLineComponent(defaultPose);
 
-  const leftPinkyFingerToleftWristPosition = usePosition(poseLine, 'leftPinkyFinger', 'leftWrist');
-  const leftIndexFingerToleftWristPosition = usePosition(poseLine, 'leftIndexFinger', 'leftWrist');
-  const leftWristToElbowPosition = usePosition(poseLine, 'leftWrist', 'leftElbow');
-  const leftElbowToShoulderPosition = usePosition(poseLine, 'leftElbow', 'leftShoulder');
-  const leftShoulderToHipPosition = usePosition(poseLine, 'leftShoulder', 'leftHip');
-  const leftHipToKneePosition = usePosition(poseLine, 'leftHip', 'leftKnee');
-  const leftKneeToAnklePosition = usePosition(poseLine, 'leftKnee', 'leftAnkle');
-  const leftAnkleToLeftHeel = usePosition(poseLine, 'leftAnkle', 'leftHeel');
-  const leftToeToLeftHeel = usePosition(poseLine, 'leftToe', 'leftHeel');
-  const leftThumbToLeftWrist = usePosition(poseLine, 'leftThumb', 'leftWrist');
-  const leftToeToLeftAnkle = usePosition(poseLine, 'leftToe', 'leftAnkle');
-
-
-  const rightPinkyFingerToRightWristPosition = usePosition(poseLine, 'rightPinkyFinger', 'rightWrist');
-  const rightIndexFingerToRightWristPosition = usePosition(poseLine, 'rightIndexFinger', 'rightWrist');
-  const rightWristToElbowPosition = usePosition(poseLine, 'rightWrist', 'rightElbow');
-  const rightElbowToShoulderPosition = usePosition(poseLine, 'rightElbow', 'rightShoulder');
-  const rightShoulderToHipPosition = usePosition(poseLine, 'rightShoulder', 'rightHip');
-  const rightHipToKneePosition = usePosition(poseLine, 'rightHip', 'rightKnee');
-  const rightKneeToAnklePosition = usePosition(poseLine, 'rightKnee', 'rightAnkle');
-  const rightAnkleToRightHeel = usePosition(poseLine, 'rightAnkle', 'rightHeel');
-  const rightToeToRightHeel = usePosition(poseLine, 'rightToe', 'rightHeel');
-  const rightThumbToRightWrist = usePosition(poseLine, 'rightThumb', 'rightWrist');
-  const rightToeToRightAnkle = usePosition(poseLine, 'rightToe', 'rightAnkle');
+  // const leftPinkyFingerToleftWristPosition = usePositionLine(poseLine, 'leftPinkyFinger', 'leftWrist');
+  // const leftIndexFingerToleftWristPosition = usePositionLine(poseLine, 'leftIndexFinger', 'leftWrist');
+  // const leftWristToElbowPosition = usePositionLine(poseLine, 'leftWrist', 'leftElbow');
+  // const leftElbowToShoulderPosition = usePositionLine(poseLine, 'leftElbow', 'leftShoulder');
+  // const leftShoulderToHipPosition = usePositionLine(poseLine, 'leftShoulder', 'leftHip');
+  // const leftHipToKneePosition = usePositionLine(poseLine, 'leftHip', 'leftKnee');
+  // const leftKneeToAnklePosition = usePositionLine(poseLine, 'leftKnee', 'leftAnkle');
+  // const leftAnkleToLeftHeel = usePositionLine(poseLine, 'leftAnkle', 'leftHeel');
+  // const leftToeToLeftHeel = usePositionLine(poseLine, 'leftToe', 'leftHeel');
+  // const leftThumbToLeftWrist = usePositionLine(poseLine, 'leftThumb', 'leftWrist');
+  // const leftToeToLeftAnkle = usePositionLine(poseLine, 'leftToe', 'leftAnkle');
 
 
-  const shoulderToShoulderPosition = usePosition(poseLine, 'leftShoulder', 'rightShoulder');
-  const hipToHipPosition = usePosition(poseLine, 'leftHip', 'rightHip');
+  // const rightPinkyFingerToRightWristPosition = usePositionLine(poseLine, 'rightPinkyFinger', 'rightWrist');
+  // const rightIndexFingerToRightWristPosition = usePositionLine(poseLine, 'rightIndexFinger', 'rightWrist');
+  // const rightWristToElbowPosition = usePositionLine(poseLine, 'rightWrist', 'rightElbow');
+  // const rightElbowToShoulderPosition = usePositionLine(poseLine, 'rightElbow', 'rightShoulder');
+  // const rightShoulderToHipPosition = usePositionLine(poseLine, 'rightShoulder', 'rightHip');
+  // const rightHipToKneePosition = usePositionLine(poseLine, 'rightHip', 'rightKnee');
+  // const rightKneeToAnklePosition = usePositionLine(poseLine, 'rightKnee', 'rightAnkle');
+  // const rightAnkleToRightHeel = usePositionLine(poseLine, 'rightAnkle', 'rightHeel');
+  // const rightToeToRightHeel = usePositionLine(poseLine, 'rightToe', 'rightHeel');
+  // const rightThumbToRightWrist = usePositionLine(poseLine, 'rightThumb', 'rightWrist');
+  // const rightToeToRightAnkle = usePositionLine(poseLine, 'rightToe', 'rightAnkle');
+
+
+  // const shoulderToShoulderPosition = usePositionLine(poseLine, 'leftShoulder', 'rightShoulder');
+  // const hipToHipPosition = usePositionLine(poseLine, 'leftHip', 'rightHip');
+
 
   const updateData = useCallback((now: any, landmarks: any) => {
 
@@ -178,7 +179,7 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      console.warn(Date() + " Body is not visible!")
+      // console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -282,7 +283,10 @@ export function Assessment(props: AssessmentProp) {
           width={width}
           style={styles.linesContainer}
         >
-          <AnimatedLine animatedProps={leftPinkyFingerToleftWristPosition} stroke="red" strokeWidth="2" />
+          {lineCordinateData.map(item => {
+            <AnimatedLine animatedProps={item.value} stroke="red" strokeWidth="2" />
+          })}
+          {/* <AnimatedLine animatedProps={leftPinkyFingerToleftWristPosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={leftAnkleToLeftHeel} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={rightPinkyFingerToRightWristPosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={rightAnkleToRightHeel} stroke="red" strokeWidth="2" />
@@ -307,7 +311,7 @@ export function Assessment(props: AssessmentProp) {
           <AnimatedLine animatedProps={rightHipToKneePosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={rightKneeToAnklePosition} stroke="red" strokeWidth="2" />
           <AnimatedLine animatedProps={shoulderToShoulderPosition} stroke="red" strokeWidth="2" />
-          <AnimatedLine animatedProps={hipToHipPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={hipToHipPosition} stroke="red" strokeWidth="2" /> */}
         </Svg>
       )}
 

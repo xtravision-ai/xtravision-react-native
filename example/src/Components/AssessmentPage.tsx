@@ -10,7 +10,8 @@ LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
 
-  const auth_token = "_AUTH_TOKEN";
+  // dont push auth token to public repo
+  const auth_token = "_Auth_token_";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   let assessment_config = {} as any;

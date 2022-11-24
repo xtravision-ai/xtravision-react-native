@@ -10,8 +10,8 @@ LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
 
-  // dont push auth token to public repo
-  const auth_token = "_Auth_token_";
+  // don't push auth token to public repo
+  const auth_token = "__AUTH_TOKEN__";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   let assessment_config = {} as any;
@@ -40,24 +40,26 @@ export default function AssessmentPage({ route }: any) {
   const onServerResponse = function (serverResponse: any) {
     if (serverResponse.errors.length) {
       console.error(Date() + ' Server Error Response:', serverResponse.errors);
+      setDisplayText(` ERROR :=> ${serverResponse.errors[0].message}.`)
       return;
     }
 
     console.log(Date() + ' Server Data:', serverResponse.data);
 
+    const additional_response = serverResponse.data.additional_response
     /* @ts-ignore:next-line */
-    switch (assessmentName) {
+    switch (assessment_name) {
 
       /* @ts-ignore:next-line */
-      case "SIDE_FLAMINGO":
-        setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
-        break;
-      /* @ts-ignore:next-line */
-      case "PLATE_TAPPING_COORDINATION":
-        setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
-        break;
+      // case "SIDE_FLAMINGO":
+      //   setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
+      //   break;
+      // /* @ts-ignore:next-line */
+      // case "PLATE_TAPPING_COORDINATION":
+      //   setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
+      //   break;
       default:
-        setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; Reps: ${serverResponse.data.reps};`)
+        setDisplayText(`Current-Pose: ${additional_response?.in_pose}; Reps: ${additional_response?.reps?.total};`)
     }
 
   };

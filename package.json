@@ -30,8 +30,7 @@
     "example": "yarn --cwd example",
     "android": "cd example && yarn android",
     "bootstrap": "yarn install && yarn example && yarn install && yarn android ",
-    "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
-    "ln": "react-native link react-native-svg"
+    "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd .."
   },
   "keywords": [
     "xtravision",
@@ -64,7 +63,8 @@
     "@types/react": "~17.0.21",
     "@types/react-dom": "^18.0.6",
     "@types/react-native": "0.68.0",
-    "commitlint": "^17.0.2",
+    "@typescript-eslint/parser": "^5.44.0",
+    "commitlint": "17.0.2",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -164,9 +164,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "react-native-svg": "^13.6.0",
-    "react-native-use-websocket": "^0.2.6",
-    "react-native-webview": "^11.23.1"
+    "react-native-use-websocket": "^0.2.6"
   },
   "directories": {
     "example": "example",

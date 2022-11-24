@@ -5,6 +5,7 @@ import { SelectList } from 'react-native-dropdown-select-list'
 export const AssessmentList = (props: any) => {
 
   const data = [
+    { key: "HALF_SQUAT", value: "HALF_SQUAT" },
     { key: "PARTIAL_CURL_UP", value: "PARTIAL_CURL_UP" },
     { key: "PUSH_UPS", value: "PUSH_UPS" },
     { key: "PLATE_TAPPING_COORDINATION", value: "PLATE_TAPPING_COORDINATION" },
@@ -17,16 +18,10 @@ export const AssessmentList = (props: any) => {
 
   return (
     <SelectList
-      boxStyles={{ backgroundColor: 'black'}}
-      dropdownStyles={{ backgroundColor: 'black'}}
       data={data}
       defaultOption={defaultOption}
-      // setSelected={setSelected} //{(e) => props.setSelectedOption(e.value)}
       setSelected={(value: any) => props.setSelectedOption(value)}
-      // onChange={(e) => props.setSelectedOption(e.target.value)}
       search={false}
-    // setSelected={setSelected} 
-    // notFoundText = {"Requested assessment is not available"}
     />
   )
 

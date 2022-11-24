@@ -34,9 +34,9 @@ export interface AssessmentProp {
   }
 }
 
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
-//const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v1';
-//const WS_BASE_URL = 'ws://localhost:8000/wss/v1';
+ const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+// const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
+// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
@@ -46,11 +46,11 @@ export function Assessment(props: AssessmentProp) {
   //   queryParams = { ...queryParams, ...props.connection.queryParams };
   // }
 
-  if (props.connectionData.user_config) {
+  if (!_.isEmpty(props.connectionData.user_config)) {
     queryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
   }
 
-  if (props.connectionData.assessment_config) {
+  if (!_.isEmpty(props.connectionData.assessment_config)) {
     queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 

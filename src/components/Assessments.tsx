@@ -54,16 +54,16 @@ export function Assessment(props: AssessmentProp) {
     queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 
-  //   // add some extra params
-  //   if (props.assessment === 'STANDING_BROAD_JUMP'){
-  //     // TODO: hardcoded part. auto calculate by frame or remove it
-  //     const orientationData = {
-  //       "image_height": 720, //orientation.image_height,
-  //       "image_width": 1280 //orientation.image_width
-  //     }
+  // // add some extra params
+  // if (props.connectionData.assessment_name === 'STANDING_BROAD_JUMP') {
+  //   // TODO: hardcoded part. auto calculate by frame or remove it
+  //   const orientationData = {
+  //     "image_height": 720, //orientation.image_height,
+  //     "image_width": 1280 //orientation.image_width
+  //   }
 
-  //     queryParams = {...queryParams, ...orientationData }
-  //  }
+  //   queryParams = { ...queryParams, ...orientationData }
+  // }
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   const {

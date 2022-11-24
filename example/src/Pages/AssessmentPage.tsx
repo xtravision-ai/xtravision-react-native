@@ -11,7 +11,7 @@ LogBox.ignoreAllLogs();
 export default function AssessmentPage({ route }: any) {
 
   // don't push auth token to public repo
-  const auth_token = "__AUTH_TOKEN__";
+  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   let assessment_config = {} as any;
@@ -90,22 +90,22 @@ export default function AssessmentPage({ route }: any) {
   const libData = {
     onServerResponse,
     cameraPosition,
-}
+  }
 
 
-return (
-  <View style={styles({}).container}>
-    {hasPermission ? (
-      <>
-        {/* <Text>App has Permission</Text> */}
-        <Assessment
-          connectionData={connectionData}
-          requestData={requestData}
-          libData={libData}
-        />
-        {/* {
+  return (
+    <View style={styles({}).container}>
+      {hasPermission ? (
+        <>
+          {/* <Text>App has Permission</Text> */}
+          <Assessment
+            connectionData={connectionData}
+            requestData={requestData}
+            libData={libData}
+          />
+          {
             // @ts-ignore:next-line
-            assessmentName == "STANDING_BROAD_JUMP" &&
+            assessment_name == "STANDING_BROAD_JUMP" &&
             (
               <>
                 <View style={styles({ stand_x, stand_y }).point} />
@@ -113,18 +113,18 @@ return (
               </>
 
             )
-          } */}
-        <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
-          {displayText}
-        </Text>
-      </>
-    ) : (
-      <>
-        <Text>App don't have Permission</Text>
-      </>
-    )}
-  </View>
-);
+          }
+          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
+            {displayText}
+          </Text>
+        </>
+      ) : (
+        <>
+          <Text>App don't have Permission</Text>
+        </>
+      )}
+    </View>
+  );
 }
 
 const styles = (orientation: any) => StyleSheet.create({

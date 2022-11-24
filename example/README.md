@@ -31,11 +31,8 @@ yarn run android
 
 
 
-### Assessment List
-1. PUSH_UPS
-2. SIT_UPS
-3. V_SIT_AND_REACH
-4. STANDING_BROAD_JUMP
+### Assessment List:
+- [Please refer this link] (https://github.com/xtravision-ai/xtravision-react-native#assessment-list)
 
 
 -------

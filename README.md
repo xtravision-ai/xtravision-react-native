@@ -85,6 +85,9 @@ export default function App() {
 1. PUSH_UPS
 2. SIT_UPS
 3. V_SIT_AND_REACH
+4. SIDE_FLAMINGO
+5. PLATE_TAPPING_COORDINATION, 
+6. PARTIAL_CURL_UP
 
 > Tested with Node:v16.10.0 and react-native: v0.68.2
 

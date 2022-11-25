@@ -95,8 +95,7 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      // testing
-      // console.warn(Date() + " Body is not visible!")
+      console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -129,8 +128,6 @@ export function Assessment(props: AssessmentProp) {
     console.error(Date() + "  " + error.message)
 
   }
-
-  console.log("queryParams: ", queryParams)
 
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   const {

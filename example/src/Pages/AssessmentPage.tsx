@@ -11,7 +11,7 @@ LogBox.ignoreAllLogs();
 export default function AssessmentPage({ route }: any) {
 
   // don't push auth token to public repo
-  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
+  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOGRmMjM3Yi03NzljLTRlYzItYWY2Ny1iNGE5OTdlOGJjOGQiLCJhcHBJZCI6Ijk1ZWFjZDQ1LTgyZjUtMTFlYy1hOWY1LWE0YmI2ZDZlZGM0ZSIsIm9yZ0lkIjoiZGQ4MzA1OWMtODJmMy0xMWVjLWE5ZjUtYTRiYjZkNmVkYzRlIiwiaWF0IjoxNjY5MzY3NDg1LCJleHAiOjE2NzE5NTk0ODV9.U0MHfGYZyColqrcB1VclbxTNTD2PpFzyr78f9p-hI9c";
   const assessment_name = route.params.assessmentName; //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption; // 'front'; // back or front
   const userHeight = route.params.userHeight;
@@ -24,10 +24,6 @@ export default function AssessmentPage({ route }: any) {
   // (width, height) = Coordinates (x,y)
   const { width, height } = Dimensions.get('window');
 
-  // const stand_x = width - (width - width / 10) //100
-  // const stand_y = height / (height / 300) //- 100
-
-  // testing
   const stand_x = width - (width - width / 10) //100
   const stand_y = height / (height / 250) //- 100
 
@@ -63,6 +59,9 @@ export default function AssessmentPage({ route }: any) {
       // case "PLATE_TAPPING_COORDINATION":
       //   setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
       //   break;
+      case "STANDING_BROAD_JUMP":
+        setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
+        break;
       default:
         setDisplayText(`Current-Pose: ${additional_response?.in_pose}; Reps: ${additional_response?.reps?.total};`)
     }
@@ -72,7 +71,7 @@ export default function AssessmentPage({ route }: any) {
 
   // // @ts-ignore:next-line
   if (assessment_name == 'STANDING_BROAD_JUMP') {
-    user_config.userHeight = userHeight; // in Centimeter string
+    user_config.user_height = userHeight; // in Centimeter string
     // Coordinates of start point
     assessment_config.stand_x = stand_x * 2;
     assessment_config.stand_y = stand_y * 2;
@@ -96,10 +95,6 @@ export default function AssessmentPage({ route }: any) {
     onServerResponse,
     cameraPosition,
   }
-
-  // testing
-  console.log("width, height", width, height , '\n', stand_x, stand_y)
-
 
   return (
     <View style={styles({}).container}>

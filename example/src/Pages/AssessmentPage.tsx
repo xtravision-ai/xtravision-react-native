@@ -55,9 +55,9 @@ export default function AssessmentPage({ route }: any) {
       //   setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
       //   break;
       // /* @ts-ignore:next-line */
-      // case "PLATE_TAPPING_COORDINATION":
-      //   setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
-      //   break;
+      case "PLATE_TAPPING_COORDINATION":
+        setDisplayText(` Total Cycles: ${additional_response?.reps?.total};`)
+        break;
       default:
         setDisplayText(`Current-Pose: ${additional_response?.in_pose}; Reps: ${additional_response?.reps?.total};`)
     }

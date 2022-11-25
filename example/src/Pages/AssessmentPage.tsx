@@ -12,8 +12,9 @@ export default function AssessmentPage({ route }: any) {
 
   // don't push auth token to public repo
   const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMmY3N2VlOC0xOGE0LTRkNzQtYmQxMC1jYWFhMDUzNjExMTAiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjY4Njc4OTM2LCJleHAiOjE2NzEyNzA5MzZ9.S2qv_cfo5wmJJWlq1LiKbjV6Mv9V6d8SmYc5pYd2nt4";
-  const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
-  const cameraPosition = route.params.cameraOption // 'front'; // back or front
+  const assessment_name = route.params.assessmentName; //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
+  const cameraPosition = route.params.cameraOption; // 'front'; // back or front
+  const userHeight = route.params.userHeight;
   let assessment_config = {} as any;
   let user_config = {} as any;
 
@@ -23,8 +24,12 @@ export default function AssessmentPage({ route }: any) {
   // (width, height) = Coordinates (x,y)
   const { width, height } = Dimensions.get('window');
 
+  // const stand_x = width - (width - width / 10) //100
+  // const stand_y = height / (height / 300) //- 100
+
+  // testing
   const stand_x = width - (width - width / 10) //100
-  const stand_y = height / (height / 300) //- 100
+  const stand_y = height / (height / 250) //- 100
 
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
@@ -67,11 +72,11 @@ export default function AssessmentPage({ route }: any) {
 
   // // @ts-ignore:next-line
   if (assessment_name == 'STANDING_BROAD_JUMP') {
-    user_config.userHeight = 180; // in Centimeter
+    user_config.userHeight = userHeight; // in Centimeter string
     // Coordinates of start point
     assessment_config.stand_x = stand_x * 2;
     assessment_config.stand_y = stand_y * 2;
-    // TODO: hardcoded part. auto calculate by frame or remove it
+    // // TODO: hardcoded part. auto calculate by frame or remove it
     assessment_config.image_height = 720;
     assessment_config.image_width = 1280;
   }
@@ -91,6 +96,9 @@ export default function AssessmentPage({ route }: any) {
     onServerResponse,
     cameraPosition,
   }
+
+  // testing
+  console.log("width, height", width, height , '\n', stand_x, stand_y)
 
 
   return (

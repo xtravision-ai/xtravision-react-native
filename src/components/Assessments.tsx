@@ -73,7 +73,7 @@ export function Assessment(props: AssessmentProp) {
     // getWebSocket
   } = useWebSocket(WS_URL, {
     queryParams: queryParams, //{...props.connection.queryParams, queryParams}
-    onOpen: () => console.log('WS Connection opened'),
+    onOpen: () => console.log(Date() + ' WS Connection opened'),
     onError: (e: any) => console.error(e), // todo : proper error handling
     //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (_closeEvent: any) => true,

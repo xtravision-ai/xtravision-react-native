@@ -11,8 +11,8 @@ export default function HomeScreen({ navigation }: any) {
     const [cameraOption, setCameraOption] = useState("front");
 
     const styles = StyleSheet.create({
-        component: { margin: 30, padding: 25, },
-        labelText: { fontSize: 25, fontWeight: "bold", color: 'black', marginTop: 10 }
+        component: { margin: 30, padding: 25},
+        labelText: { fontSize: 25, fontWeight: "bold", marginTop: 10 }
     });
 
     const updateAssessmentName = (value: any) => setAssessmentName(value)

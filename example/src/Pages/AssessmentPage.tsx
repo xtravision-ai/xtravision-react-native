@@ -11,8 +11,7 @@ LogBox.ignoreAllLogs();
 export default function AssessmentPage({ route }: any) {
 
   // don't push auth token to public repo
-  const auth_token = "__AUTH_TOKEN__";
-  const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
+  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmYjdmMjBkOC1kMjU4LTQyZTUtODA2My0zZjg1NzM5YjBlM2IiLCJhcHBJZCI6ImFlMjkyMGUyLTQ5MmUtMTFlZC05NzhkLTAyNzNkZDFhMzQ2YyIsIm9yZ0lkIjoiYWI0MzFjMGMtNDkyZS0xMWVkLTk3OGQtMDI3M2RkMWEzNDZjIiwiaWF0IjoxNjY3OTkwODgxLCJleHAiOjE2OTk1NDg0ODF9.YXgCK40oFEaHLUoOHOYpIv8ccZzigGOddDba91omyFA";  const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   let assessment_config = {} as any;
   let user_config = {} as any;

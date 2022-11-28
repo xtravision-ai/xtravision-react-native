@@ -29,8 +29,9 @@
     "release": "release-it",
     "example": "yarn --cwd example",
     "android": "cd example && yarn android",
-    "bootstrap": "yarn install && yarn example && yarn install && yarn android ",
-    "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd .."
+    "setup": "yarn install && yarn example && yarn install && yarn android ",
+    "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
+    "create:debugAPK": "cd example && yarn build:APK && yarn create:debugAPK"
   },
   "keywords": [
     "xtravision",

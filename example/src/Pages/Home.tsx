@@ -15,7 +15,6 @@ export default function HomeScreen({ navigation }: any) {
         component: { margin: 30, padding: 25, },
         labelText: { fontSize: 25, fontWeight: "bold", color: 'black', marginTop: 10 },
         labelHeightText: { fontSize: 15, fontWeight: "bold", color: 'black', marginTop: 10 },
-
         input: {
             height: 50,
             margin: 12,

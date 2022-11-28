@@ -52,13 +52,13 @@ export default function AssessmentPage({ route }: any) {
     switch (assessment_name) {
 
       /* @ts-ignore:next-line */
-      // case "SIDE_FLAMINGO":
-      //   setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
-      //   break;
-      // /* @ts-ignore:next-line */
-      // case "PLATE_TAPPING_COORDINATION":
-      //   setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
-      //   break;
+      case "SIDE_FLAMINGO":
+        setDisplayText(`Current-Pose: ${serverResponse.data.in_pose}; \n Balance Loss: ${serverResponse.data.balance_loss} ; Remaining Time: ${serverResponse.data.remaining_time};`)
+        break;
+      /* @ts-ignore:next-line */
+      case "PLATE_TAPPING_COORDINATION":
+        setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
+        break;
       case "STANDING_BROAD_JUMP":
         setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
         break;

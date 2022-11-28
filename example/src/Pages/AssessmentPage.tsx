@@ -86,45 +86,46 @@ export default function AssessmentPage({ route }: any) {
   const requestData = {
     isPreJoin: false
   }
-
+  
   const libData = {
     onServerResponse,
     cameraPosition,
-}
+  }
 
 
-return (
-  <View style={styles({}).container}>
-    {hasPermission ? (
-      <>
-        {/* <Text>App has Permission</Text> */}
-        <Assessment
-          connectionData={connectionData}
-          requestData={requestData}
-          libData={libData}
-        />
-        {/* {
-            // @ts-ignore:next-line
-            assessmentName == "STANDING_BROAD_JUMP" &&
-            (
-              <>
-                <View style={styles({ stand_x, stand_y }).point} />
-                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
-              </>
+  return (
 
-            )
-          } */}
-        <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
-          {displayText}
-        </Text>
-      </>
-    ) : (
-      <>
-        <Text>App don't have Permission</Text>
-      </>
-    )}
-  </View>
-);
+    <View style={styles({}).container}>
+      {hasPermission ? (
+        <>
+          {/* <Text>App has Permission</Text> */}
+          <Assessment
+            connectionData={connectionData}
+            requestData={requestData}
+            libData={libData}
+          />
+          {/* {
+              // @ts-ignore:next-line
+              assessmentName == "STANDING_BROAD_JUMP" &&
+              (
+                <>
+                  <View style={styles({ stand_x, stand_y }).point} />
+                  <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+                </>
+
+              )
+            } */}
+          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
+            {displayText}
+          </Text>
+        </>
+      ) : (
+        <>
+          <Text>App don't have Permission</Text>
+        </>
+      )}
+    </View>
+  );
 }
 
 const styles = (orientation: any) => StyleSheet.create({

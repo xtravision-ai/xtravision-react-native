@@ -24,8 +24,10 @@ export default function AssessmentPage({ route }: any) {
   // (width, height) = Coordinates (x,y)
   const { width, height } = Dimensions.get('window');
 
-  const stand_x = width - (width - width / 10) //100
-  const stand_y = height / (height / 250) //- 100
+  // const stand_x = width - (width - width / 10) //100
+  // const stand_y = height / (height / 250) //- 100
+  const stand_y = height / (width / 500) //- 100
+  const stand_x = (width - width / 5)
 
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {

@@ -1,31 +1,40 @@
 {
-  "name": "react-native-xtravision-example",
-  "description": "Example app for react-native-xtravision",
-  "version": "0.0.1",
+  "name": "xtravision-react-native-example",
+  "description": "Example app for xtravision-react-native",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start --reset-cache"
+    "start": "react-native start",
+    "pods": "pod-install --quiet",
+    "postinstall": "patch-package",
+    "build:APK": "react-native bundle --platform android --dev false --entry-file index.tsx --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "create:debugAPK": "cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
-    "@types/react": "~17.0.2",
-    "@types/react-dom": "17.0.14",
-    "@types/react-native": "~0.66.3",
-    "lodash": "^4.17.21",
-    "react": "17.0.2",
-    "react-native": "0.66.3",
-    "react-native-reanimated": "^2.10.0",
-    "react-native-use-websocket": "^0.2.6",
-    "react-native-vision-camera": "2.14.1"
+    "@react-navigation/native": "^6.0.13",
+    "@react-navigation/native-stack": "^6.9.1",
+    "react": "^18.2.0",
+    "react-native": "0.68.2",
+    "react-native-dropdown-select-list": "^2.0.2",
+    "react-native-reanimated": "2.10.0",
+    "react-native-safe-area-context": "^4.4.1",
+    "react-native-screens": "^3.18.2",
+    "react-native-simple-radio-button": "^2.7.4",
+    "react-native-vision-camera": "2.13.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/runtime": "^7.15.3",
+    "@babel/core": "^7.12.10",
+    "@babel/runtime": "^7.12.5",
+    "@types/react": "^18.0.18",
+    "@types/react-native": "^0.69.8",
+    "@types/react-native-simple-radio-button": "^2.7.2",
     "babel-plugin-module-resolver": "^4.1.0",
-    "metro-react-native-babel-preset": "^0.66.2"
-  },
-  "resolutions": {
-    "@types/react": "17.0.43"
+    "basil-ws-flipper": "^0.2.8",
+    "metro-react-native-babel-preset": "^0.67.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
+    "react-native-flipper": "^0.174.0"
   }
 }

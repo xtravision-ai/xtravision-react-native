@@ -58,16 +58,31 @@ export default function App() {
   const assessmentName = '__ASSESSMENT_NAME__';
   const cameraPosition = 'back'; // front or back
 
+
+  const connectionData = {
+    assessment_name,
+    auth_token,
+    assessment_config = {},  // check document for more details
+    user_config = {}, // check document for more details
+  };
+
+  const requestData = {
+    isPreJoin: false
+  }
+  
+  const libData = {
+    onServerResponse,
+    cameraPosition,
+  }
+
   return (
     <View style={styles.container}>
       {hasPermission ? (
         <>
           <Assessment
-            cameraPosition={cameraPosition}
-            connection={{authToken, queryParams: {}}}
-            assessment={assessmentName}
-            isEducationScreen={false}
-            onServerResponse={onServerResponse}
+            connectionData={connectionData}
+            requestData={requestData}
+            libData={libData}
           />
         </>
       ) : (

@@ -121,7 +121,7 @@ export function Assessment(props: AssessmentProp) {
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible
-      if (!pose[v] || pose[v].visibility < 0.3) {
+      if (!pose[v]) {
         return;
       }
       poseCopy[v] = {

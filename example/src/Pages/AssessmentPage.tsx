@@ -11,9 +11,10 @@ LogBox.ignoreAllLogs();
 export default function AssessmentPage({ route }: any) {
 
   // don't push auth token to public repo
-  const auth_token = "__AUTH_TOKEN__";  
+  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTU1NTVkNS0wNmFhLTExZWQtOGJkYy0xMmZhYjRmZmFiZWQiLCJhcHBJZCI6IjY5YTdmMmU2LTA2YWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiNmQ5MWZlN2YtMDZhOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYwMTA3MjI0LCJleHAiOjE2OTE2NjQ4MjR9._i4MJbwPznHzxoStcRAcK7N7k_xGdUjvKwmHXv1zixM";  
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
+  const showSkeleton = route.params.showSkeleton; // true or false
   let assessment_config = {} as any;
   let user_config = {} as any;
 
@@ -44,7 +45,8 @@ export default function AssessmentPage({ route }: any) {
       return;
     }
 
-    console.log(Date() + ' Server Data:', serverResponse.data);
+    // testing
+    // console.log(Date() + ' Server Data:', serverResponse.data);
 
     const additional_response = serverResponse.data.additional_response
     /* @ts-ignore:next-line */
@@ -90,6 +92,7 @@ export default function AssessmentPage({ route }: any) {
   const libData = {
     onServerResponse,
     cameraPosition,
+    showSkeleton,
   }
 
 

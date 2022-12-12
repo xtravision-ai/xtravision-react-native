@@ -8,15 +8,34 @@ import {
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
 import { scanPoseLandmarks } from '../helper';
-import { runOnJS } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
-
+import Svg, { Line } from 'react-native-svg';
 
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
+const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
+
+const usePositionLine = (poseLine: any, valueName1: any, valueName2: any) => {
+  try {
+    const res = useAnimatedStyle(
+      () => ({
+        x1: poseLine.value[valueName1].x,
+        y1: poseLine.value[valueName1].y,
+        x2: poseLine.value[valueName2].x,
+        y2: poseLine.value[valueName2].y,
+      } as any),
+      [poseLine],
+    );
+    return res;
+  } catch (e) { console.log(e) }
+};
+
 const { width, height } = Dimensions.get('window');
+
+const defaultPose = getDefaultObject();
 
 export interface AssessmentProp {
   connectionData: {
@@ -31,10 +50,11 @@ export interface AssessmentProp {
   libData: {
     onServerResponse(serverResponse: any): void;
     cameraPosition: 'front' | 'back';
+    showSkeleton: boolean;
   }
 }
 
- const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
@@ -86,6 +106,33 @@ export function Assessment(props: AssessmentProp) {
   const devices = useCameraDevices();
   const device = devices[props.libData.cameraPosition];
 
+  const poseLine: any = useSharedValue(defaultPose);
+  const leftPinkyFingerToleftWristPosition = usePositionLine(poseLine, 'leftPinkyFinger', 'leftWrist');
+  const leftIndexFingerToleftWristPosition = usePositionLine(poseLine, 'leftIndexFinger', 'leftWrist');
+  const leftWristToElbowPosition = usePositionLine(poseLine, 'leftWrist', 'leftElbow');
+  const leftElbowToShoulderPosition = usePositionLine(poseLine, 'leftElbow', 'leftShoulder');
+  const leftShoulderToHipPosition = usePositionLine(poseLine, 'leftShoulder', 'leftHip');
+  const leftHipToKneePosition = usePositionLine(poseLine, 'leftHip', 'leftKnee');
+  const leftKneeToAnklePosition = usePositionLine(poseLine, 'leftKnee', 'leftAnkle');
+  const leftAnkleToLeftHeel = usePositionLine(poseLine, 'leftAnkle', 'leftHeel');
+  const leftToeToLeftHeel = usePositionLine(poseLine, 'leftToe', 'leftHeel');
+  const leftThumbToLeftWrist = usePositionLine(poseLine, 'leftThumb', 'leftWrist');
+  const leftToeToLeftAnkle = usePositionLine(poseLine, 'leftToe', 'leftAnkle');
+  const rightPinkyFingerToRightWristPosition = usePositionLine(poseLine, 'rightPinkyFinger', 'rightWrist');
+  const rightIndexFingerToRightWristPosition = usePositionLine(poseLine, 'rightIndexFinger', 'rightWrist');
+  const rightWristToElbowPosition = usePositionLine(poseLine, 'rightWrist', 'rightElbow');
+  const rightElbowToShoulderPosition = usePositionLine(poseLine, 'rightElbow', 'rightShoulder');
+  const rightShoulderToHipPosition = usePositionLine(poseLine, 'rightShoulder', 'rightHip');
+  const rightHipToKneePosition = usePositionLine(poseLine, 'rightHip', 'rightKnee');
+  const rightKneeToAnklePosition = usePositionLine(poseLine, 'rightKnee', 'rightAnkle');
+  const rightAnkleToRightHeel = usePositionLine(poseLine, 'rightAnkle', 'rightHeel');
+  const rightToeToRightHeel = usePositionLine(poseLine, 'rightToe', 'rightHeel');
+  const rightThumbToRightWrist = usePositionLine(poseLine, 'rightThumb', 'rightWrist');
+  const rightToeToRightAnkle = usePositionLine(poseLine, 'rightToe', 'rightAnkle');
+
+  const shoulderToShoulderPosition = usePositionLine(poseLine, 'leftShoulder', 'rightShoulder');
+  const hipToHipPosition = usePositionLine(poseLine, 'leftHip', 'rightHip');
+
   const updateData = useCallback((now: any, landmarks: any) => {
 
     // Step-2: after extracting landmarks store unto temp variable
@@ -100,6 +147,23 @@ export function Assessment(props: AssessmentProp) {
 
     landmarksTempRef.current[now] = { landmarks };
   }, [])
+
+  const calculatePose = (poseCopy: any, pose: any, frame: any) => {
+    'worklet';
+    const xFactor = (height / frame.width) - 0.05;
+    const yFactor = (width / frame.height);
+
+    // [TypeError: Cannot read property 'x' of undefined]
+    try {
+      Object.keys(pose).forEach(v => {
+        poseCopy[v] = {
+          x: pose[v].x * xFactor,
+          y: pose[v].y * yFactor,
+        };
+      });
+    } catch (e) { }
+    poseLine.value = poseCopy;
+  }
 
 
   // Step-1: using frame processor, extract body landmarks from Pose
@@ -118,6 +182,7 @@ export function Assessment(props: AssessmentProp) {
     const now = Date.now();
     // normalize pose: process to convert pose object to required formate
     const poseCopy: any = getDefaultObject();
+    const poseCopyLine: any = getDefaultObject();
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible
@@ -131,6 +196,8 @@ export function Assessment(props: AssessmentProp) {
         visibility: pose[v].visibility,
       };
     });
+
+    calculatePose(poseCopyLine, pose, frame);
 
     runOnJS(updateData)(now, Object.values(poseCopy))
 
@@ -204,6 +271,41 @@ export function Assessment(props: AssessmentProp) {
         frameProcessorFps={10}
         onError={onError}
       />
+
+      {props.libData.showSkeleton && (
+        //@ts-ignore
+        <Svg
+          height={height}
+          width={width}
+          style={styles.linesContainer}
+        >
+          <AnimatedLine animatedProps={leftPinkyFingerToleftWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftAnkleToLeftHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightPinkyFingerToRightWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightAnkleToRightHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftIndexFingerToleftWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftToeToLeftHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightIndexFingerToRightWristPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightToeToRightHeel} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftThumbToLeftWrist} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightThumbToRightWrist} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightToeToRightAnkle} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftToeToLeftAnkle} stroke="red" strokeWidth="2" />
+
+          <AnimatedLine animatedProps={leftWristToElbowPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftElbowToShoulderPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftShoulderToHipPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftHipToKneePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={leftKneeToAnklePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightWristToElbowPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightElbowToShoulderPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightShoulderToHipPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightHipToKneePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={rightKneeToAnklePosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={shoulderToShoulderPosition} stroke="red" strokeWidth="2" />
+          <AnimatedLine animatedProps={hipToHipPosition} stroke="red" strokeWidth="2" />
+        </Svg>
+      )}
     </>
   );
 }

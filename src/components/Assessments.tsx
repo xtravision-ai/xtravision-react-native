@@ -18,8 +18,20 @@ import useWebSocket from 'react-native-use-websocket';
 
 const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
 
-const usePositionLine = (poseLine: any, valueName1: any, valueName2: any) => {
+const usePositionLine = (poseLine: any, valueName1: any, valueName2: any, cameraOption: string, width: number, height: number) => {
   try {
+    if (cameraOption === 'front') {
+      const res = useAnimatedStyle(
+        () => ({
+          x1: width - poseLine.value[valueName1].x,
+          y1: poseLine.value[valueName1].y,
+          x2: width - poseLine.value[valueName2].x,
+          y2: poseLine.value[valueName2].y,
+        } as any),
+        [poseLine],
+      );
+      return res;
+    }
     const res = useAnimatedStyle(
       () => ({
         x1: poseLine.value[valueName1].x,
@@ -107,31 +119,31 @@ export function Assessment(props: AssessmentProp) {
   const device = devices[props.libData.cameraPosition];
 
   const poseLine: any = useSharedValue(defaultPose);
-  const leftPinkyFingerToleftWristPosition = usePositionLine(poseLine, 'leftPinkyFinger', 'leftWrist');
-  const leftIndexFingerToleftWristPosition = usePositionLine(poseLine, 'leftIndexFinger', 'leftWrist');
-  const leftWristToElbowPosition = usePositionLine(poseLine, 'leftWrist', 'leftElbow');
-  const leftElbowToShoulderPosition = usePositionLine(poseLine, 'leftElbow', 'leftShoulder');
-  const leftShoulderToHipPosition = usePositionLine(poseLine, 'leftShoulder', 'leftHip');
-  const leftHipToKneePosition = usePositionLine(poseLine, 'leftHip', 'leftKnee');
-  const leftKneeToAnklePosition = usePositionLine(poseLine, 'leftKnee', 'leftAnkle');
-  const leftAnkleToLeftHeel = usePositionLine(poseLine, 'leftAnkle', 'leftHeel');
-  const leftToeToLeftHeel = usePositionLine(poseLine, 'leftToe', 'leftHeel');
-  const leftThumbToLeftWrist = usePositionLine(poseLine, 'leftThumb', 'leftWrist');
-  const leftToeToLeftAnkle = usePositionLine(poseLine, 'leftToe', 'leftAnkle');
-  const rightPinkyFingerToRightWristPosition = usePositionLine(poseLine, 'rightPinkyFinger', 'rightWrist');
-  const rightIndexFingerToRightWristPosition = usePositionLine(poseLine, 'rightIndexFinger', 'rightWrist');
-  const rightWristToElbowPosition = usePositionLine(poseLine, 'rightWrist', 'rightElbow');
-  const rightElbowToShoulderPosition = usePositionLine(poseLine, 'rightElbow', 'rightShoulder');
-  const rightShoulderToHipPosition = usePositionLine(poseLine, 'rightShoulder', 'rightHip');
-  const rightHipToKneePosition = usePositionLine(poseLine, 'rightHip', 'rightKnee');
-  const rightKneeToAnklePosition = usePositionLine(poseLine, 'rightKnee', 'rightAnkle');
-  const rightAnkleToRightHeel = usePositionLine(poseLine, 'rightAnkle', 'rightHeel');
-  const rightToeToRightHeel = usePositionLine(poseLine, 'rightToe', 'rightHeel');
-  const rightThumbToRightWrist = usePositionLine(poseLine, 'rightThumb', 'rightWrist');
-  const rightToeToRightAnkle = usePositionLine(poseLine, 'rightToe', 'rightAnkle');
+  const leftPinkyFingerToleftWristPosition = usePositionLine(poseLine, 'leftPinkyFinger', 'leftWrist', props.libData.cameraPosition, width, height);
+  const leftIndexFingerToleftWristPosition = usePositionLine(poseLine, 'leftIndexFinger', 'leftWrist', props.libData.cameraPosition, width, height);
+  const leftWristToElbowPosition = usePositionLine(poseLine, 'leftWrist', 'leftElbow', props.libData.cameraPosition, width, height);
+  const leftElbowToShoulderPosition = usePositionLine(poseLine, 'leftElbow', 'leftShoulder', props.libData.cameraPosition, width, height);
+  const leftShoulderToHipPosition = usePositionLine(poseLine, 'leftShoulder', 'leftHip', props.libData.cameraPosition, width, height);
+  const leftHipToKneePosition = usePositionLine(poseLine, 'leftHip', 'leftKnee', props.libData.cameraPosition, width, height);
+  const leftKneeToAnklePosition = usePositionLine(poseLine, 'leftKnee', 'leftAnkle', props.libData.cameraPosition, width, height);
+  const leftAnkleToLeftHeel = usePositionLine(poseLine, 'leftAnkle', 'leftHeel', props.libData.cameraPosition, width, height);
+  const leftToeToLeftHeel = usePositionLine(poseLine, 'leftToe', 'leftHeel', props.libData.cameraPosition, width, height);
+  const leftThumbToLeftWrist = usePositionLine(poseLine, 'leftThumb', 'leftWrist', props.libData.cameraPosition, width, height);
+  const leftToeToLeftAnkle = usePositionLine(poseLine, 'leftToe', 'leftAnkle', props.libData.cameraPosition, width, height);
+  const rightPinkyFingerToRightWristPosition = usePositionLine(poseLine, 'rightPinkyFinger', 'rightWrist', props.libData.cameraPosition, width, height);
+  const rightIndexFingerToRightWristPosition = usePositionLine(poseLine, 'rightIndexFinger', 'rightWrist', props.libData.cameraPosition, width, height);
+  const rightWristToElbowPosition = usePositionLine(poseLine, 'rightWrist', 'rightElbow', props.libData.cameraPosition, width, height);
+  const rightElbowToShoulderPosition = usePositionLine(poseLine, 'rightElbow', 'rightShoulder', props.libData.cameraPosition, width, height);
+  const rightShoulderToHipPosition = usePositionLine(poseLine, 'rightShoulder', 'rightHip', props.libData.cameraPosition, width, height);
+  const rightHipToKneePosition = usePositionLine(poseLine, 'rightHip', 'rightKnee', props.libData.cameraPosition, width, height);
+  const rightKneeToAnklePosition = usePositionLine(poseLine, 'rightKnee', 'rightAnkle', props.libData.cameraPosition, width, height);
+  const rightAnkleToRightHeel = usePositionLine(poseLine, 'rightAnkle', 'rightHeel', props.libData.cameraPosition, width, height);
+  const rightToeToRightHeel = usePositionLine(poseLine, 'rightToe', 'rightHeel', props.libData.cameraPosition, width, height);
+  const rightThumbToRightWrist = usePositionLine(poseLine, 'rightThumb', 'rightWrist', props.libData.cameraPosition, width, height);
+  const rightToeToRightAnkle = usePositionLine(poseLine, 'rightToe', 'rightAnkle', props.libData.cameraPosition, width, height);
 
-  const shoulderToShoulderPosition = usePositionLine(poseLine, 'leftShoulder', 'rightShoulder');
-  const hipToHipPosition = usePositionLine(poseLine, 'leftHip', 'rightHip');
+  const shoulderToShoulderPosition = usePositionLine(poseLine, 'leftShoulder', 'rightShoulder', props.libData.cameraPosition, width, height);
+  const hipToHipPosition = usePositionLine(poseLine, 'leftHip', 'rightHip', props.libData.cameraPosition, width, height);
 
   const updateData = useCallback((now: any, landmarks: any) => {
 
@@ -148,7 +160,7 @@ export function Assessment(props: AssessmentProp) {
     landmarksTempRef.current[now] = { landmarks };
   }, [])
 
-  const calculatePose = (poseCopy: any, pose: any, frame: any) => {
+  const calculateLinePose = (poseCopy: any, pose: any, frame: any) => {
     'worklet';
     const xFactor = (height / frame.width) - 0.05;
     const yFactor = (width / frame.height);
@@ -197,7 +209,7 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    calculatePose(poseCopyLine, pose, frame);
+    calculateLinePose(poseCopyLine, pose, frame);
 
     runOnJS(updateData)(now, Object.values(poseCopy))
 

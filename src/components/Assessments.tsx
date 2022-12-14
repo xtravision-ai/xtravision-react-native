@@ -97,6 +97,7 @@ export function Assessment(props: AssessmentProp) {
   const poseLine: any = useSharedValue(defaultPose);
   const poseCircle: any = useSharedValue(defaultPose);
 
+
   const animatedLinesArray = generateSkeletonLines(poseLine, props.libData.cameraPosition, width);
   const animatedCircleArray = generateSkeletonCircle(poseCircle, props.libData.cameraPosition, width);
 
@@ -115,7 +116,7 @@ export function Assessment(props: AssessmentProp) {
     landmarksTempRef.current[now] = { landmarks };
   }, [])
 
-  const calculateLinePose = (poseCopy: any, pose: any, frame: any) => {
+  const calculateLinePose = (poseCopyLine: any, pose: any, frame: any) => {
     'worklet';
     const xFactor = (height / frame.width) - 0.05;
     const yFactor = (width / frame.height);
@@ -123,16 +124,18 @@ export function Assessment(props: AssessmentProp) {
     // [TypeError: Cannot read property 'x' of undefined]
     try {
       Object.keys(pose).forEach(v => {
-        poseCopy[v] = {
+        poseCopyLine[v] = {
           x: pose[v].x * xFactor,
           y: pose[v].y * yFactor,
         };
       });
+
     } catch (e) { }
-    poseLine.value = poseCopy;
+    poseLine.value = poseCopyLine;
+    console.log("poseLine", poseLine)
   }
 
-  const calculateCirclePose = (poseCopy: any, pose: any, frame: any) => {
+  const calculateCirclePose = (poseCopyCircle: any, pose: any, frame: any) => {
     'worklet';
     const xFactor = (height / frame.width) - 0.05;
     const yFactor = (width / frame.height);
@@ -140,13 +143,15 @@ export function Assessment(props: AssessmentProp) {
     // [TypeError: Cannot read property 'x' of undefined]
     try {
       Object.keys(pose).forEach(v => {
-        poseCopy[v] = {
-          x: pose[v].x * xFactor,
-          y: pose[v].y * yFactor,
+        poseCopyCircle[v] = {
+          cx: pose[v].x * xFactor,
+          cy: pose[v].y * yFactor,
         };
       });
     } catch (e) { }
-    poseCircle.value = poseCopy;
+    poseCircle.value = poseCopyCircle;
+    // console.log("poseCircle", poseCircle)
+
   }
 
 
@@ -272,15 +277,7 @@ export function Assessment(props: AssessmentProp) {
           })}
           {/* {animatedCircleArray.map((element: any) => {
             return (
-              // <AnimatedCircle animatedProps={element} stroke="red" fill="red" />
-              <Circle
-                cx={element.initial.value.x}
-                cy={element.initial.value.y}
-                r="8"
-                stroke="red"
-                strokeWidth="2.5"
-                fill="red"
-              />
+              <AnimatedCircle animatedProps={element} stroke="red" fill="red" />
             )
           })} */}
         </Svg>
@@ -288,6 +285,16 @@ export function Assessment(props: AssessmentProp) {
     </>
   );
 }
+
+//   <Circle
+//     cx={element.initial.value.x}
+//     cy={element.initial.value.y}
+//     r="8"
+//     stroke="red"
+//     strokeWidth="2.5"
+//     fill="red"
+//   />
+// )
 
 const styles = StyleSheet.create({
   camera: {

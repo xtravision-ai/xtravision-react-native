@@ -44,30 +44,28 @@ export const usePositionLine = (poseLine: any, valueName1: any, valueName2: any,
 };
 
 export const usePositionCircle = (poseCircle: any, valueName1: any, cameraOption: string, width: number) => {
-  if (_.isUndefined(poseCircle[valueName1])) console.log(valueName1);
-  // try {
-  //   if (cameraOption === 'front') {
-  //     const res = useAnimatedStyle(
-  //       () => ({
-  //         cx: width - poseCircle.value[valueName1].x,
-  //         cy: poseCircle.value[valueName1].y,
-  //         r: 20,
-  //       } as any),
-  //       [poseCircle],
-  //     );
-  //     return res;
-  //   }
-  //   const res = useAnimatedStyle(
-  //     () => ({
-  //       cx: poseCircle.value[valueName1].x,
-  //       cy: poseCircle.value[valueName1].y,
-  //       r: 20,
-  //     } as any),
-  //     [poseCircle],
-  //   );
-
-  //   return res;
-  // } catch (e) { console.log(e) }
+  try {
+    if (cameraOption === 'front') {
+      const res = useAnimatedStyle(
+        () => ({
+          cx: width - poseCircle[valueName1].x,
+          cy: poseCircle[valueName1].y,
+          r: 20,
+        } as any),
+        [poseCircle],
+      );
+      return res;
+    }
+    const res = useAnimatedStyle(
+      () => ({
+        cx: poseCircle.value[valueName1].x,
+        cy: poseCircle.value[valueName1].y,
+        r: 20,
+      } as any),
+      [poseCircle],
+    );
+    return res;
+  } catch (e) { console.log(e) }
 };
 
 export const generateSkeletonLines = (poseLine: any, cameraPosition: any, width: any) => {
@@ -139,37 +137,17 @@ export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, wid
   const leftAnkle = usePositionCircle(poseCircle, 'leftAnkle', cameraPosition, width);
   const rightAnkle = usePositionCircle(poseCircle, 'rightAnkle', cameraPosition, width);
 
-  const leftPinky = usePositionCircle(poseCircle, 'leftPinky', cameraPosition, width);
-  const rightPinky = usePositionCircle(poseCircle, 'rightPinky', cameraPosition, width);
-  const leftIndex = usePositionCircle(poseCircle, 'leftIndex', cameraPosition, width);
-  const rightIndex = usePositionCircle(poseCircle, 'rightIndex', cameraPosition, width);
+  const leftPinkyFinger = usePositionCircle(poseCircle, 'leftPinkyFinger', cameraPosition, width);
+  const rightPinkyFinger = usePositionCircle(poseCircle, 'rightPinkyFinger', cameraPosition, width);
+  const leftIndexFinger = usePositionCircle(poseCircle, 'leftIndexFinger', cameraPosition, width);
+  const rightIndexFinger = usePositionCircle(poseCircle, 'rightIndexFinger', cameraPosition, width);
   const leftThumb = usePositionCircle(poseCircle, 'leftThumb', cameraPosition, width);
   const rightThumb = usePositionCircle(poseCircle, 'rightThumb', cameraPosition, width);
   const leftHeel = usePositionCircle(poseCircle, 'leftHeel', cameraPosition, width);
   const rightHeel = usePositionCircle(poseCircle, 'rightHeel', cameraPosition, width);
-  const leftFootIndex = usePositionCircle(poseCircle, 'leftFootIndex', cameraPosition, width);
-  const rightFootIndex = usePositionCircle(poseCircle, 'rightFootIndex', cameraPosition, width);
-
-  //todo: match undefined values to the getDefaultvalues 
-
-  // leftPinky      
-  // rightPinky     
-  // leftIndex      
-  // rightIndex     
-  // leftFootIndex  
-  // rightFootIndex 
-  // leftPinky      
-  // rightPinky     
-  // leftIndex      
-  // rightIndex     
-  // leftFootIndex  
-  // rightFootIndex 
-  // leftPinky      
-  // rightPinky     
-  // leftIndex      
-  // rightIndex     
-  // leftFootIndex  
-  // rightFootIndex 
+  const leftToe = usePositionCircle(poseCircle, 'leftToe', cameraPosition, width);
+  const rightToe = usePositionCircle(poseCircle, 'rightToe', cameraPosition, width);
+  // console.log("leftShoulder: ", leftShoulder);
 
   return [
     leftShoulder,
@@ -184,15 +162,15 @@ export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, wid
     rightKnee,
     leftAnkle,
     rightAnkle,
-    leftPinky,
-    rightPinky,
-    leftIndex,
-    rightIndex,
+    leftPinkyFinger,
+    rightPinkyFinger,
+    leftIndexFinger,
+    rightIndexFinger,
     leftThumb,
     rightThumb,
     leftHeel,
     rightHeel,
-    leftFootIndex,
-    rightFootIndex,
+    leftToe,
+    rightToe,
   ]
 };

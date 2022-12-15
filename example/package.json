@@ -10,7 +10,8 @@
     "pods": "pod-install --quiet",
     "postinstall": "patch-package",
     "build:APK": "react-native bundle --platform android --dev false --entry-file index.tsx --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
-    "create:debugAPK": "cd android && ./gradlew assembleDebug"
+    "create:debugAPK": "cd android && ./gradlew assembleDebug",
+    "build:ios": "react-native bundle --entry-file='index.tsx' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'"
   },
   "dependencies": {
     "@react-navigation/native": "^6.0.13",

@@ -39,6 +39,7 @@ export interface AssessmentProp {
 // const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
+  console.log("========Assessment==============")
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
 
   let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
@@ -80,7 +81,7 @@ export function Assessment(props: AssessmentProp) {
     //To attempt to reconnect on error events,
     retryOnError: true,
   });
-
+  console.log("========1==============")
   const landmarksTempRef = React.useRef<any>({});
 
   const devices = useCameraDevices();
@@ -97,7 +98,7 @@ export function Assessment(props: AssessmentProp) {
     // // normalized frames into landmarks and store landmarks with current millis in temp variable
     // const now = Date.now();
     // const landmarks = getNormalizedArray(pose1, frame, dimensions);
-
+    console.log("========2==============")
     landmarksTempRef.current[now] = { landmarks };
   }, [])
 
@@ -105,8 +106,9 @@ export function Assessment(props: AssessmentProp) {
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
+    console.log("========3==============")
     const pose = scanPoseLandmarks(frame);
-
+    console.log("========4==============")
     if (Object.keys(pose).length == 0) {
       console.warn(Date() + " Body is not visible!")
       return;

@@ -45,8 +45,7 @@ export default function AssessmentPage({ route }: any) {
       return;
     }
 
-    // testing
-    // console.log(Date() + ' Server Data:', serverResponse.data);
+    console.log(Date() + ' Server Data:', serverResponse.data);
 
     const additional_response = serverResponse.data.additional_response
     /* @ts-ignore:next-line */

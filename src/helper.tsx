@@ -48,9 +48,9 @@ export const usePositionCircle = (poseCircle: any, valueName1: any, cameraOption
     if (cameraOption === 'front') {
       const res = useAnimatedStyle(
         () => ({
-          cx: width - poseCircle[valueName1].x,
-          cy: poseCircle[valueName1].y,
-          r: 20,
+          cx: width - poseCircle.value[valueName1].x,
+          cy: poseCircle.value[valueName1].y,
+          r: 7,
         } as any),
         [poseCircle],
       );
@@ -60,7 +60,7 @@ export const usePositionCircle = (poseCircle: any, valueName1: any, cameraOption
       () => ({
         cx: poseCircle.value[valueName1].x,
         cy: poseCircle.value[valueName1].y,
-        r: 20,
+        r: 7,
       } as any),
       [poseCircle],
     );
@@ -147,7 +147,6 @@ export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, wid
   const rightHeel = usePositionCircle(poseCircle, 'rightHeel', cameraPosition, width);
   const leftToe = usePositionCircle(poseCircle, 'leftToe', cameraPosition, width);
   const rightToe = usePositionCircle(poseCircle, 'rightToe', cameraPosition, width);
-  // console.log("leftShoulder: ", leftShoulder);
 
   return [
     leftShoulder,

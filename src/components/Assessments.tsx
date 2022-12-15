@@ -8,7 +8,7 @@ import {
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
 import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
-import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
+import Animated, {runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
 import Svg, { Circle, Line } from 'react-native-svg';
@@ -94,12 +94,10 @@ export function Assessment(props: AssessmentProp) {
   const device = devices[props.libData.cameraPosition];
 
   // svg
-  const poseLine: any = useSharedValue(defaultPose);
-  const poseCircle: any = useSharedValue(defaultPose);
+  const poseSkeleton: any = useSharedValue(defaultPose);
 
-
-  const animatedLinesArray = generateSkeletonLines(poseLine, props.libData.cameraPosition, width);
-  const animatedCircleArray = generateSkeletonCircle(poseCircle, props.libData.cameraPosition, width);
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width);
+  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width);
 
   const updateData = useCallback((now: any, landmarks: any) => {
 
@@ -116,7 +114,7 @@ export function Assessment(props: AssessmentProp) {
     landmarksTempRef.current[now] = { landmarks };
   }, [])
 
-  const calculateLinePose = (poseCopyLine: any, pose: any, frame: any) => {
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
     'worklet';
     const xFactor = (height / frame.width) - 0.05;
     const yFactor = (width / frame.height);
@@ -124,36 +122,15 @@ export function Assessment(props: AssessmentProp) {
     // [TypeError: Cannot read property 'x' of undefined]
     try {
       Object.keys(pose).forEach(v => {
-        poseCopyLine[v] = {
+        poseCopyObj[v] = {
           x: pose[v].x * xFactor,
           y: pose[v].y * yFactor,
         };
       });
 
     } catch (e) { }
-    poseLine.value = poseCopyLine;
-    console.log("poseLine", poseLine)
+    poseSkeleton.value = poseCopyObj;
   }
-
-  const calculateCirclePose = (poseCopyCircle: any, pose: any, frame: any) => {
-    'worklet';
-    const xFactor = (height / frame.width) - 0.05;
-    const yFactor = (width / frame.height);
-
-    // [TypeError: Cannot read property 'x' of undefined]
-    try {
-      Object.keys(pose).forEach(v => {
-        poseCopyCircle[v] = {
-          cx: pose[v].x * xFactor,
-          cy: pose[v].y * yFactor,
-        };
-      });
-    } catch (e) { }
-    poseCircle.value = poseCopyCircle;
-    // console.log("poseCircle", poseCircle)
-
-  }
-
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -171,8 +148,7 @@ export function Assessment(props: AssessmentProp) {
     const now = Date.now();
     // normalize pose: process to convert pose object to required formate
     const poseCopy: any = getDefaultObject();
-    const poseCopyLine: any = getDefaultObject();
-    const poseCopyCircle: any = getDefaultObject();
+    const poseCopyObj: any = getDefaultObject();
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible
@@ -187,9 +163,7 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    calculateLinePose(poseCopyLine, pose, frame);
-    calculateCirclePose(poseCopyCircle, pose, frame);
-
+    calculatePoseSkeleton(poseCopyObj, pose, frame);
     runOnJS(updateData)(now, Object.values(poseCopy))
 
   }, []);
@@ -270,16 +244,16 @@ export function Assessment(props: AssessmentProp) {
           width={width}
           style={styles.linesContainer}
         >
-          {animatedLinesArray.map((element: any) => {
+          {animatedLinesArray.map((element: any, key: any) => {
             return (
-              <AnimatedLine animatedProps={element} stroke="red" strokeWidth="2" />
+              <AnimatedLine animatedProps={element} stroke="red" strokeWidth="2" key={key} />
             )
           })}
-          {/* {animatedCircleArray.map((element: any) => {
+          {animatedCircleArray.map((element: any) => {
             return (
               <AnimatedCircle animatedProps={element} stroke="red" fill="red" />
             )
-          })} */}
+          })}
         </Svg>
       )}
     </>

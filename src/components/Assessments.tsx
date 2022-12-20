@@ -35,8 +35,8 @@ export interface AssessmentProp {
 }
 
 //  const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
-const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+// const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
@@ -112,13 +112,12 @@ export function Assessment(props: AssessmentProp) {
         return;
       }
       poseCopy[v] = {
-        x: pose[v].x / frame.width,
+        x: props.libData.cameraPosition === 'back' ? pose[v].x / frame.width : (frame.width - pose[v].x) / frame.width,
         y: pose[v].y / frame.width,
         z: pose[v].z / frame.width,
         visibility: pose[v].visibility,
       };
     });
-
     runOnJS(updateData)(now, Object.values(poseCopy))
 
   }, []);

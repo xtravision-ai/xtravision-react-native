@@ -1,15 +1,16 @@
 import React from "react";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput } from "react-native";
-import { Button, View } from 'react-native';
+import { Button } from 'react-native';
 import { AssessmentList } from "../Components/AssessmentList";
 import { CameraOption } from "../Components/CameraOption";
 
 
 export default function HomeScreen({ navigation }: any) {
     const [assessmentName, setAssessmentName] = useState("");
-    const [cameraOption, setCameraOption] = useState("back");
-    const [userHeight, onChangeUserHeight] = React.useState('0');
+    const [cameraOption, setCameraOption] = useState("front");
+    // testing
+    const [userHeight, onChangeUserHeight] = React.useState('160');
 
     const styles = StyleSheet.create({
         component: { margin: 30, padding: 25, },

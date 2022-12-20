@@ -11,7 +11,7 @@ LogBox.ignoreAllLogs();
 export default function AssessmentPage({ route }: any) {
 
   // don't push auth token to public repo
-  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3OTliZDI2YS0zYWMzLTQ4MzYtYWQ0NS04NDU4MDE1ZWUzODIiLCJhcHBJZCI6ImFlMjkyMGUyLTQ5MmUtMTFlZC05NzhkLTAyNzNkZDFhMzQ2YyIsIm9yZ0lkIjoiYWI0MzFjMGMtNDkyZS0xMWVkLTk3OGQtMDI3M2RkMWEzNDZjIiwiaWF0IjoxNjY4NTExODk5LCJleHAiOjE3MDAwNjk0OTl9.Jhxc8810s2hL8P2w2qiKj4O9WDVuZ9wU1_UevNTpWF4";
+  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwOGRmMjM3Yi03NzljLTRlYzItYWY2Ny1iNGE5OTdlOGJjOGQiLCJhcHBJZCI6Ijk1ZWFjZDQ1LTgyZjUtMTFlYy1hOWY1LWE0YmI2ZDZlZGM0ZSIsIm9yZ0lkIjoiZGQ4MzA1OWMtODJmMy0xMWVjLWE5ZjUtYTRiYjZkNmVkYzRlIiwiaWF0IjoxNjcwODI1OTc3LCJleHAiOjE2NzM0MTc5Nzd9.nWiGihyAL8a6cN5NwxNTDcWWmqw7hqVHf-_g_oqmGzQ";
   const assessment_name = route.params.assessmentName; //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption; // 'front'; // back or front
   const userHeight = route.params.userHeight;
@@ -24,10 +24,10 @@ export default function AssessmentPage({ route }: any) {
   // (width, height) = Coordinates (x,y)
   const { width, height } = Dimensions.get('window');
 
-  // const stand_x = width - (width - width / 10) //100
-  // const stand_y = height / (height / 250) //- 100
-  const stand_y = height / (width / 500) //- 100
-  const stand_x = (width - width / 5)
+  const stand_x = width - (width - width / 10) //100
+  const stand_y = height / (height / 250) //- 100
+  // const stand_y = height / (width / 500) //- 100
+  // const stand_x = (width - width / 5)
 
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
@@ -70,13 +70,12 @@ export default function AssessmentPage({ route }: any) {
 
   };
 
-
   // // @ts-ignore:next-line
   if (assessment_name == 'STANDING_BROAD_JUMP') {
     user_config.user_height = userHeight; // in Centimeter string
     // Coordinates of start point
-    assessment_config.stand_x = stand_x * 2;
-    assessment_config.stand_y = stand_y * 2;
+    assessment_config.stand_x = stand_x ;
+    assessment_config.stand_y = stand_y ;
     // // TODO: hardcoded part. auto calculate by frame or remove it
     assessment_config.image_height = 720;
     assessment_config.image_width = 1280;
@@ -158,7 +157,7 @@ const styles = (orientation: any) => StyleSheet.create({
   startPoint: {
     // width: 20,
     // height: 20,
-    // borderRadius: 20,
+    // borderRadius: 20,........
     // backgroundColor: '#fc0505',
     top: orientation?.stand_y + 20,   // y axis
     left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable

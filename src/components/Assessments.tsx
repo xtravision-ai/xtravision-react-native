@@ -7,16 +7,22 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import { scanPoseLandmarks } from '../helper';
-import { runOnJS } from 'react-native-reanimated';
+import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
+import Animated, {runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
-
+import Svg, { Circle, Line } from 'react-native-svg';
 
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
+const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
+const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
+
+
 const { width, height } = Dimensions.get('window');
+
+const defaultPose = getDefaultObject();
 
 export interface AssessmentProp {
   connectionData: {
@@ -31,10 +37,11 @@ export interface AssessmentProp {
   libData: {
     onServerResponse(serverResponse: any): void;
     cameraPosition: 'front' | 'back';
+    showSkeleton: boolean;
   }
 }
 
- const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
@@ -86,6 +93,12 @@ export function Assessment(props: AssessmentProp) {
   const devices = useCameraDevices();
   const device = devices[props.libData.cameraPosition];
 
+  // svg
+  const poseSkeleton: any = useSharedValue(defaultPose);
+
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width);
+  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width);
+
   const updateData = useCallback((now: any, landmarks: any) => {
 
     // Step-2: after extracting landmarks store unto temp variable
@@ -101,6 +114,23 @@ export function Assessment(props: AssessmentProp) {
     landmarksTempRef.current[now] = { landmarks };
   }, [])
 
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
+    'worklet';
+    const xFactor = (height / frame.width) - 0.05;
+    const yFactor = (width / frame.height);
+
+    // [TypeError: Cannot read property 'x' of undefined]
+    try {
+      Object.keys(pose).forEach(v => {
+        poseCopyObj[v] = {
+          x: pose[v].x * xFactor,
+          y: pose[v].y * yFactor,
+        };
+      });
+
+    } catch (e) { }
+    poseSkeleton.value = poseCopyObj;
+  }
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -118,6 +148,7 @@ export function Assessment(props: AssessmentProp) {
     const now = Date.now();
     // normalize pose: process to convert pose object to required formate
     const poseCopy: any = getDefaultObject();
+    const poseCopyObj: any = getDefaultObject();
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible
@@ -132,6 +163,7 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
+    calculatePoseSkeleton(poseCopyObj, pose, frame);
     runOnJS(updateData)(now, Object.values(poseCopy))
 
   }, []);
@@ -204,9 +236,39 @@ export function Assessment(props: AssessmentProp) {
         frameProcessorFps={10}
         onError={onError}
       />
+
+      {props.libData.showSkeleton && (
+        //@ts-ignore
+        <Svg
+          height={height}
+          width={width}
+          style={styles.linesContainer}
+        >
+          {animatedLinesArray.map((element: any, key: any) => {
+            return (
+              <AnimatedLine animatedProps={element} stroke="red" strokeWidth="2" key={key} />
+            )
+          })}
+          {animatedCircleArray.map((element: any) => {
+            return (
+              <AnimatedCircle animatedProps={element} stroke="red" fill="red" />
+            )
+          })}
+        </Svg>
+      )}
     </>
   );
 }
+
+//   <Circle
+//     cx={element.initial.value.x}
+//     cy={element.initial.value.y}
+//     r="8"
+//     stroke="red"
+//     strokeWidth="2.5"
+//     fill="red"
+//   />
+// )
 
 const styles = StyleSheet.create({
   camera: {

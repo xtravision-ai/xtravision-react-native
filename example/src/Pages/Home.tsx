@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, TextInput } from "react-native";
 import { Button } from 'react-native';
 import { AssessmentList } from "../Components/AssessmentList";
 import { CameraOption } from "../Components/CameraOption";
+import { SkeletonOption } from "../Components/SkeletonOption";
 
 
 export default function HomeScreen({ navigation }: any) {
@@ -11,6 +12,7 @@ export default function HomeScreen({ navigation }: any) {
     const [cameraOption, setCameraOption] = useState("front");
     // testing
     const [userHeight, onChangeUserHeight] = React.useState('160');
+    const [showSkeleton, setShowSkeleton] = useState("true");
 
     const styles = StyleSheet.create({
         component: { margin: 30, padding: 25, },
@@ -27,6 +29,7 @@ export default function HomeScreen({ navigation }: any) {
 
     const updateAssessmentName = (value: any) => setAssessmentName(value)
     const onPressCameraOption = (value: any) => setCameraOption(value)
+    const onPressSkeletonOption = (value: any) => setShowSkeleton(value)
 
     return (
         <>
@@ -49,6 +52,9 @@ export default function HomeScreen({ navigation }: any) {
 
                 )}
 
+                <Text style={styles.labelText}>Display Skeleton </Text>
+                <SkeletonOption setSelectedOption={onPressSkeletonOption} />
+
                 <Text style={styles.labelText}>Choose  Camera </Text>
                 <CameraOption setSelectedOption={onPressCameraOption} />
 
@@ -57,10 +63,10 @@ export default function HomeScreen({ navigation }: any) {
                     title={"Let's Start " + assessmentName}
                     disabled={userHeight.length <= 1}
                     onPress={() =>
-                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight })
+                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight, showSkeleton })
                     }
                 />
-                <Text style={{marginBottom: 20}}></Text>
+                <Text style={{ marginBottom: 20 }}></Text>
             </ScrollView>
         </>
 

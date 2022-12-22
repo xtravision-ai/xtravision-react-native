@@ -10,8 +10,7 @@ import { SkeletonOption } from "../Components/SkeletonOption";
 export default function HomeScreen({ navigation }: any) {
     const [assessmentName, setAssessmentName] = useState("");
     const [cameraOption, setCameraOption] = useState("front");
-    // testing
-    const [userHeight, onChangeUserHeight] = React.useState('160');
+    const [userHeight, onChangeUserHeight] = React.useState('');
     const [showSkeleton, setShowSkeleton] = useState("true");
 
     const styles = StyleSheet.create({
@@ -52,8 +51,8 @@ export default function HomeScreen({ navigation }: any) {
 
                 )}
 
-                <Text style={styles.labelText}>Display Skeleton </Text>
-                <SkeletonOption setSelectedOption={onPressSkeletonOption} />
+                {/* <Text style={styles.labelText}>Display Skeleton </Text>
+                <SkeletonOption setSelectedOption={onPressSkeletonOption} /> */}
 
                 <Text style={styles.labelText}>Choose  Camera </Text>
                 <CameraOption setSelectedOption={onPressCameraOption} />

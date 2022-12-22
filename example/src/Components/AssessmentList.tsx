@@ -15,9 +15,8 @@ export const AssessmentList = (props: any) => {
     { key: "V_SIT_AND_REACH", value: "V_SIT_AND_REACH" },
   ]
   
-  const defaultOption = { key: "STANDING_BROAD_JUMP", value: "STANDING_BROAD_JUMP" };
+  const defaultOption = { key: "PARTIAL_CURL_UP", value: "PARTIAL_CURL_UP" };
   
-
   return (
     <SelectList
       data={data}

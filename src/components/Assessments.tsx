@@ -41,15 +41,12 @@ export interface AssessmentProp {
   }
 }
 
-//  const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+ const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
-
-
-
   let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
   // if (props.connection.queryParams) {
   //   queryParams = { ...queryParams, ...props.connection.queryParams };

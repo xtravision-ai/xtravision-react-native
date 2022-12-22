@@ -4,8 +4,7 @@ import { ScrollView, StyleSheet, Text, TextInput } from "react-native";
 import { Button } from 'react-native';
 import { AssessmentList } from "../Components/AssessmentList";
 import { CameraOption } from "../Components/CameraOption";
-import { SkeletonOption } from "../Components/SkeletonOption";
-
+// import { SkeletonOption } from "../Components/SkeletonOption";
 
 export default function HomeScreen({ navigation }: any) {
     const [assessmentName, setAssessmentName] = useState("");
@@ -16,8 +15,8 @@ export default function HomeScreen({ navigation }: any) {
 
     const styles = StyleSheet.create({
         component: { margin: 30, padding: 25, },
-        labelText: { fontSize: 25, fontWeight: "bold", color: 'black', marginTop: 10 },
-        labelHeightText: { fontSize: 15, fontWeight: "bold", color: 'black', marginTop: 10 },
+        labelText: { fontSize: 25, fontWeight: "bold", marginTop: 10 },
+        labelHeightText: { fontSize: 15, fontWeight: "bold",  marginTop: 10 },
         input: {
             height: 50,
             margin: 12,
@@ -29,7 +28,7 @@ export default function HomeScreen({ navigation }: any) {
 
     const updateAssessmentName = (value: any) => setAssessmentName(value)
     const onPressCameraOption = (value: any) => setCameraOption(value)
-    const onPressSkeletonOption = (value: any) => setShowSkeleton(value)
+    // const onPressSkeletonOption = (value: any) => setShowSkeleton(value)
 
     return (
         <>

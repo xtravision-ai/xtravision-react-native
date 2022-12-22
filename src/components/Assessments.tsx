@@ -41,13 +41,12 @@ export interface AssessmentProp {
   }
 }
 
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+ const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
-
   let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
   // if (props.connection.queryParams) {
   //   queryParams = { ...queryParams, ...props.connection.queryParams };
@@ -61,32 +60,17 @@ export function Assessment(props: AssessmentProp) {
     queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 
-  //   // add some extra params
-  //   if (props.assessment === 'STANDING_BROAD_JUMP'){
-  //     // TODO: hardcoded part. auto calculate by frame or remove it
-  //     const orientationData = {
-  //       "image_height": 720, //orientation.image_height,
-  //       "image_width": 1280 //orientation.image_width
-  //     }
+  // add some extra params
+  // if (props.connectionData.assessment_name === 'STANDING_BROAD_JUMP') {
+  //   // TODO: hardcoded part. auto calculate by frame or remove it
+  //   const orientationData = {
+  //     "image_height": 720, //orientation.image_height,
+  //     "image_width": 1280 //orientation.image_width
+  //   }
 
-  //     queryParams = {...queryParams, ...orientationData }
-  //  }
+  //   queryParams = { ...queryParams, ...orientationData }
+  // }
 
-  // https://github.com/Sumit1993/react-native-use-websocket#readme
-  const {
-    sendJsonMessage,
-    lastJsonMessage,
-    // readyState,
-    // getWebSocket
-  } = useWebSocket(WS_URL, {
-    queryParams: queryParams, //{...props.connection.queryParams, queryParams}
-    onOpen: () => console.log(Date() + ' WS Connection opened'),
-    onError: (e: any) => console.error(e), // todo : proper error handling
-    //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (_closeEvent: any) => true,
-    //To attempt to reconnect on error events,
-    retryOnError: true,
-  });
 
   const landmarksTempRef = React.useRef<any>({});
 
@@ -156,7 +140,7 @@ export function Assessment(props: AssessmentProp) {
         return;
       }
       poseCopy[v] = {
-        x: pose[v].x / frame.width,
+        x: props.libData.cameraPosition === 'back' ? pose[v].x / frame.width : (frame.width - pose[v].x) / frame.width,
         y: pose[v].y / frame.width,
         z: pose[v].z / frame.width,
         visibility: pose[v].visibility,
@@ -168,13 +152,27 @@ export function Assessment(props: AssessmentProp) {
 
   }, []);
 
-
-
   const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
     console.error(Date() + "  " + error.message)
 
   }
+
+  // https://github.com/Sumit1993/react-native-use-websocket#readme
+  const {
+    sendJsonMessage,
+    lastJsonMessage,
+    // readyState,
+    // getWebSocket
+  } = useWebSocket(WS_URL, {
+    queryParams: queryParams, //{...props.connection.queryParams, queryParams}
+    onOpen: () => console.log('WS Connection opened'),
+    onError: (e: any) => console.error(e), // todo : proper error handling
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (_closeEvent: any) => true,
+    //To attempt to reconnect on error events,
+    retryOnError: true,
+  });
 
   // step-3: send data to server
   useEffect(() => {

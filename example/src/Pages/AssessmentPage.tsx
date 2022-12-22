@@ -9,10 +9,11 @@ import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
-  const auth_token = "_AUTH_TOKEN_";  
+  const auth_token = "_AUTH_TOKEN_";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  const showSkeleton = route.params.showSkeleton; // true or false
+  // const showSkeleton = route.params.showSkeleton; // true or false
+  const showSkeleton = false; // true or false
   const userHeight = route.params.userHeight;
   let assessment_config = {} as any;
   let user_config = {} as any;
@@ -73,8 +74,8 @@ export default function AssessmentPage({ route }: any) {
   if (assessment_name == 'STANDING_BROAD_JUMP') {
     user_config.user_height = userHeight; // in Centimeter string
     // Coordinates of start point
-    assessment_config.stand_x = stand_x ;
-    assessment_config.stand_y = stand_y ;
+    assessment_config.stand_x = stand_x;
+    assessment_config.stand_y = stand_y;
     // // TODO: hardcoded part. auto calculate by frame or remove it
     assessment_config.image_height = 720;
     assessment_config.image_width = 1280;
@@ -90,7 +91,7 @@ export default function AssessmentPage({ route }: any) {
   const requestData = {
     isPreJoin: false
   }
-  
+
   const libData = {
     onServerResponse,
     cameraPosition,

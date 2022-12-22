@@ -52,6 +52,9 @@ export default function HomeScreen({ navigation }: any) {
 
                 )}
 
+                {/* <Text style={styles.labelText}>Display Skeleton </Text>
+                <SkeletonOption setSelectedOption={onPressSkeletonOption} /> */}
+
                 <Text style={styles.labelText}>Choose  Camera </Text>
                 <CameraOption setSelectedOption={onPressCameraOption} />
 
@@ -63,7 +66,7 @@ export default function HomeScreen({ navigation }: any) {
                         navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight, showSkeleton  })
                     }
                 />
-                <Text style={{marginBottom: 20}}></Text>
+                <Text style={{ marginBottom: 20 }}></Text>
             </ScrollView>
         </>
 

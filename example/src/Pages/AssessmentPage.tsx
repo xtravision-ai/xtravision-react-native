@@ -59,7 +59,7 @@ export default function AssessmentPage({ route }: any) {
         break;
       // /* @ts-ignore:next-line */
       case "PLATE_TAPPING_COORDINATION":
-        setDisplayText(` Total Cycles: ${serverResponse.data.reps};`)
+        setDisplayText(` Total Cycles: ${additional_response?.reps?.total};`)
         break;
       case "STANDING_BROAD_JUMP":
         setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)

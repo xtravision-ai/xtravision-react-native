@@ -29,6 +29,18 @@ export default function AssessmentPage({ route }: any) {
   // const stand_y = height / (width / 500) //- 100
   // const stand_x = (width - width / 5)
 
+  let point_1;
+  let point_2;
+  let point_3;
+
+  // console.log("point_1", point_1, "point_2: ", point_2, "point_3: ", point_3);
+
+  if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
+    point_1 = width / 3 - (width / 3) / 2;
+    point_2 = width / 2;
+    point_3 = width - width / 3 + (width / 3) / 2;
+  };
+
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
     (async () => {
@@ -79,6 +91,9 @@ export default function AssessmentPage({ route }: any) {
     // // TODO: hardcoded part. auto calculate by frame or remove it
     assessment_config.image_height = 720;
     assessment_config.image_width = 1280;
+    assessment_config.point_1 = point_1;
+    assessment_config.point_2 = point_2;
+    assessment_config.point_3 = point_3;
   }
 
   const connectionData = {
@@ -108,13 +123,31 @@ export default function AssessmentPage({ route }: any) {
             requestData={requestData}
             libData={libData}
           />
+          {/* {
+              // @ts-ignore:next-line
+              assessment_name == "STANDING_BROAD_JUMP" &&
+              (
+                <>
+                  <View style={styles({ stand_x, stand_y }).point} />
+                  <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+                </>
+
+              )
+            } */}
+
           {
             // @ts-ignore:next-line
-            assessment_name == "STANDING_BROAD_JUMP" &&
+            assessment_name == "PLATE_TAPPING_COORDINATION" &&
             (
               <>
-                <View style={styles({ stand_x, stand_y }).point} />
-                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+                {/* left */}
+                <View style={styles({ height, point_1 }).leftPoint} />
+
+                {/* center */}
+                <View style={styles({ height, point_2 }).middlePoint} />
+
+                {/* right */}
+                <View style={styles({ height, point_3 }).rightPoint} />
               </>
 
             )
@@ -152,6 +185,36 @@ const styles = (orientation: any) => StyleSheet.create({
     backgroundColor: '#fc0505',
     top: orientation?.stand_y,   // y axis
     left: orientation?.stand_x,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  leftPoint: {
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    backgroundColor: '#fc0505',
+    top: orientation.height - orientation.height / 4,   // y axis
+    left: orientation?.point_1,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  middlePoint: {
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    backgroundColor: '#fc0505',
+    top: orientation.height - orientation.height / 4,   // y axis
+    left: orientation.point_2,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  rightPoint: {
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    backgroundColor: '#fc0505',
+    top: orientation.height - orientation.height / 4,   // y axis
+    left: orientation?.point_3,     // x axis // TODO: make is configurable
     position: 'absolute', //overlap on the camera
     // // left: 280,     // x axis // TODO: make is configurable
   },

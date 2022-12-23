@@ -15,7 +15,8 @@ export const AssessmentList = (props: any) => {
     { key: "V_SIT_AND_REACH", value: "V_SIT_AND_REACH" },
   ]
   
-  const defaultOption = { key: "PARTIAL_CURL_UP", value: "PARTIAL_CURL_UP" };
+  // testing
+  const defaultOption = { key: "PLATE_TAPPING_COORDINATION", value: "PLATE_TAPPING_COORDINATION" };
   
   return (
     <SelectList

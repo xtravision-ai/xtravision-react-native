@@ -86,6 +86,7 @@ export default function AssessmentPage({ route }: any) {
     auth_token,
     assessment_config,
     user_config,
+    session_id : null
   };
 
   const requestData = {

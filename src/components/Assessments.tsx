@@ -1,5 +1,5 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text, Dimensions } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import {
   Camera,
@@ -19,9 +19,6 @@ import useWebSocket from 'react-native-use-websocket';
 const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
-
-const { width, height } = Dimensions.get('window');
-
 const defaultPose = getDefaultObject();
 
 export interface AssessmentProp {
@@ -30,6 +27,7 @@ export interface AssessmentProp {
     auth_token: string;
     assessment_config?: object;
     user_config?: object;
+    session_id?:string | null
   };
   requestData: {
     isPreJoin?: boolean;
@@ -41,17 +39,29 @@ export interface AssessmentProp {
   }
 }
 
- const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+//  const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
-  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
-  let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
-  // if (props.connection.queryParams) {
-  //   queryParams = { ...queryParams, ...props.connection.queryParams };
-  // }
+  // const { width, height } = Dimensions.get('window');
+  const dimensions = useWindowDimensions();
 
+  const width = dimensions.width
+  const height = dimensions.height;
+
+  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+  let queryParams: { [key: string]: any } = {}; 
+  
+  // put all required query params;
+  queryParams["auth_token"] = props.connectionData.auth_token;
+
+  // TODO: enable below code. Facing weird behavior, unable to start assessment component while use below 2 lines
+  // const reqAt = Date.now();
+  // queryParams["requested_at"]= reqAt
+
+  queryParams["session_id"]= props.connectionData.session_id ? props.connectionData.session_id : null;
+  
   if (!_.isEmpty(props.connectionData.user_config)) {
     queryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
   }
@@ -60,50 +70,32 @@ export function Assessment(props: AssessmentProp) {
     queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 
-  // add some extra params
-  // if (props.connectionData.assessment_name === 'STANDING_BROAD_JUMP') {
-  //   // TODO: hardcoded part. auto calculate by frame or remove it
-  //   const orientationData = {
-  //     "image_height": 720, //orientation.image_height,
-  //     "image_width": 1280 //orientation.image_width
-  //   }
-
-  //   queryParams = { ...queryParams, ...orientationData }
-  // }
-
-
   const landmarksTempRef = React.useRef<any>({});
+  const frameTempRef = React.useRef<any>({frame_height: height, frame_width: width});
 
   const devices = useCameraDevices();
   const device = devices[props.libData.cameraPosition];
 
-  // svg
   const poseSkeleton: any = useSharedValue(defaultPose);
+  // const frameDimensions: any = useSharedValue({width, height });
 
   const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width);
   const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width);
 
-  const updateData = useCallback((now: any, landmarks: any) => {
-
-    // Step-2: after extracting landmarks store unto temp variable
-    // const poseFrameHandler = useCallback((pose1: any, frame: any) => {
-    //   if (_.isEmpty(pose1)) {
-    //     // console.log('Pose is empty!',)
-    //     return;
-    //   }
-    // // normalized frames into landmarks and store landmarks with current millis in temp variable
-    // const now = Date.now();
-    // const landmarks = getNormalizedArray(pose1, frame, dimensions);
-
+  const updateData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
+    frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
   }, [])
 
-  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
     'worklet';
+
+    // always consider updated values: (if phone rotate then height and width should be change)
+    const height = dimensions.height;
+    const width = dimensions.width;
     const xFactor = (height / frame.width) - 0.05;
     const yFactor = (width / frame.height);
 
-    // [TypeError: Cannot read property 'x' of undefined]
     try {
       Object.keys(pose).forEach(v => {
         poseCopyObj[v] = {
@@ -147,10 +139,10 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    calculatePoseSkeleton(poseCopyObj, pose, frame);
-    runOnJS(updateData)(now, Object.values(poseCopy))
+    calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
+    runOnJS(updateData)(now, Object.values(poseCopy), frame)
 
-  }, []);
+  }, [dimensions]);
 
   const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
@@ -199,6 +191,8 @@ export function Assessment(props: AssessmentProp) {
         timestamp,
         user_keypoints: keyPoints,
         isprejoin: !!props.requestData.isPreJoin,
+        frame_width: frameTempRef.current.frame_width,
+        frame_height: frameTempRef.current.frame_height
       });
     }, 1000);
 
@@ -220,6 +214,45 @@ export function Assessment(props: AssessmentProp) {
       </Text>
     );
   }
+
+
+  const styles = StyleSheet.create({
+    camera: {
+      flex: 1,
+      width: '100%',
+    },
+    container: {
+      // flex: 1,
+      // justifyContent: "center",
+      // alignItems: "center",
+      //backgroundColor: "#e5e5e5",
+      position: 'absolute', //overlap on the camera
+      left: 280,     // x axis // TODO: make is configurable
+      top: 650, // y axis
+  
+    },
+    verticalText: {
+      transform: [{ rotate: '270deg' }],
+      color: 'red',
+      fontWeight: 'bold'
+    },
+    point: {
+      width: 20,
+      height: 20,
+      backgroundColor: '#fc0505',
+      borderRadius: 20,
+      // position: 'absolute', //overlap on the camera
+      // left: 280,     // x axis // TODO: make is configurable
+      top: 20,   // y axis
+    },
+    linesContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      height: height,
+      width: width,
+    },
+  });
 
   return (
     <>
@@ -257,65 +290,3 @@ export function Assessment(props: AssessmentProp) {
     </>
   );
 }
-
-//   <Circle
-//     cx={element.initial.value.x}
-//     cy={element.initial.value.y}
-//     r="8"
-//     stroke="red"
-//     strokeWidth="2.5"
-//     fill="red"
-//   />
-// )
-
-const styles = StyleSheet.create({
-  camera: {
-    flex: 1,
-    width: '100%',
-  },
-  container: {
-    // flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
-    //backgroundColor: "#e5e5e5",
-    position: 'absolute', //overlap on the camera
-    left: 280,     // x axis // TODO: make is configurable
-    top: 650, // y axis
-
-  },
-  verticalText: {
-    transform: [{ rotate: '270deg' }],
-    color: 'red',
-    fontWeight: 'bold'
-  },
-  point: {
-    width: 20,
-    height: 20,
-    backgroundColor: '#fc0505',
-    borderRadius: 20,
-    // position: 'absolute', //overlap on the camera
-    // left: 280,     // x axis // TODO: make is configurable
-    top: 20,   // y axis
-  },
-  linesContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: height,
-    width: width,
-  },
-});
-
-
-// const markerStyles = (orientation: any) =>
-//   StyleSheet.create({
-//     point: {
-//       width: 20,
-//       height: 20,
-//       backgroundColor: '#fc0505',
-//       borderRadius: 20,
-//       position: 'absolute', //overlap on the camera
-//       left: 280,     // x axis // TODO: make is configurable
-//       top: 650,   // y axis
-//     },
-//   });

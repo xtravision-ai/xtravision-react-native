@@ -21,6 +21,8 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
 const defaultPose = getDefaultObject();
 
+const { width, height } = Dimensions.get('window');
+
 export interface AssessmentProp {
   connectionData: {
     assessment_name: string;
@@ -38,9 +40,9 @@ export interface AssessmentProp {
   }
 }
 
-// const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
@@ -108,13 +110,12 @@ export function Assessment(props: AssessmentProp) {
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, orientation: any) => {
     'worklet';
     // og code
-    // const xFactor = (height / frame.width) - 0.05;
-    // const yFactor = (width / frame.height);
+    const xFactor = (height / frame.width) - 0.05;
+    const yFactor = (width / frame.height);
 
     // using orientation height,width
-    console.log("frame height: ", frame.height)
-    const xFactor = orientation.mode === 'PORTRAIT' ? (orientation.height / frame.height) : (orientation.width / frame.width);
-    const yFactor = orientation.mode === 'PORTRAIT' ? (orientation.width / frame.width) : (orientation.height / frame.width);
+    // const xFactor = orientation.mode === 'PORTRAIT' ? (orientation.height / frame.height) : (orientation.width / frame.width);
+    // const yFactor = orientation.mode === 'PORTRAIT' ? (orientation.width / frame.width) : (orientation.height / frame.width);
 
     // [TypeError: Cannot read property 'x' of undefined]
     try {

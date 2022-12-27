@@ -40,21 +40,36 @@ export interface AssessmentProp {
   }
 }
 
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+// const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
   const [orientation, setOrientation] = React.useState({ width: 1280, height: 720, mode: 'LANDSCAPE' });
 
   React.useEffect(() => {
+    const { width, height } = Dimensions.get('window');
+    if (height > width) {
+      setOrientation({ height: height, width: width, mode: 'PORTRAIT' })
+    }
+    else {
+      setOrientation({ height: height, width: width, mode: 'LANDSCAPE' })
+    }
+  }, []);
+
+  React.useEffect(() => {
     const orientationSub = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-      if (height > width) setOrientation({ height: height, width: width, mode: 'PORTRAIT' })
-      else setOrientation({ height: height, width: width, mode: 'LANDSCAPE' })
+      if (height > width) {
+        setOrientation({ height: height, width: width, mode: 'PORTRAIT' })
+      }
+      else {
+        setOrientation({ height: height, width: width, mode: 'LANDSCAPE' })
+      }
     })
     return () => orientationSub.remove();
-  }, [])
+  }, []);
+
 
   let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
   // if (props.connection.queryParams) {
@@ -107,15 +122,15 @@ export function Assessment(props: AssessmentProp) {
     landmarksTempRef.current[now] = { landmarks };
   }, [])
 
-  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, orientation: any) => {
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
     'worklet';
     // og code
-    const xFactor = (height / frame.width) - 0.05;
-    const yFactor = (width / frame.height);
+    // const xFactor = (height / frame.width) - 0.05;
+    // const yFactor = (width / frame.height);
 
     // using orientation height,width
-    // const xFactor = orientation.mode === 'PORTRAIT' ? (orientation.height / frame.height) : (orientation.width / frame.width);
-    // const yFactor = orientation.mode === 'PORTRAIT' ? (orientation.width / frame.width) : (orientation.height / frame.width);
+    const xFactor = orientation.mode === 'PORTRAIT' ? (orientation.height / frame.width) : (orientation.width / orientation.width) - 0.34;
+    const yFactor = orientation.mode === 'PORTRAIT' ? (orientation.width / frame.height) : (orientation.height / orientation.height) - 0.55;
 
     // [TypeError: Cannot read property 'x' of undefined]
     try {
@@ -162,7 +177,7 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    calculatePoseSkeleton(poseCopyObj, pose, frame, orientation);
+    calculatePoseSkeleton(poseCopyObj, pose, frame);
     runOnJS(updateData)(now, Object.values(poseCopy));
 
   }, [orientation]);
@@ -251,7 +266,9 @@ export function Assessment(props: AssessmentProp) {
         onError={onError}
       />
 
-      {props.libData.showSkeleton && Object.values(landmarksTempRef.current).length !== 0 && (
+      <Text>width: {orientation.width} heighgt: {orientation.height}</Text>
+
+      {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
           height={orientation.height}

@@ -11,11 +11,12 @@ export const AssessmentList = (props: any) => {
     { key: "PLATE_TAPPING_COORDINATION", value: "PLATE_TAPPING_COORDINATION" },
     { key: "SIDE_FLAMINGO", value: "SIDE_FLAMINGO" },
     { key: "SIT_UPS", value: "SIT_UPS" },
-    // { key: "STANDING_BROAD_JUMP", value: "STANDING_BROAD_JUMP" },
+    { key: "STANDING_BROAD_JUMP", value: "STANDING_BROAD_JUMP" },
     { key: "V_SIT_AND_REACH", value: "V_SIT_AND_REACH" },
   ]
+  
   const defaultOption = { key: "PARTIAL_CURL_UP", value: "PARTIAL_CURL_UP" };
-
+  
   return (
     <SelectList
       data={data}

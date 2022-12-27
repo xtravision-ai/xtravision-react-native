@@ -37,7 +37,7 @@ export default function MyStack() {
           name="AssessmentPage"
           component={AssessmentPage}
           //@ts-expect-error
-          options={({ route}) => ({ title: 'Assessment: ' + route.params?.assessmentName })}
+          options={({ route}) => ({ headerShown:false,  title: 'Assessment: ' + route.params?.assessmentName })}
         />
       </Stack.Navigator>
     </NavigationContainer>

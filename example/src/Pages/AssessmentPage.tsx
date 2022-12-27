@@ -9,11 +9,12 @@ import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
-
-  // don't push auth token to public repo
-  const auth_token = "__AUTH_TOKEN__";  
+  const auth_token = "_AUTH_TOKEN_";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
+  // const showSkeleton = route.params.showSkeleton; // true or false
+  const showSkeleton = false; // true or false
+  const userHeight = route.params.userHeight;
   let assessment_config = {} as any;
   let user_config = {} as any;
 
@@ -24,7 +25,9 @@ export default function AssessmentPage({ route }: any) {
   const { width, height } = Dimensions.get('window');
 
   const stand_x = width - (width - width / 10) //100
-  const stand_y = height / (height / 300) //- 100
+  const stand_y = height / (height / 250) //- 100
+  // const stand_y = height / (width / 500) //- 100
+  // const stand_x = (width - width / 5)
 
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
@@ -58,20 +61,22 @@ export default function AssessmentPage({ route }: any) {
       case "PLATE_TAPPING_COORDINATION":
         setDisplayText(` Total Cycles: ${additional_response?.reps?.total};`)
         break;
+      case "STANDING_BROAD_JUMP":
+        setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
+        break;
       default:
         setDisplayText(`Current-Pose: ${additional_response?.in_pose}; Reps: ${additional_response?.reps?.total};`)
     }
 
   };
 
-
   // // @ts-ignore:next-line
   if (assessment_name == 'STANDING_BROAD_JUMP') {
-    user_config.userHeight = 180; // in Centimeter
+    user_config.user_height = userHeight; // in Centimeter string
     // Coordinates of start point
-    assessment_config.stand_x = stand_x * 2;
-    assessment_config.stand_y = stand_y * 2;
-    // TODO: hardcoded part. auto calculate by frame or remove it
+    assessment_config.stand_x = stand_x;
+    assessment_config.stand_y = stand_y;
+    // // TODO: hardcoded part. auto calculate by frame or remove it
     assessment_config.image_height = 720;
     assessment_config.image_width = 1280;
   }
@@ -86,15 +91,14 @@ export default function AssessmentPage({ route }: any) {
   const requestData = {
     isPreJoin: false
   }
-  
+
   const libData = {
     onServerResponse,
     cameraPosition,
+    showSkeleton
   }
 
-
   return (
-
     <View style={styles({}).container}>
       {hasPermission ? (
         <>
@@ -104,17 +108,17 @@ export default function AssessmentPage({ route }: any) {
             requestData={requestData}
             libData={libData}
           />
-          {/* {
-              // @ts-ignore:next-line
-              assessmentName == "STANDING_BROAD_JUMP" &&
-              (
-                <>
-                  <View style={styles({ stand_x, stand_y }).point} />
-                  <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
-                </>
+          {
+            // @ts-ignore:next-line
+            assessment_name == "STANDING_BROAD_JUMP" &&
+            (
+              <>
+                <View style={styles({ stand_x, stand_y }).point} />
+                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+              </>
 
-              )
-            } */}
+            )
+          }
           <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
             {displayText}
           </Text>
@@ -154,7 +158,7 @@ const styles = (orientation: any) => StyleSheet.create({
   startPoint: {
     // width: 20,
     // height: 20,
-    // borderRadius: 20,
+    // borderRadius: 20,........
     // backgroundColor: '#fc0505',
     top: orientation?.stand_y + 20,   // y axis
     left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable

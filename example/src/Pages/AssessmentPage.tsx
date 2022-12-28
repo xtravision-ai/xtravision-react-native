@@ -40,7 +40,7 @@ export default function AssessmentPage({ route }: any) {
     point_1x = width / 3 - (width / 3) / 2;
     point_2x = width / 2;
     point_3x = width - width / 3 + (width / 3) / 2;
-    radius = 80;
+    radius = 60;
   };
 
   const [hasPermission, setHasPermission] = React.useState(false);

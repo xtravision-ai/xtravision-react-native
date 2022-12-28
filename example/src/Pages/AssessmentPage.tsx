@@ -40,7 +40,7 @@ export default function AssessmentPage({ route }: any) {
     point_1x = width / 3 - (width / 3) / 2;
     point_2x = width / 2;
     point_3x = width - width / 3 + (width / 3) / 2;
-    radius = 20;
+    radius = 80;
   };
 
   const [hasPermission, setHasPermission] = React.useState(false);
@@ -101,6 +101,8 @@ export default function AssessmentPage({ route }: any) {
     assessment_config.point_2 = { point_2x, point_2y };
     assessment_config.point_3 = { point_3x, point_3y };
     assessment_config.point_radius = radius;
+    assessment_config.image_height = height;
+    assessment_config.image_width = width;
   }
 
   const connectionData = {
@@ -196,8 +198,8 @@ const styles = (orientation: any) => StyleSheet.create({
     // // left: 280,     // x axis // TODO: make is configurable
   },
   leftPoint: {
-    width: 20,
-    height: 20,
+    width: 80,
+    height: 80,
     borderRadius: orientation?.radius,
     backgroundColor: '#fc0505',
     top: orientation?.point_1y,   // y axis
@@ -206,8 +208,8 @@ const styles = (orientation: any) => StyleSheet.create({
     // // left: 280,     // x axis // TODO: make is configurable
   },
   middlePoint: {
-    width: 20,
-    height: 20,
+    width: 80,
+    height: 80,
     borderRadius: orientation?.radius,
     backgroundColor: '#fc0505',
     top: orientation?.point_2y,   // y axis
@@ -216,8 +218,8 @@ const styles = (orientation: any) => StyleSheet.create({
     // // left: 280,     // x axis // TODO: make is configurable
   },
   rightPoint: {
-    width: 20,
-    height: 20,
+    width: 80,
+    height: 80,
     borderRadius: orientation?.radius,
     backgroundColor: '#fc0505',
     top: orientation?.point_3y,   // y axis

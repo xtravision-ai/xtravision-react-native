@@ -47,7 +47,8 @@ public class VisionCameraPoseDetector: NSObject, FrameProcessorPluginBase {
              }
             return map
        }
-       } catch _ {
+       } catch {
+           print("Error info: \(error)")
            return map
        }
     return map

@@ -12,8 +12,7 @@ export default function AssessmentPage({ route }: any) {
   const auth_token = "_AUTH_TOKEN_";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  // const showSkeleton = route.params.showSkeleton; // true or false
-  const showSkeleton = false; // true or false
+  const showSkeleton = false //: false, // TODO: fix in next release //route.params.showSkeleton; // true or false
   const userHeight = route.params.userHeight;
   let assessment_config = {} as any;
   let user_config = {} as any;
@@ -28,6 +27,21 @@ export default function AssessmentPage({ route }: any) {
   const stand_y = height / (height / 250) //- 100
   // const stand_y = height / (width / 500) //- 100
   // const stand_x = (width - width / 5)
+
+  let point_1x, point_1y
+  let point_2x, point_2y;
+  let point_3x, point_3y;
+  let radius;
+
+  // console.log("point_1", point_1, "point_2: ", point_2, "point_3: ", point_3);
+
+  if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
+    point_1y = point_2y = point_3y = height - height / 4;
+    point_1x = width / 3 - (width / 3) / 2;
+    point_2x = width / 2;
+    point_3x = width - width / 3 + (width / 3) / 2;
+    radius = 80;
+  };
 
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
@@ -79,6 +93,16 @@ export default function AssessmentPage({ route }: any) {
     // // TODO: hardcoded part. auto calculate by frame or remove it
     assessment_config.image_height = 720;
     assessment_config.image_width = 1280;
+
+  }
+
+  if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
+    assessment_config.point_1 = { point_1x, point_1y };
+    assessment_config.point_2 = { point_2x, point_2y };
+    assessment_config.point_3 = { point_3x, point_3y };
+    assessment_config.point_radius = radius;
+    assessment_config.image_height = height;
+    assessment_config.image_width = width;
   }
 
   const connectionData = {
@@ -108,13 +132,31 @@ export default function AssessmentPage({ route }: any) {
             requestData={requestData}
             libData={libData}
           />
+          {/* {
+              // @ts-ignore:next-line
+              assessment_name == "STANDING_BROAD_JUMP" &&
+              (
+                <>
+                  <View style={styles({ stand_x, stand_y }).point} />
+                  <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+                </>
+
+              )
+            } */}
+
           {
             // @ts-ignore:next-line
-            assessment_name == "STANDING_BROAD_JUMP" &&
+            assessment_name == "PLATE_TAPPING_COORDINATION" &&
             (
               <>
-                <View style={styles({ stand_x, stand_y }).point} />
-                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+                {/* left */}
+                <View style={styles({ height, point_1x, point_1y, radius }).leftPoint} />
+
+                {/* center */}
+                <View style={styles({ height, point_2x, point_2y, radius }).middlePoint} />
+
+                {/* right */}
+                <View style={styles({ height, point_3x, point_3y, radius }).rightPoint} />
               </>
 
             )
@@ -148,10 +190,40 @@ const styles = (orientation: any) => StyleSheet.create({
   point: {
     width: 20,
     height: 20,
-    borderRadius: 20,
+    borderRadius: orientation?.radius,
     backgroundColor: '#fc0505',
     top: orientation?.stand_y,   // y axis
     left: orientation?.stand_x,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  leftPoint: {
+    width: 80,
+    height: 80,
+    borderRadius: orientation?.radius,
+    backgroundColor: '#fc0505',
+    top: orientation?.point_1y,   // y axis
+    left: orientation?.point_1x,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  middlePoint: {
+    width: 80,
+    height: 80,
+    borderRadius: orientation?.radius,
+    backgroundColor: '#fc0505',
+    top: orientation?.point_2y,   // y axis
+    left: orientation.point_2x,     // x axis // TODO: make is configurable
+    position: 'absolute', //overlap on the camera
+    // // left: 280,     // x axis // TODO: make is configurable
+  },
+  rightPoint: {
+    width: 80,
+    height: 80,
+    borderRadius: orientation?.radius,
+    backgroundColor: '#fc0505',
+    top: orientation?.point_3y,   // y axis
+    left: orientation?.point_3x,     // x axis // TODO: make is configurable
     position: 'absolute', //overlap on the camera
     // // left: 280,     // x axis // TODO: make is configurable
   },

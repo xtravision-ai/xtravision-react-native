@@ -268,7 +268,7 @@ export function Assessment(props: AssessmentProp) {
         onError={onError}
       />
 
-      <Text>width: {orientation.width} heighgt: {orientation.height}</Text>
+      <Text>width: {orientation.width} height: {orientation.height}</Text>
 
       {/* {props.libData.showSkeleton && (
         //@ts-ignore

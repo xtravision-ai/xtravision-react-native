@@ -7,21 +7,23 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
-import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
+// import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
+import { scanPoseLandmarks} from '../helper';
+// import Animated from 'react-native-reanimated';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
-import Svg, { Circle, Line } from 'react-native-svg';
+// import Svg, { Circle, Line } from 'react-native-svg';
 
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
-const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
+// const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
+// const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
 const defaultPose = getDefaultObject();
 
-const { width, height } = Dimensions.get('window');
+// const { width, height } = Dimensions.get('window');
 
 export interface AssessmentProp {
   connectionData: {
@@ -40,9 +42,9 @@ export interface AssessmentProp {
   }
 }
 
-// const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
@@ -104,8 +106,8 @@ export function Assessment(props: AssessmentProp) {
   // svg
   const poseSkeleton: any = useSharedValue(defaultPose);
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, orientation.width);
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, orientation.width);
+  // const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, orientation.width);
+  // const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, orientation.width);
 
   const updateData = useCallback((now: any, landmarks: any) => {
 
@@ -268,7 +270,7 @@ export function Assessment(props: AssessmentProp) {
 
       <Text>width: {orientation.width} heighgt: {orientation.height}</Text>
 
-      {props.libData.showSkeleton && (
+      {/* {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
           height={orientation.height}
@@ -286,7 +288,7 @@ export function Assessment(props: AssessmentProp) {
             )
           })}
         </Svg>
-      )}
+      )} */}
     </>
   );
 }

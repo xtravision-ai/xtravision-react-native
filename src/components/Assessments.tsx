@@ -7,22 +7,23 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
-import Animated, {runOnJS, useSharedValue } from 'react-native-reanimated';
+// import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
+import { scanPoseLandmarks} from '../helper';
+// import Animated from 'react-native-reanimated';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
-import Svg, { Circle, Line } from 'react-native-svg';
+// import Svg, { Circle, Line } from 'react-native-svg';
 
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
-const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
-
-
-const { width, height } = Dimensions.get('window');
+// const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
+// const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
 const defaultPose = getDefaultObject();
+
+// const { width, height } = Dimensions.get('window');
 
 export interface AssessmentProp {
   connectionData: {
@@ -41,12 +42,37 @@ export interface AssessmentProp {
   }
 }
 
- const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+  const [orientation, setOrientation] = React.useState({ width: 1280, height: 720, mode: 'LANDSCAPE' });
+
+  React.useEffect(() => {
+    const { width, height } = Dimensions.get('window');
+    if (height > width) {
+      setOrientation({ height: height, width: width, mode: 'PORTRAIT' })
+    }
+    else {
+      setOrientation({ height: height, width: width, mode: 'LANDSCAPE' })
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const orientationSub = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+      if (height > width) {
+        setOrientation({ height: height, width: width, mode: 'PORTRAIT' })
+      }
+      else {
+        setOrientation({ height: height, width: width, mode: 'LANDSCAPE' })
+      }
+    })
+    return () => orientationSub.remove();
+  }, []);
+
+
   let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
   // if (props.connection.queryParams) {
   //   queryParams = { ...queryParams, ...props.connection.queryParams };
@@ -80,8 +106,8 @@ export function Assessment(props: AssessmentProp) {
   // svg
   const poseSkeleton: any = useSharedValue(defaultPose);
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width);
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width);
+  // const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, orientation.width);
+  // const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, orientation.width);
 
   const updateData = useCallback((now: any, landmarks: any) => {
 
@@ -100,8 +126,13 @@ export function Assessment(props: AssessmentProp) {
 
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
     'worklet';
-    const xFactor = (height / frame.width) - 0.05;
-    const yFactor = (width / frame.height);
+    // og code
+    // const xFactor = (height / frame.width) - 0.05;
+    // const yFactor = (width / frame.height);
+
+    // using orientation height,width
+    const xFactor = orientation.mode === 'PORTRAIT' ? (orientation.height / frame.width) : (orientation.width / orientation.width) - 0.34;
+    const yFactor = orientation.mode === 'PORTRAIT' ? (orientation.width / frame.height) : (orientation.height / orientation.height) - 0.55;
 
     // [TypeError: Cannot read property 'x' of undefined]
     try {
@@ -122,7 +153,8 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      console.warn(Date() + " Body is not visible!")
+      // testing
+      // console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -148,9 +180,9 @@ export function Assessment(props: AssessmentProp) {
     });
 
     calculatePoseSkeleton(poseCopyObj, pose, frame);
-    runOnJS(updateData)(now, Object.values(poseCopy))
+    runOnJS(updateData)(now, Object.values(poseCopy));
 
-  }, []);
+  }, [orientation]);
 
   const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
@@ -193,7 +225,8 @@ export function Assessment(props: AssessmentProp) {
       landmarksTempRef.current = {};
       const timestamp = Date.now();
 
-      __DEV__ && console.log(Date() + ' Message send to Server on timestamp: ', timestamp);
+      // testing
+      // __DEV__ && console.log(Date() + ' Message send to Server on timestamp: ', timestamp);
       // WS SEND Kps -> 1s
       sendJsonMessage({
         timestamp,
@@ -225,7 +258,7 @@ export function Assessment(props: AssessmentProp) {
     <>
       {/* @ts-ignore */}
       <Camera
-        style={styles.camera}
+        style={styles(orientation).camera}
         device={device}
         isActive={true}
         // isActive={isAppForeground}
@@ -235,40 +268,32 @@ export function Assessment(props: AssessmentProp) {
         onError={onError}
       />
 
-      {props.libData.showSkeleton && (
+      <Text>width: {orientation.width} height: {orientation.height}</Text>
+
+      {/* {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
-          height={height}
-          width={width}
-          style={styles.linesContainer}
+          height={orientation.height}
+          width={orientation.width}
+          style={styles(orientation).linesContainer}
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (
               <AnimatedLine animatedProps={element} stroke="red" strokeWidth="2" key={key} />
             )
           })}
-          {animatedCircleArray.map((element: any) => {
+          {animatedCircleArray.map((element: any, key: any) => {
             return (
-              <AnimatedCircle animatedProps={element} stroke="red" fill="red" />
+              <AnimatedCircle animatedProps={element} stroke="red" fill="red" key={key} />
             )
           })}
         </Svg>
-      )}
+      )} */}
     </>
   );
 }
 
-//   <Circle
-//     cx={element.initial.value.x}
-//     cy={element.initial.value.y}
-//     r="8"
-//     stroke="red"
-//     strokeWidth="2.5"
-//     fill="red"
-//   />
-// )
-
-const styles = StyleSheet.create({
+const styles = (orientation: any) => StyleSheet.create({
   camera: {
     flex: 1,
     width: '100%',
@@ -301,8 +326,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    height: height,
-    width: width,
+    right: 0,
+    height: orientation.height,
+    width: orientation.width,
   },
 });
 

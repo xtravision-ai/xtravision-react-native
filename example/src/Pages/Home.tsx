@@ -63,7 +63,8 @@ export default function HomeScreen({ navigation }: any) {
                     title={"Let's Start " + assessmentName}
                     disabled={userHeight.length <= 1}
                     onPress={() =>
-                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight, showSkeleton  })
+                        // navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight, showSkeleton  })
+                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight })
                     }
                 />
                 <Text style={{ marginBottom: 20 }}></Text>

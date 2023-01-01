@@ -7,19 +7,23 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
-import Animated, {runOnJS, useSharedValue } from 'react-native-reanimated';
+// import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
+import { scanPoseLandmarks} from '../helper';
+// import Animated from 'react-native-reanimated';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
-import Svg, { Circle, Line } from 'react-native-svg';
+// import Svg, { Circle, Line } from 'react-native-svg';
 
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
-const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
+// const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
+// const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
 const defaultPose = getDefaultObject();
+
+// const { width, height } = Dimensions.get('window');
 
 export interface AssessmentProp {
   connectionData: {
@@ -39,7 +43,7 @@ export interface AssessmentProp {
   }
 }
 
- const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
@@ -51,8 +55,9 @@ export function Assessment(props: AssessmentProp) {
   const height = dimensions.height;
 
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+
   let queryParams: { [key: string]: any } = {}; 
-  
+
   // put all required query params;
   queryParams["auth_token"] = props.connectionData.auth_token;
 
@@ -61,14 +66,15 @@ export function Assessment(props: AssessmentProp) {
   // queryParams["requested_at"]= reqAt
 
   queryParams["session_id"]= props.connectionData.session_id ? props.connectionData.session_id : null;
-  
+
   if (!_.isEmpty(props.connectionData.user_config)) {
     queryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
   }
-
+	
   if (!_.isEmpty(props.connectionData.assessment_config)) {
     queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
+
 
   const landmarksTempRef = React.useRef<any>({});
   const frameTempRef = React.useRef<any>({frame_height: height, frame_width: width});
@@ -79,8 +85,8 @@ export function Assessment(props: AssessmentProp) {
   const poseSkeleton: any = useSharedValue(defaultPose);
   // const frameDimensions: any = useSharedValue({width, height });
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width);
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width);
+  // const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, orientation.width);
+  // const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, orientation.width);
 
   const updateData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
@@ -89,12 +95,22 @@ export function Assessment(props: AssessmentProp) {
 
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
     'worklet';
+    
+    // default consideration: Phone in Portrait mode
+    const width = dimensions.width
+    const height = dimensions.height
 
-    // always consider updated values: (if phone rotate then height and width should be change)
-    const height = dimensions.height;
-    const width = dimensions.width;
-    const xFactor = (height / frame.width) - 0.05;
-    const yFactor = (width / frame.height);
+    let xFactor:any , yFactor:any;
+    
+    if (height > width ) {
+      xFactor = height / frame.width
+      yFactor = width / frame.height
+    } else { // Phone in landscape mode
+      // TODo: @Jestin: why we need to adjust this thing. Is it any phone specific ? 
+      xFactor =  1 - 0.34;
+      yFactor = 1 - 0.55;
+    }
+
 
     try {
       Object.keys(pose).forEach(v => {
@@ -114,7 +130,8 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      console.warn(Date() + " Body is not visible!")
+      // testing
+      // console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -158,7 +175,7 @@ export function Assessment(props: AssessmentProp) {
     // getWebSocket
   } = useWebSocket(WS_URL, {
     queryParams: queryParams, //{...props.connection.queryParams, queryParams}
-    onOpen: () => console.log('WS Connection opened'),
+    onOpen: () => console.log(Date() + ' WS Connection opened'),
     onError: (e: any) => console.error(e), // todo : proper error handling
     //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (_closeEvent: any) => true,
@@ -185,7 +202,8 @@ export function Assessment(props: AssessmentProp) {
       landmarksTempRef.current = {};
       const timestamp = Date.now();
 
-      __DEV__ && console.log(Date() + ' Message send to Server on timestamp: ', timestamp);
+      // testing
+      // __DEV__ && console.log(Date() + ' Message send to Server on timestamp: ', timestamp);
       // WS SEND Kps -> 1s
       sendJsonMessage({
         timestamp,
@@ -216,49 +234,11 @@ export function Assessment(props: AssessmentProp) {
   }
 
 
-  const styles = StyleSheet.create({
-    camera: {
-      flex: 1,
-      width: '100%',
-    },
-    container: {
-      // flex: 1,
-      // justifyContent: "center",
-      // alignItems: "center",
-      //backgroundColor: "#e5e5e5",
-      position: 'absolute', //overlap on the camera
-      left: 280,     // x axis // TODO: make is configurable
-      top: 650, // y axis
-  
-    },
-    verticalText: {
-      transform: [{ rotate: '270deg' }],
-      color: 'red',
-      fontWeight: 'bold'
-    },
-    point: {
-      width: 20,
-      height: 20,
-      backgroundColor: '#fc0505',
-      borderRadius: 20,
-      // position: 'absolute', //overlap on the camera
-      // left: 280,     // x axis // TODO: make is configurable
-      top: 20,   // y axis
-    },
-    linesContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      height: height,
-      width: width,
-    },
-  });
-
   return (
     <>
       {/* @ts-ignore */}
       <Camera
-        style={styles.camera}
+        style={getStylesData(dimensions).camera}
         device={device}
         isActive={true}
         // isActive={isAppForeground}
@@ -268,25 +248,81 @@ export function Assessment(props: AssessmentProp) {
         onError={onError}
       />
 
-      {props.libData.showSkeleton && (
+      {/* @ts-ignore */}
+      <Text> width: {dimensions.width} height: {dimensions.height}</Text>
+
+      {/* {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
-          height={height}
-          width={width}
-          style={styles.linesContainer}
+          height={orientation.height}
+          width={orientation.width}
+          style={styles(orientation).linesContainer}
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (
               <AnimatedLine animatedProps={element} stroke="red" strokeWidth="2" key={key} />
             )
           })}
-          {animatedCircleArray.map((element: any) => {
+          {animatedCircleArray.map((element: any, key: any) => {
             return (
-              <AnimatedCircle animatedProps={element} stroke="red" fill="red" />
+              <AnimatedCircle animatedProps={element} stroke="red" fill="red" key={key} />
             )
           })}
         </Svg>
-      )}
+      )} */}
     </>
   );
 }
+
+const getStylesData = (orientation: any) => StyleSheet.create({
+  camera: {
+    flex: 1,
+    width: '100%',
+  },
+  container: {
+    // flex: 1,
+    // justifyContent: "center",
+    // alignItems: "center",
+    //backgroundColor: "#e5e5e5",
+    position: 'absolute', //overlap on the camera
+    left: 280,     // x axis // TODO: make is configurable
+    top: 650, // y axis
+
+  },
+  verticalText: {
+    transform: [{ rotate: '270deg' }],
+    color: 'red',
+    fontWeight: 'bold'
+  },
+  point: {
+    width: 20,
+    height: 20,
+    backgroundColor: '#fc0505',
+    borderRadius: 20,
+    // position: 'absolute', //overlap on the camera
+    // left: 280,     // x axis // TODO: make is configurable
+    top: 20,   // y axis
+  },
+  linesContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: orientation.height,
+    width: orientation.width,
+  },
+});
+
+
+// const markerStyles = (orientation: any) =>
+//   StyleSheet.create({
+//     point: {
+//       width: 20,
+//       height: 20,
+//       backgroundColor: '#fc0505',
+//       borderRadius: 20,
+//       position: 'absolute', //overlap on the camera
+//       left: 280,     // x axis // TODO: make is configurable
+//       top: 650,   // y axis
+//     },
+//   });

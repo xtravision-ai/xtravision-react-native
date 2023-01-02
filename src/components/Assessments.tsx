@@ -1,5 +1,5 @@
 import 'react-native-reanimated';
-import { StyleSheet, Text, Dimensions } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import {
   Camera,
@@ -21,7 +21,6 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
 const defaultPose = getDefaultObject();
 
-const { width, height } = Dimensions.get('window');
 
 export interface AssessmentProp {
   connectionData: {
@@ -46,30 +45,8 @@ const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
-  const [orientation, setOrientation] = React.useState({ width: 1280, height: 720, mode: 'LANDSCAPE' });
 
-  React.useEffect(() => {
-    const { width, height } = Dimensions.get('window');
-    if (height > width) {
-      setOrientation({ height: height, width: width, mode: 'PORTRAIT' })
-    }
-    else {
-      setOrientation({ height: height, width: width, mode: 'LANDSCAPE' })
-    }
-  }, []);
-
-  React.useEffect(() => {
-    const orientationSub = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-      if (height > width) {
-        setOrientation({ height: height, width: width, mode: 'PORTRAIT' })
-      }
-      else {
-        setOrientation({ height: height, width: width, mode: 'LANDSCAPE' })
-      }
-    })
-    return () => orientationSub.remove();
-  }, []);
-
+  const { width, height } = useWindowDimensions();
 
   let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
   // if (props.connection.queryParams) {
@@ -84,18 +61,6 @@ export function Assessment(props: AssessmentProp) {
     queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 
-  // add some extra params
-  // if (props.connectionData.assessment_name === 'STANDING_BROAD_JUMP') {
-  //   // TODO: hardcoded part. auto calculate by frame or remove it
-  //   const orientationData = {
-  //     "image_height": 720, //orientation.image_height,
-  //     "image_width": 1280 //orientation.image_width
-  //   }
-
-  //   queryParams = { ...queryParams, ...orientationData }
-  // }
-
-
   const landmarksTempRef = React.useRef<any>({});
 
   const devices = useCameraDevices();
@@ -104,8 +69,8 @@ export function Assessment(props: AssessmentProp) {
   // svg
   const poseSkeleton: any = useSharedValue(defaultPose);
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, orientation.width);
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, orientation.width);
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width);
+  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width);
 
   const updateData = useCallback((now: any, landmarks: any) => {
 
@@ -124,13 +89,8 @@ export function Assessment(props: AssessmentProp) {
 
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
     'worklet';
-    // og code
-    // const xFactor = (height / frame.width) - 0.05;
-    // const yFactor = (width / frame.height);
-
-    // using orientation height,width
-    const xFactor = orientation.mode === 'PORTRAIT' ? (orientation.height / frame.width) : (orientation.width / orientation.width) - 0.34;
-    const yFactor = orientation.mode === 'PORTRAIT' ? (orientation.width / frame.height) : (orientation.height / orientation.height) - 0.55;
+    const xFactor = (height / frame.width) - 0.05;
+    const yFactor = (width / frame.height);
 
     // [TypeError: Cannot read property 'x' of undefined]
     try {
@@ -180,7 +140,7 @@ export function Assessment(props: AssessmentProp) {
     calculatePoseSkeleton(poseCopyObj, pose, frame);
     runOnJS(updateData)(now, Object.values(poseCopy));
 
-  }, [orientation]);
+  }, [width]);
 
   const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
@@ -256,7 +216,7 @@ export function Assessment(props: AssessmentProp) {
     <>
       {/* @ts-ignore */}
       <Camera
-        style={styles(orientation).camera}
+        style={styles({ width, height }).camera}
         device={device}
         isActive={true}
         // isActive={isAppForeground}
@@ -268,9 +228,9 @@ export function Assessment(props: AssessmentProp) {
       {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
-          height={orientation.height}
-          width={orientation.width}
-          style={styles(orientation).linesContainer}
+          height={height}
+          width={width}
+          style={styles({ width, height }).linesContainer}
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (

@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
 import { StyleSheet, Text, useWindowDimensions } from 'react-native';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Camera,
   useCameraDevices,
@@ -23,8 +23,6 @@ import useWebSocket from 'react-native-use-websocket';
 
 const defaultPose = getDefaultObject();
 
-// const { width, height } = Dimensions.get('window');
-
 export interface AssessmentProp {
   connectionData: {
     assessment_name: string;
@@ -43,9 +41,9 @@ export interface AssessmentProp {
   }
 }
 
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+// const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   // const { width, height } = Dimensions.get('window');
@@ -54,28 +52,26 @@ export function Assessment(props: AssessmentProp) {
   const width = dimensions.width
   const height = dimensions.height;
 
-  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+  // TODO: clean up below code and move into custom hook
 
-  let queryParams: { [key: string]: any } = {}; 
-
-  // put all required query params;
-  queryParams["auth_token"] = props.connectionData.auth_token;
-
-  // TODO: enable below code. Facing weird behavior, unable to start assessment component while use below 2 lines
-  // const reqAt = Date.now();
-  // queryParams["requested_at"]= reqAt
-
-  queryParams["session_id"]= props.connectionData.session_id ? props.connectionData.session_id : null;
+  let iQueryParams: { [key: string]: any } = {}; 
+  iQueryParams['requested_at'] = Date.now();
+  iQueryParams["session_id"]= props.connectionData.session_id ? props.connectionData.session_id : null;
+  iQueryParams["auth_token"] = props.connectionData.auth_token;
 
   if (!_.isEmpty(props.connectionData.user_config)) {
-    queryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
+    iQueryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
   }
-	
+
   if (!_.isEmpty(props.connectionData.assessment_config)) {
-    queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
+    iQueryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 
-
+  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`
+  
+  //Imp: Since component is rendering multiple times and query params have current time, So we need to set query params only one time when load component
+  const [queryParams] = useState(iQueryParams)
+  
   const landmarksTempRef = React.useRef<any>({});
   const frameTempRef = React.useRef<any>({frame_height: height, frame_width: width});
 
@@ -83,7 +79,6 @@ export function Assessment(props: AssessmentProp) {
   const device = devices[props.libData.cameraPosition];
 
   const poseSkeleton: any = useSharedValue(defaultPose);
-  // const frameDimensions: any = useSharedValue({width, height });
 
   // const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, orientation.width);
   // const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, orientation.width);
@@ -111,7 +106,6 @@ export function Assessment(props: AssessmentProp) {
       yFactor = 1 - 0.55;
     }
 
-
     try {
       Object.keys(pose).forEach(v => {
         poseCopyObj[v] = {
@@ -120,7 +114,7 @@ export function Assessment(props: AssessmentProp) {
         };
       });
 
-    } catch (e) { }
+    } catch (e) { console.error(Date() + " ", e)}
     poseSkeleton.value = poseCopyObj;
   }
 
@@ -130,8 +124,7 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      // testing
-      // console.warn(Date() + " Body is not visible!")
+      __DEV__ && console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -164,24 +157,25 @@ export function Assessment(props: AssessmentProp) {
   const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
     console.error(Date() + "  " + error.message)
-
   }
-
+  
   // https://github.com/Sumit1993/react-native-use-websocket#readme
+  let default_options = {
+    queryParams: queryParams, //{...props.connection.queryParams, queryParams}
+    onOpen: () => console.log(Date() + ' WS Connection opened'),
+    onError: (e: any) => console.error(Date() + ' ',  e), // todo : proper error handling
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (_closeEvent: any) => true,
+    //To attempt to reconnect on error events,
+    retryOnError: true,
+  }
+ 
   const {
     sendJsonMessage,
     lastJsonMessage,
     // readyState,
     // getWebSocket
-  } = useWebSocket(WS_URL, {
-    queryParams: queryParams, //{...props.connection.queryParams, queryParams}
-    onOpen: () => console.log(Date() + ' WS Connection opened'),
-    onError: (e: any) => console.error(e), // todo : proper error handling
-    //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (_closeEvent: any) => true,
-    //To attempt to reconnect on error events,
-    retryOnError: true,
-  });
+  } = useWebSocket(WS_URL, default_options );
 
   // step-3: send data to server
   useEffect(() => {
@@ -232,7 +226,6 @@ export function Assessment(props: AssessmentProp) {
       </Text>
     );
   }
-
 
   return (
     <>

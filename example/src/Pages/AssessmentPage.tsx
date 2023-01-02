@@ -54,7 +54,7 @@ export default function AssessmentPage({ route }: any) {
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
 
   // required prop:
-  const onServerResponse = function (serverResponse: any) {
+  const onServerResponse = (serverResponse: any) => {
     if (serverResponse.errors.length) {
       console.error(Date() + ' Server Error Response:', serverResponse.errors);
       setDisplayText(` ERROR :=> ${serverResponse.errors[0].message}.`)

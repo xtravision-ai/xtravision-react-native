@@ -97,9 +97,9 @@ export default function AssessmentPage({ route }: any) {
   }
 
   if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
-    assessment_config.point_1 = { point_1x, point_1y };
-    assessment_config.point_2 = { point_2x, point_2y };
-    assessment_config.point_3 = { point_3x, point_3y };
+    assessment_config.point_1 = { point_1x, point_1y };  // left
+    assessment_config.point_2 = { point_2x, point_2y };  // center
+    assessment_config.point_3 = { point_3x, point_3y };   // right
     assessment_config.point_radius = radius;
     assessment_config.image_height = height;
     assessment_config.image_width = width;
@@ -143,6 +143,18 @@ export default function AssessmentPage({ route }: any) {
 
               )
             } */}
+
+          {
+              // @ts-ignore:next-line
+              assessment_name == "STANDING_BROAD_JUMP" &&
+              (
+                <>
+                  <View style={styles({ stand_x, stand_y }).point} />
+                  <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+                </>
+
+              )
+            }
 
           {
             // @ts-ignore:next-line

@@ -17,6 +17,10 @@ export default function AssessmentPage({ route }: any) {
   let assessment_config = {} as any;
   let user_config = {} as any;
 
+  const left_Side_color = '#5588cf';  // blue color
+  const right_Side_color = '#55bacf'; // sky blue color
+
+  assessment_config.side_color = { left_Side_color, right_Side_color };
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump

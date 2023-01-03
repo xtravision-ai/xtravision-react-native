@@ -69,8 +69,10 @@ export function Assessment(props: AssessmentProp) {
   // svg
   const poseSkeleton: any = useSharedValue(defaultPose);
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width);
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width);
+  //@ts-ignore
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
+  //@ts-ignore
+  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
 
   const updateData = useCallback((now: any, landmarks: any) => {
 
@@ -225,7 +227,7 @@ export function Assessment(props: AssessmentProp) {
         frameProcessorFps={10}
         onError={onError}
       />
-      {props.libData.showSkeleton && (
+      {props.libData.showSkeleton && Object.keys(landmarksTempRef.current).length > 0 && (
         //@ts-ignore
         <Svg
           height={height}
@@ -234,12 +236,12 @@ export function Assessment(props: AssessmentProp) {
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (
-              <AnimatedLine animatedProps={element} stroke="red" strokeWidth="2" key={key} />
+              <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="2" key={key} />
             )
           })}
           {animatedCircleArray.map((element: any, key: any) => {
             return (
-              <AnimatedCircle animatedProps={element} stroke="red" fill="red" key={key} />
+              <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
             )
           })}
         </Svg>

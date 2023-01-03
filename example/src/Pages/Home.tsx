@@ -11,7 +11,7 @@ export default function HomeScreen({ navigation }: any) {
     const [cameraOption, setCameraOption] = useState("front");
     // testing
     const [userHeight, onChangeUserHeight] = React.useState('160');
-    const [showSkeleton, setShowSkeleton] = useState("false");
+    const [showSkeleton, setShowSkeleton] = useState("true");
 
     const styles = StyleSheet.create({
         component: { margin: 30, padding: 25, },

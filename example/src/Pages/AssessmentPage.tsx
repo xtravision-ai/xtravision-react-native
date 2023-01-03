@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, Dimensions, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
@@ -9,7 +9,7 @@ import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
-  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTU1NTVkNS0wNmFhLTExZWQtOGJkYy0xMmZhYjRmZmFiZWQiLCJhcHBJZCI6IjY5YTdmMmU2LTA2YWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiNmQ5MWZlN2YtMDZhOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYwMTA3MjI0LCJleHAiOjE2OTE2NjQ4MjR9._i4MJbwPznHzxoStcRAcK7N7k_xGdUjvKwmHXv1zixM";
+  const auth_token = "_AUTH_TOKEN_";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = route.params.showSkeleton; // true or false
@@ -32,8 +32,6 @@ export default function AssessmentPage({ route }: any) {
   let point_2x, point_2y;
   let point_3x, point_3y;
   let radius;
-
-  // console.log("point_1", point_1, "point_2: ", point_2, "point_3: ", point_3);
 
   if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
     point_1y = point_2y = point_3y = height - height / 4;
@@ -132,18 +130,6 @@ export default function AssessmentPage({ route }: any) {
             requestData={requestData}
             libData={libData}
           />
-          {/* {
-              // @ts-ignore:next-line
-              assessment_name == "STANDING_BROAD_JUMP" &&
-              (
-                <>
-                  <View style={styles({ stand_x, stand_y }).point} />
-                  <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
-                </>
-
-              )
-            } */}
-
           {
             // @ts-ignore:next-line
             assessment_name == "STANDING_BROAD_JUMP" &&

@@ -89,8 +89,8 @@ export function Assessment(props: AssessmentProp) {
 
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
     'worklet';
-    const xFactor = (height / frame.width) - 0.05;
-    const yFactor = (width / frame.height);
+    const xFactor = height > width ? (height / frame.width) - 0.045 : (width / frame.width);
+    const yFactor = height > width ? (width / frame.height) + 0.04 : (height / frame.height) - 0.09;
 
     // [TypeError: Cannot read property 'x' of undefined]
     try {
@@ -140,7 +140,7 @@ export function Assessment(props: AssessmentProp) {
     calculatePoseSkeleton(poseCopyObj, pose, frame);
     runOnJS(updateData)(now, Object.values(poseCopy));
 
-  }, [width]);
+  }, [width, height]);
 
   const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164

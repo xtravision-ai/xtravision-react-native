@@ -11,12 +11,12 @@ export default function HomeScreen({ navigation }: any) {
     const [cameraOption, setCameraOption] = useState("front");
     // testing
     const [userHeight, onChangeUserHeight] = React.useState('160');
-    // const [showSkeleton, setShowSkeleton] = useState("false");
+    const [showSkeleton, setShowSkeleton] = useState("false");
 
     const styles = StyleSheet.create({
         component: { margin: 30, padding: 25, },
         labelText: { fontSize: 25, fontWeight: "bold", marginTop: 10 },
-        labelHeightText: { fontSize: 15, fontWeight: "bold",  marginTop: 10 },
+        labelHeightText: { fontSize: 15, fontWeight: "bold", marginTop: 10 },
         input: {
             height: 50,
             margin: 12,
@@ -63,8 +63,7 @@ export default function HomeScreen({ navigation }: any) {
                     title={"Let's Start " + assessmentName}
                     disabled={userHeight.length <= 1}
                     onPress={() =>
-                        // navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight, showSkeleton  })
-                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight })
+                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight, showSkeleton })
                     }
                 />
                 <Text style={{ marginBottom: 20 }}></Text>

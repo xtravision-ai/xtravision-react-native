@@ -84,6 +84,10 @@ export const generateSkeletonLines = (poseLine: any, cameraPosition: any, width:
   const leftToeToLeftHeel = usePositionLine(poseLine, 'leftToe', 'leftHeel', cameraPosition, width, paint.left_Side_color);
   const leftThumbToLeftWrist = usePositionLine(poseLine, 'leftThumb', 'leftWrist', cameraPosition, width, paint.left_Side_color);
   const leftToeToLeftAnkle = usePositionLine(poseLine, 'leftToe', 'leftAnkle', cameraPosition, width, paint.left_Side_color);
+  const leftEyeInnerToNosePosition = usePositionLine(poseLine, 'leftEyeInner', 'nose', cameraPosition, width, paint.left_Side_color);
+  const leftEyeInnerToLeftEyeOuterPosition = usePositionLine(poseLine, 'leftEyeInner', 'leftEyeOuter', cameraPosition, width, paint.left_Side_color);
+  const leftEyeOuterToLeftEarPosition = usePositionLine(poseLine, 'leftEyeOuter', 'leftEar', cameraPosition, width, paint.left_Side_color);
+
 
   const rightPinkyFingerToRightWristPosition = usePositionLine(poseLine, 'rightPinkyFinger', 'rightWrist', cameraPosition, width, paint.right_Side_color);
   const rightIndexFingerToRightWristPosition = usePositionLine(poseLine, 'rightIndexFinger', 'rightWrist', cameraPosition, width, paint.right_Side_color);
@@ -96,9 +100,15 @@ export const generateSkeletonLines = (poseLine: any, cameraPosition: any, width:
   const rightToeToRightHeel = usePositionLine(poseLine, 'rightToe', 'rightHeel', cameraPosition, width, paint.right_Side_color);
   const rightThumbToRightWrist = usePositionLine(poseLine, 'rightThumb', 'rightWrist', cameraPosition, width, paint.right_Side_color);
   const rightToeToRightAnkle = usePositionLine(poseLine, 'rightToe', 'rightAnkle', cameraPosition, width, paint.right_Side_color);
+  const rightEyeInnerToNosePosition = usePositionLine(poseLine, 'rightEyeInner', 'nose', cameraPosition, width, paint.right_Side_color);
+  const rightEyeInnerToRightEyeOuterPosition = usePositionLine(poseLine, 'rightEyeInner', 'rightEyeOuter', cameraPosition, width, paint.right_Side_color);
+  const rightEyeOuterToRightEarPosition = usePositionLine(poseLine, 'rightEyeOuter', 'rightEar', cameraPosition, width, paint.left_Side_color);
+
 
   const shoulderToShoulderPosition = usePositionLine(poseLine, 'leftShoulder', 'rightShoulder', cameraPosition, width, 'white');
   const hipToHipPosition = usePositionLine(poseLine, 'leftHip', 'rightHip', cameraPosition, width, 'white');
+  const mouthLeftToMouthRightPosition = usePositionLine(poseLine, 'mouthLeft', 'mouthRight', cameraPosition, width, 'white');
+
 
   return [
     leftPinkyFingerToleftWristPosition,
@@ -124,11 +134,23 @@ export const generateSkeletonLines = (poseLine: any, cameraPosition: any, width:
     rightThumbToRightWrist,
     rightToeToRightAnkle,
     shoulderToShoulderPosition,
-    hipToHipPosition
+    hipToHipPosition,
+    mouthLeftToMouthRightPosition,
+    leftEyeInnerToNosePosition,
+    rightEyeInnerToNosePosition,
+    rightEyeInnerToRightEyeOuterPosition,
+    leftEyeInnerToLeftEyeOuterPosition,
+    rightEyeOuterToRightEarPosition,
+    leftEyeOuterToLeftEarPosition
   ];
 };
 
 export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, width: any, paint: any) => {
+  const leftEyeInner = usePositionCircle(poseCircle, 'leftEyeInner', cameraPosition, width, paint.left_Side_color);
+  const leftEye = usePositionCircle(poseCircle, 'leftEye', cameraPosition, width, paint.left_Side_color);
+  const leftEyeOuter = usePositionCircle(poseCircle, 'leftEyeOuter', cameraPosition, width, paint.left_Side_color);
+  const leftEar = usePositionCircle(poseCircle, 'leftEar', cameraPosition, width, paint.left_Side_color);
+  const mouthLeft = usePositionCircle(poseCircle, 'mouthLeft', cameraPosition, width, paint.left_Side_color);
   const leftShoulder = usePositionCircle(poseCircle, 'leftShoulder', cameraPosition, width, paint.left_Side_color);
   const leftElbow = usePositionCircle(poseCircle, 'leftElbow', cameraPosition, width, paint.left_Side_color);
   const leftWrist = usePositionCircle(poseCircle, 'leftWrist', cameraPosition, width, paint.left_Side_color);
@@ -152,6 +174,13 @@ export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, wid
   const rightThumb = usePositionCircle(poseCircle, 'rightThumb', cameraPosition, width, paint.right_Side_color);
   const rightHeel = usePositionCircle(poseCircle, 'rightHeel', cameraPosition, width, paint.right_Side_color);
   const rightToe = usePositionCircle(poseCircle, 'rightToe', cameraPosition, width, paint.right_Side_color);
+  const rightEyeInner = usePositionCircle(poseCircle, 'rightEyeInner', cameraPosition, width, paint.right_Side_color);
+  const rightEye = usePositionCircle(poseCircle, 'rightEye', cameraPosition, width, paint.right_Side_color);
+  const rightEyeOuter = usePositionCircle(poseCircle, 'rightEyeOuter', cameraPosition, width, paint.right_Side_color);
+  const rightEar = usePositionCircle(poseCircle, 'rightEar', cameraPosition, width, paint.right_Side_color);
+  const mouthRight = usePositionCircle(poseCircle, 'mouthRight', cameraPosition, width, paint.right_Side_color);
+
+  const nose = usePositionCircle(poseCircle, 'nose', cameraPosition, width, 'white');
 
   return [
     leftShoulder,
@@ -176,5 +205,17 @@ export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, wid
     rightHeel,
     leftToe,
     rightToe,
+
+    nose,
+    leftEyeInner,
+    leftEye,
+    leftEyeOuter,
+    rightEyeInner,
+    rightEye,
+    rightEyeOuter,
+    leftEar,
+    rightEar,
+    mouthLeft,
+    mouthRight,
   ]
 };

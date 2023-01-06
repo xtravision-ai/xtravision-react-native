@@ -27,6 +27,9 @@ export default function AssessmentPage({ route }: any) {
   // (width, height) = Coordinates (x,y)
   const { width, height } = useWindowDimensions();
 
+  assessment_config.image_height = height;
+  assessment_config.image_width = width;
+
   const stand_x = width - (width - width / 10) //100
   const stand_y = height / (height / 250) //- 100
   // const stand_y = height / (width / 500) //- 100
@@ -92,10 +95,6 @@ export default function AssessmentPage({ route }: any) {
     // Coordinates of start point
     assessment_config.stand_x = stand_x;
     assessment_config.stand_y = stand_y;
-    // // TODO: hardcoded part. auto calculate by frame or remove it
-    assessment_config.image_height = 720;
-    assessment_config.image_width = 1280;
-
   }
 
   if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
@@ -103,8 +102,6 @@ export default function AssessmentPage({ route }: any) {
     assessment_config.point_2 = { point_2x, point_2y };  // center
     assessment_config.point_3 = { point_3x, point_3y };   // right
     assessment_config.point_radius = radius;
-    assessment_config.image_height = height;
-    assessment_config.image_width = width;
   }
 
   const connectionData = {

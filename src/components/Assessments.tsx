@@ -16,9 +16,6 @@ import Svg, { Circle, Line } from 'react-native-svg';
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
-const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
-
 const defaultPose = getDefaultObject();
 
 
@@ -45,6 +42,9 @@ const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+
+  const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
+  const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
   const { width, height } = useWindowDimensions();
 
@@ -133,7 +133,7 @@ export function Assessment(props: AssessmentProp) {
       }
       poseCopy[v] = {
         x: props.libData.cameraPosition === 'back' ? pose[v].x / frame.width : (frame.width - pose[v].x) / frame.width,
-        y: pose[v].y / frame.width,
+        y: pose[v].y / frame.height,
         z: pose[v].z / frame.width,
         visibility: pose[v].visibility,
       };

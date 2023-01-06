@@ -52,8 +52,8 @@ export default function HomeScreen({ navigation }: any) {
                 )}
                 {/* comment out later */}
 
-                <Text style={styles.labelText}>Display Skeleton </Text>
-                <SkeletonOption setSelectedOption={onPressSkeletonOption} />
+                {/* <Text style={styles.labelText}>Display Skeleton </Text>
+                <SkeletonOption setSelectedOption={onPressSkeletonOption} /> */}
 
                 <Text style={styles.labelText}>Choose  Camera </Text>
                 <CameraOption setSelectedOption={onPressCameraOption} />
@@ -63,7 +63,7 @@ export default function HomeScreen({ navigation }: any) {
                     title={"Let's Start " + assessmentName}
                     disabled={userHeight.length <= 1}
                     onPress={() =>
-                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight, showSkeleton })
+                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight })
                     }
                 />
                 <Text style={{ marginBottom: 20 }}></Text>

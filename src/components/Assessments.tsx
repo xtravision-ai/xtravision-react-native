@@ -227,7 +227,7 @@ export function Assessment(props: AssessmentProp) {
         frameProcessorFps={10}
         onError={onError}
       />
-      {props.libData.showSkeleton && Object.keys(landmarksTempRef.current).length > 0 && (
+      {/* {props.libData.showSkeleton && Object.keys(landmarksTempRef.current).length > 0 && (
         //@ts-ignore
         <Svg
           height={height}
@@ -245,7 +245,7 @@ export function Assessment(props: AssessmentProp) {
             )
           })}
         </Svg>
-      )}
+      )} */}
     </>
   );
 }

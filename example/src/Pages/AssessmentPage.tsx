@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
@@ -9,19 +9,26 @@ import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
-  const auth_token = "_AUTH_TOKEN_";
+  const auth_token = "__AUTH-TOKEN__";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  const showSkeleton = false //: false, // TODO: fix in next release //route.params.showSkeleton; // true or false
+  const showSkeleton = false; // true or false
   const userHeight = route.params.userHeight;
   let assessment_config = {} as any;
   let user_config = {} as any;
 
+  const left_Side_color = '#5588cf';  // blue color
+  const right_Side_color = '#55bacf'; // sky blue color
+
+  assessment_config.side_color = { left_Side_color, right_Side_color };
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump
   // (width, height) = Coordinates (x,y)
-  const { width, height } = Dimensions.get('window');
+  const { width, height } = useWindowDimensions();
+
+  assessment_config.image_height = height;
+  assessment_config.image_width = width;
 
   const stand_x = width - (width - width / 10) //100
   const stand_y = height / (height / 250) //- 100
@@ -32,8 +39,6 @@ export default function AssessmentPage({ route }: any) {
   let point_2x, point_2y;
   let point_3x, point_3y;
   let radius;
-
-  // console.log("point_1", point_1, "point_2: ", point_2, "point_3: ", point_3);
 
   if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
     point_1y = point_2y = point_3y = height - height / 4;
@@ -90,10 +95,6 @@ export default function AssessmentPage({ route }: any) {
     // Coordinates of start point
     assessment_config.stand_x = stand_x;
     assessment_config.stand_y = stand_y;
-    // // TODO: hardcoded part. auto calculate by frame or remove it
-    assessment_config.image_height = 720;
-    assessment_config.image_width = 1280;
-
   }
 
   if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
@@ -101,8 +102,6 @@ export default function AssessmentPage({ route }: any) {
     assessment_config.point_2 = { point_2x, point_2y };  // center
     assessment_config.point_3 = { point_3x, point_3y };   // right
     assessment_config.point_radius = radius;
-    assessment_config.image_height = height;
-    assessment_config.image_width = width;
   }
 
   const connectionData = {
@@ -134,16 +133,16 @@ export default function AssessmentPage({ route }: any) {
             libData={libData}
           />
           {
-              // @ts-ignore:next-line
-              assessment_name == "STANDING_BROAD_JUMP" &&
-              (
-                <>
-                  <View style={styles({ stand_x, stand_y }).point} />
-                  <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
-                </>
+            // @ts-ignore:next-line
+            assessment_name == "STANDING_BROAD_JUMP" &&
+            (
+              <>
+                <View style={styles({ stand_x, stand_y }).point} />
+                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
+              </>
 
-              )
-            }
+            )
+          }
 
           {
             // @ts-ignore:next-line

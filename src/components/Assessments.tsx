@@ -7,10 +7,8 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-// import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
-import { scanPoseLandmarks} from '../helper';
-// import Animated from 'react-native-reanimated';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
+import  { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
 // import Svg, { Circle, Line } from 'react-native-svg';
@@ -18,12 +16,8 @@ import _ from 'lodash';
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
-// const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-// const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
-
 const defaultPose = getDefaultObject();
 
-// const { width, height } = Dimensions.get('window');
 
 export interface AssessmentProp {
   connectionData: {
@@ -82,8 +76,10 @@ export function Assessment(props: AssessmentProp) {
 
   const poseSkeleton: any = useSharedValue(defaultPose);
 
-  // const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, orientation.width);
-  // const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, orientation.width);
+  //@ts-ignore
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
+  //@ts-ignore
+  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
 
   const updateData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
@@ -98,15 +94,15 @@ export function Assessment(props: AssessmentProp) {
     const height = dimensions.height
 
     let xFactor:any , yFactor:any;
-    
-    if (height > width ) {
-      xFactor = height / frame.width
-      yFactor = width / frame.height
+
+    if (height>width) {
+      xFactor = (height / frame.width) - 0.045
+      yFactor = (width / frame.height) + 0.04
     } else { // Phone in landscape mode
-      // TODo: @Jestin: why we need to adjust this thing. Is it any phone specific ? 
-      xFactor =  1 - 0.34;
-      yFactor = 1 - 0.55;
+      xFactor = (width / frame.width);
+      yFactor = (height / frame.height) - 0.09;
     }
+    
 
     try {
       Object.keys(pose).forEach(v => {
@@ -145,7 +141,7 @@ export function Assessment(props: AssessmentProp) {
       }
       poseCopy[v] = {
         x: props.libData.cameraPosition === 'back' ? pose[v].x / frame.width : (frame.width - pose[v].x) / frame.width,
-        y: pose[v].y / frame.width,
+        y: pose[v].y / frame.height,
         z: pose[v].z / frame.width,
         visibility: pose[v].visibility,
       };
@@ -249,18 +245,18 @@ export function Assessment(props: AssessmentProp) {
       {/* {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
-          height={orientation.height}
-          width={orientation.width}
-          style={styles(orientation).linesContainer}
+          height={height}
+          width={width}
+          style={getStylesData(dimensions).linesContainer}
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (
-              <AnimatedLine animatedProps={element} stroke="red" strokeWidth="2" key={key} />
+              <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="2" key={key} />
             )
           })}
           {animatedCircleArray.map((element: any, key: any) => {
             return (
-              <AnimatedCircle animatedProps={element} stroke="red" fill="red" key={key} />
+              <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
             )
           })}
         </Svg>

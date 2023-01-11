@@ -23,6 +23,8 @@ import useWebSocket from 'react-native-use-websocket';
 
 const defaultPose = getDefaultObject();
 
+// const { width, height } = Dimensions.get('window');
+
 export interface AssessmentProp {
   connectionData: {
     assessment_name: string;

@@ -9,7 +9,7 @@ import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
-  const auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ODQ3ZDE3NC1jNjQ0LTQyYjUtOThkMi00OTk3ZDZlZTA4NmMiLCJhcHBJZCI6IjAwZTViZmNhLTJlMWEtMTFlZC04YmRjLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiZmMxMzk2NTItMmUxOS0xMWVkLThiZGMtMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjYyNDkyNjY4LCJleHAiOjE2OTQwNTAyNjh9.xn07CAkw3BPTSj2IIwkzzwQUTM1CXj5GJkOelS4scl8";
+  const auth_token = "__AUTH-TOKEN__";
   const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false

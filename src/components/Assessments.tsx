@@ -7,6 +7,7 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
+//@ts-ignore
 import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
 import  { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
@@ -76,10 +77,8 @@ export function Assessment(props: AssessmentProp) {
 
   const poseSkeleton: any = useSharedValue(defaultPose);
 
-  //@ts-ignore
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
-  //@ts-ignore
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
+  // const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
+  // const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
 
   const updateData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };

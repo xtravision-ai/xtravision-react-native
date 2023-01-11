@@ -16,9 +16,6 @@ import _ from 'lodash';
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
-// const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-// const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
-
 const defaultPose = getDefaultObject();
 
 
@@ -144,7 +141,7 @@ export function Assessment(props: AssessmentProp) {
       }
       poseCopy[v] = {
         x: props.libData.cameraPosition === 'back' ? pose[v].x / frame.width : (frame.width - pose[v].x) / frame.width,
-        y: pose[v].y / frame.width,
+        y: pose[v].y / frame.height,
         z: pose[v].z / frame.width,
         visibility: pose[v].visibility,
       };

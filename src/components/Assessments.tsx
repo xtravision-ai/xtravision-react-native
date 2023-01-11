@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
 import { StyleSheet, Text, useWindowDimensions } from 'react-native';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Camera,
   useCameraDevices,
@@ -8,16 +8,16 @@ import {
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
 import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
-import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
+import  { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
-import Svg, { Circle, Line } from 'react-native-svg';
+// import Svg, { Circle, Line } from 'react-native-svg';
 
 // TODO: create custom hook for WS connection
 import useWebSocket from 'react-native-use-websocket';
 
-const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
-const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
+// const AnimatedLine = Animated.createAnimatedComponent(Line) as any;
+// const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
 const defaultPose = getDefaultObject();
 
@@ -28,6 +28,7 @@ export interface AssessmentProp {
     auth_token: string;
     assessment_config?: object;
     user_config?: object;
+    session_id?:string | null
   };
   requestData: {
     isPreJoin?: boolean;
@@ -44,29 +45,38 @@ const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 export function Assessment(props: AssessmentProp) {
-  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`;
+  // const { width, height } = Dimensions.get('window');
+  const dimensions = useWindowDimensions();
 
-  const { width, height } = useWindowDimensions();
+  const width = dimensions.width
+  const height = dimensions.height;
 
-  let queryParams: { [key: string]: any } = { auth_token: props.connectionData.auth_token };
-  // if (props.connection.queryParams) {
-  //   queryParams = { ...queryParams, ...props.connection.queryParams };
-  // }
+  // TODO: clean up below code and move into custom hook
+
+  let iQueryParams: { [key: string]: any } = {}; 
+  iQueryParams['requested_at'] = Date.now();
+  iQueryParams["session_id"]= props.connectionData.session_id ? props.connectionData.session_id : null;
+  iQueryParams["auth_token"] = props.connectionData.auth_token;
 
   if (!_.isEmpty(props.connectionData.user_config)) {
-    queryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
+    iQueryParams['user_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.user_config)}`);
   }
 
   if (!_.isEmpty(props.connectionData.assessment_config)) {
-    queryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
+    iQueryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(props.connectionData.assessment_config)}`);
   }
 
+  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`
+  
+  //Imp: Since component is rendering multiple times and query params have current time, So we need to set query params only one time when load component
+  const [queryParams] = useState(iQueryParams)
+  
   const landmarksTempRef = React.useRef<any>({});
+  const frameTempRef = React.useRef<any>({frame_height: height, frame_width: width});
 
   const devices = useCameraDevices();
   const device = devices[props.libData.cameraPosition];
 
-  // svg
   const poseSkeleton: any = useSharedValue(defaultPose);
 
   //@ts-ignore
@@ -74,27 +84,29 @@ export function Assessment(props: AssessmentProp) {
   //@ts-ignore
   const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, width, props.connectionData.assessment_config?.side_color as any);
 
-  const updateData = useCallback((now: any, landmarks: any) => {
-
-    // Step-2: after extracting landmarks store unto temp variable
-    // const poseFrameHandler = useCallback((pose1: any, frame: any) => {
-    //   if (_.isEmpty(pose1)) {
-    //     // console.log('Pose is empty!',)
-    //     return;
-    //   }
-    // // normalized frames into landmarks and store landmarks with current millis in temp variable
-    // const now = Date.now();
-    // const landmarks = getNormalizedArray(pose1, frame, dimensions);
-
+  const updateData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
+    frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
   }, [])
 
-  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any) => {
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
     'worklet';
-    const xFactor = height > width ? (height / frame.width) - 0.045 : (width / frame.width);
-    const yFactor = height > width ? (width / frame.height) + 0.04 : (height / frame.height) - 0.09;
+    
+    // default consideration: Phone in Portrait mode
+    const width = dimensions.width
+    const height = dimensions.height
 
-    // [TypeError: Cannot read property 'x' of undefined]
+    let xFactor:any , yFactor:any;
+
+    if (height>width) {
+      xFactor = (height / frame.width) - 0.045
+      yFactor = (width / frame.height) + 0.04
+    } else { // Phone in landscape mode
+      xFactor = (width / frame.width);
+      yFactor = (height / frame.height) - 0.09;
+    }
+    
+
     try {
       Object.keys(pose).forEach(v => {
         poseCopyObj[v] = {
@@ -103,7 +115,7 @@ export function Assessment(props: AssessmentProp) {
         };
       });
 
-    } catch (e) { }
+    } catch (e) { console.error(Date() + " ", e)}
     poseSkeleton.value = poseCopyObj;
   }
 
@@ -113,8 +125,7 @@ export function Assessment(props: AssessmentProp) {
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
-      // testing
-      // console.warn(Date() + " Body is not visible!")
+      __DEV__ && console.warn(Date() + " Body is not visible!")
       return;
     }
 
@@ -139,32 +150,33 @@ export function Assessment(props: AssessmentProp) {
       };
     });
 
-    calculatePoseSkeleton(poseCopyObj, pose, frame);
-    runOnJS(updateData)(now, Object.values(poseCopy));
+    calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
+    runOnJS(updateData)(now, Object.values(poseCopy), frame)
 
-  }, [width, height]);
+  }, [dimensions]);
 
   const onError = function (error: any) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
     console.error(Date() + "  " + error.message)
-
   }
-
+  
   // https://github.com/Sumit1993/react-native-use-websocket#readme
+  let default_options = {
+    queryParams: queryParams, //{...props.connection.queryParams, queryParams}
+    onOpen: () => console.log(Date() + ' WS Connection opened'),
+    onError: (e: any) => console.error(Date() + ' ',  e), // todo : proper error handling
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (_closeEvent: any) => true,
+    //To attempt to reconnect on error events,
+    retryOnError: true,
+  }
+ 
   const {
     sendJsonMessage,
     lastJsonMessage,
     // readyState,
     // getWebSocket
-  } = useWebSocket(WS_URL, {
-    queryParams: queryParams, //{...props.connection.queryParams, queryParams}
-    onOpen: () => console.log('WS Connection opened'),
-    onError: (e: any) => console.error(e), // todo : proper error handling
-    //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (_closeEvent: any) => true,
-    //To attempt to reconnect on error events,
-    retryOnError: true,
-  });
+  } = useWebSocket(WS_URL, default_options );
 
   // step-3: send data to server
   useEffect(() => {
@@ -192,6 +204,8 @@ export function Assessment(props: AssessmentProp) {
         timestamp,
         user_keypoints: keyPoints,
         isprejoin: !!props.requestData.isPreJoin,
+        frame_width: frameTempRef.current.frame_width,
+        frame_height: frameTempRef.current.frame_height
       });
     }, 1000);
 
@@ -218,7 +232,7 @@ export function Assessment(props: AssessmentProp) {
     <>
       {/* @ts-ignore */}
       <Camera
-        style={styles({ width, height }).camera}
+        style={getStylesData(dimensions).camera}
         device={device}
         isActive={true}
         // isActive={isAppForeground}
@@ -227,12 +241,16 @@ export function Assessment(props: AssessmentProp) {
         frameProcessorFps={10}
         onError={onError}
       />
-      {props.libData.showSkeleton && Object.keys(landmarksTempRef.current).length > 0 && (
+
+      {/* @ts-ignore */}
+      <Text> width: {dimensions.width} height: {dimensions.height}</Text>
+
+      {/* {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
           height={height}
           width={width}
-          style={styles({ width, height }).linesContainer}
+          style={getStylesData(dimensions).linesContainer}
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (
@@ -245,12 +263,12 @@ export function Assessment(props: AssessmentProp) {
             )
           })}
         </Svg>
-      )}
+      )} */}
     </>
   );
 }
 
-const styles = (orientation: any) => StyleSheet.create({
+const getStylesData = (orientation: any) => StyleSheet.create({
   camera: {
     flex: 1,
     width: '100%',

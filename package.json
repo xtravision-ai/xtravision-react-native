@@ -1,6 +1,6 @@
 {
   "name": "@xtravision/xtravision-react-native",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "test",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -32,7 +32,7 @@
     "setup": "yarn install && yarn example && yarn install && yarn android ",
     "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
     "create:debugAPK": "cd example && yarn build:APK && yarn create:debugAPK",
-    "postinstall": "node scripts/fix-duplicate-resource/android-release-gradle-fix.js"
+    "//postinstall": "node scripts/fix-duplicate-resource/android-release-gradle-fix.js"
   },
   "keywords": [
     "xtravision",

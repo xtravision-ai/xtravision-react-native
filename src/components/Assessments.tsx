@@ -239,7 +239,7 @@ export function Assessment(props: AssessmentProp) {
       />
 
       {/* @ts-ignore */}
-      <Text> width: {dimensions.width} height: {dimensions.height}</Text>
+      {/* <Text> width: {dimensions.width} height: {dimensions.height}</Text> */}
 
       {/* {props.libData.showSkeleton && (
         //@ts-ignore

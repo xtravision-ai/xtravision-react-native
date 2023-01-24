@@ -8,44 +8,55 @@ import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
 
+const PLATE_TAPPING_COORDINATION_RADIUS = 80;
+
+// cache variable
+let responseCache: any = {positiveReps: 0, negativeReps: 0, lastReps: 0};
+
+
 export default function AssessmentPage({ route }: any) {
-  const auth_token = "__AUTH-TOKEN__";
-  const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
+  const authToken = "__AUTH_TOKEN__";
+  const selectedAssessment = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
   const userHeight = route.params.userHeight;
-  let assessment_config = {} as any;
-  let user_config = {} as any;
+  let assessmentConfig = {} as any;
+  let userConfig = {} as any;
+
+  const assessmentName = selectedAssessment.split("-")[0];// assessmentDataList[0];
 
   const left_Side_color = '#5588cf';  // blue color
   const right_Side_color = '#55bacf'; // sky blue color
 
-  assessment_config.side_color = { left_Side_color, right_Side_color };
+  assessmentConfig.side_color = { left_Side_color, right_Side_color };
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump
   // (width, height) = Coordinates (x,y)
   const { width, height } = useWindowDimensions();
 
-  assessment_config.image_height = height;
-  assessment_config.image_width = width;
+  assessmentConfig.image_height = height;
+  assessmentConfig.image_width = width;
 
   const stand_x = width - (width - width / 10) //100
   const stand_y = height / (height / 250) //- 100
   // const stand_y = height / (width / 500) //- 100
   // const stand_x = (width - width / 5)
 
-  let point_1x, point_1y
-  let point_2x, point_2y;
-  let point_3x, point_3y;
+  let leftPoint_x, leftPoint_y
+  let centerPoint_x, centerPoint_y;
+  let rightPoint_x, rightPoint_y;
   let radius;
 
-  if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
-    point_1y = point_2y = point_3y = height - height / 4;
-    point_1x = width / 3 - (width / 3) / 2;
-    point_2x = width / 2;
-    point_3x = width - width / 3 + (width / 3) / 2;
-    radius = 80;
+  if (assessmentName === 'PLATE_TAPPING_COORDINATION') {
+    leftPoint_y = centerPoint_y = rightPoint_y = height - (height* 37/100) // / 2.7;
+    const half = width/2;
+    leftPoint_x = (half - half*1/2);
+    centerPoint_x = half    // center
+    rightPoint_x = (half+ half*1/2)
+
+    radius = PLATE_TAPPING_COORDINATION_RADIUS;
+    ;
   };
 
   const [hasPermission, setHasPermission] = React.useState(false);
@@ -55,6 +66,12 @@ export default function AssessmentPage({ route }: any) {
       setHasPermission(status === CameraPermissionStatus.AUTHORIZED);
     })();
   }, []);
+
+  React.useEffect(() => { 
+    // temp data for demo
+    //initial define cache variable
+    responseCache = {positiveReps: 0, negativeReps: 0, lastReps: 0};
+  }, [])
 
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
 
@@ -69,19 +86,28 @@ export default function AssessmentPage({ route }: any) {
     console.log(Date() + ' Server Data:', serverResponse.data);
 
     const additional_response = serverResponse.data.additional_response
-    /* @ts-ignore:next-line */
-    switch (assessment_name) {
-
-      /* @ts-ignore:next-line */
+    switch (selectedAssessment) {
       case "SIDE_FLAMINGO":
         setDisplayText(`Current-Pose: ${additional_response?.in_pose};  In-Pose Time(sec): ${additional_response?.seconds};`)
         break;
-      // /* @ts-ignore:next-line */
       case "PLATE_TAPPING_COORDINATION":
         setDisplayText(` Total Cycles: ${additional_response?.reps?.total};`)
         break;
       case "STANDING_BROAD_JUMP":
         setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
+        break;
+      case "V_SIT_AND_REACH-POSITIVE_NEGATIVE":
+        // reps increase
+        if (additional_response.reps.total!= responseCache.lastReps) {
+          if (additional_response.in_pose){
+            responseCache.positiveReps ++;
+          }else{
+            responseCache.negativeReps ++;
+          }
+          responseCache.lastReps = additional_response.reps.total;
+        }
+      
+        setDisplayText(` Positive Reps: ${responseCache.positiveReps}; Negative reps: ${responseCache.negativeReps}`)
         break;
       default:
         setDisplayText(`Current-Pose: ${additional_response?.in_pose}; Reps: ${additional_response?.reps?.total};`)
@@ -90,25 +116,26 @@ export default function AssessmentPage({ route }: any) {
   };
 
   // // @ts-ignore:next-line
-  if (assessment_name == 'STANDING_BROAD_JUMP') {
-    user_config.user_height = userHeight; // in Centimeter string
+  if (assessmentName == 'STANDING_BROAD_JUMP') {
+    userConfig.user_height = userHeight; // in Centimeter string
     // Coordinates of start point
-    assessment_config.stand_x = stand_x;
-    assessment_config.stand_y = stand_y;
+    assessmentConfig.stand_x = stand_x;
+    assessmentConfig.stand_y = stand_y;
   }
 
-  if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
-    assessment_config.point_1 = { point_1x, point_1y };  // left
-    assessment_config.point_2 = { point_2x, point_2y };  // center
-    assessment_config.point_3 = { point_3x, point_3y };   // right
-    assessment_config.point_radius = radius;
+  if (assessmentName === 'PLATE_TAPPING_COORDINATION') {
+    assessmentConfig.point_1 = { point_1x: leftPoint_x, point_1y: leftPoint_y };  // left
+    assessmentConfig.point_2 = { point_2x: centerPoint_x, point_2y: centerPoint_y };  // center
+    assessmentConfig.point_3 = { point_3x: rightPoint_x, point_3y: rightPoint_y };   // right
+    assessmentConfig.point_radius = radius;
   }
 
+  // formatted data as required
   const connectionData = {
-    assessment_name,
-    auth_token,
-    assessment_config,
-    user_config,
+    assessment_name: assessmentName,
+    auth_token: authToken,
+    assessment_config: assessmentConfig,
+    user_config: userConfig,
     session_id : null
   };
 
@@ -134,7 +161,7 @@ export default function AssessmentPage({ route }: any) {
           />
           {
             // @ts-ignore:next-line
-            assessment_name == "STANDING_BROAD_JUMP" &&
+            assessmentName == "STANDING_BROAD_JUMP" &&
             (
               <>
                 <View style={styles({ stand_x, stand_y }).point} />
@@ -146,17 +173,23 @@ export default function AssessmentPage({ route }: any) {
 
           {
             // @ts-ignore:next-line
-            assessment_name == "PLATE_TAPPING_COORDINATION" &&
+            assessmentName == "PLATE_TAPPING_COORDINATION" &&
             (
               <>
                 {/* left */}
-                <View style={styles({ height, point_1x, point_1y, radius }).leftPoint} />
+                <View style={styles({ height, leftPoint_x, leftPoint_y, radius }).leftPoint} >
+                  <Text style={{fontSize: 40,textAlign: 'center', color: "black"}}>L</Text>
+                </View>
 
                 {/* center */}
-                <View style={styles({ height, point_2x, point_2y, radius }).middlePoint} />
+                <View style={styles({ height, centerPoint_x, centerPoint_y, radius }).middlePoint} >
+                  <Text style={{fontSize: 40,textAlign: 'center', color: "black"}}>C</Text>
+                </View>
 
                 {/* right */}
-                <View style={styles({ height, point_3x, point_3y, radius }).rightPoint} />
+                <View style={styles({ height, rightPoint_x, rightPoint_y, radius }).rightPoint}>
+                  <Text style={{fontSize: 40,textAlign: 'center', color: "black"}}>R</Text>
+                </View>
               </>
 
             )
@@ -198,32 +231,34 @@ const styles = (orientation: any) => StyleSheet.create({
     // // left: 280,     // x axis // TODO: make is configurable
   },
   leftPoint: {
-    width: 80,
-    height: 80,
-    borderRadius: orientation?.radius,
-    backgroundColor: '#fc0505',
-    top: orientation?.point_1y,   // y axis
-    left: orientation?.point_1x,     // x axis // TODO: make is configurable
+    justifyContent: 'center',
+    width: PLATE_TAPPING_COORDINATION_RADIUS,
+    height: PLATE_TAPPING_COORDINATION_RADIUS,
+    borderRadius: PLATE_TAPPING_COORDINATION_RADIUS,
+    backgroundColor: '#A52A2A',
+    top: orientation?.leftPoint_y,   // y axis
+    left: orientation?.leftPoint_x,     // x axis // TODO: make is configurable
     position: 'absolute', //overlap on the camera
-    // // left: 280,     // x axis // TODO: make is configurable
   },
   middlePoint: {
-    width: 80,
-    height: 80,
-    borderRadius: orientation?.radius,
-    backgroundColor: '#fc0505',
-    top: orientation?.point_2y,   // y axis
-    left: orientation.point_2x,     // x axis // TODO: make is configurable
+    justifyContent: 'center',
+    width: PLATE_TAPPING_COORDINATION_RADIUS,
+    height: PLATE_TAPPING_COORDINATION_RADIUS,
+    borderRadius: PLATE_TAPPING_COORDINATION_RADIUS,
+    backgroundColor: '#A52A2A', //#A52A2A
+    top: orientation?.centerPoint_y,   // y axis
+    left: orientation.centerPoint_x,     // x axis // TODO: make is configurable
     position: 'absolute', //overlap on the camera
     // // left: 280,     // x axis // TODO: make is configurable
   },
   rightPoint: {
-    width: 80,
-    height: 80,
-    borderRadius: orientation?.radius,
-    backgroundColor: '#fc0505',
-    top: orientation?.point_3y,   // y axis
-    left: orientation?.point_3x,     // x axis // TODO: make is configurable
+    justifyContent: 'center',
+    width: PLATE_TAPPING_COORDINATION_RADIUS,
+    height: PLATE_TAPPING_COORDINATION_RADIUS,
+    borderRadius: PLATE_TAPPING_COORDINATION_RADIUS,
+    backgroundColor: '#A52A2A',
+    top: orientation?.rightPoint_y,   // y axis
+    left: orientation?.rightPoint_x,     // x axis // TODO: make is configurable
     position: 'absolute', //overlap on the camera
     // // left: 280,     // x axis // TODO: make is configurable
   },

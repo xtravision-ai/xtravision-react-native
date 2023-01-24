@@ -188,8 +188,8 @@ const styles = (orientation: any) => StyleSheet.create({
     fontWeight: 'bold'
   },
   point: {
-    width: 20,
-    height: 20,
+    width: 40,
+    height: 40,
     borderRadius: orientation?.radius,
     backgroundColor: '#fc0505',
     top: orientation?.stand_y,   // y axis
@@ -232,7 +232,7 @@ const styles = (orientation: any) => StyleSheet.create({
     // height: 20,
     // borderRadius: 20,........
     // backgroundColor: '#fc0505',
-    top: orientation?.stand_y + 20,   // y axis
+    top: orientation?.stand_y + 40,   // y axis
     left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable
     position: 'absolute',
   }

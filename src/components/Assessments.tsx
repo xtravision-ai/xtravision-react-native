@@ -9,7 +9,7 @@ import {
 import type { Frame } from 'react-native-vision-camera';
 //@ts-ignore
 import { scanPoseLandmarks, generateSkeletonLines, generateSkeletonCircle } from '../helper';
-import  { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../formatter';
 import _ from 'lodash';
 // import Svg, { Circle, Line } from 'react-native-svg';
@@ -26,12 +26,13 @@ export interface AssessmentProp {
     auth_token: string;
     assessment_config?: object;
     user_config?: object;
-    session_id?:string | null
+    session_id?: string | null
   };
   requestData: {
     isPreJoin?: boolean;
   };
   libData: {
+    sideColor?: object;
     onServerResponse(serverResponse: any): void;
     cameraPosition: 'front' | 'back';
     showSkeleton: boolean;
@@ -51,9 +52,9 @@ export function Assessment(props: AssessmentProp) {
 
   // TODO: clean up below code and move into custom hook
 
-  let iQueryParams: { [key: string]: any } = {}; 
+  let iQueryParams: { [key: string]: any } = {};
   iQueryParams['requested_at'] = Date.now();
-  iQueryParams["session_id"]= props.connectionData.session_id ? props.connectionData.session_id : null;
+  iQueryParams["session_id"] = props.connectionData.session_id ? props.connectionData.session_id : null;
   iQueryParams["auth_token"] = props.connectionData.auth_token;
 
   if (!_.isEmpty(props.connectionData.user_config)) {
@@ -65,12 +66,12 @@ export function Assessment(props: AssessmentProp) {
   }
 
   const WS_URL = `${WS_BASE_URL}/assessment/fitness/${props.connectionData.assessment_name}`
-  
+
   //Imp: Since component is rendering multiple times and query params have current time, So we need to set query params only one time when load component
   const [queryParams] = useState(iQueryParams)
-  
+
   const landmarksTempRef = React.useRef<any>({});
-  const frameTempRef = React.useRef<any>({frame_height: height, frame_width: width});
+  const frameTempRef = React.useRef<any>({ frame_height: height, frame_width: width });
 
   const devices = useCameraDevices();
   const device = devices[props.libData.cameraPosition];
@@ -87,21 +88,21 @@ export function Assessment(props: AssessmentProp) {
 
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
     'worklet';
-    
+
     // default consideration: Phone in Portrait mode
     const width = dimensions.width
     const height = dimensions.height
 
-    let xFactor:any , yFactor:any;
+    let xFactor: any, yFactor: any;
 
-    if (height>width) {
+    if (height > width) {
       xFactor = (height / frame.width) - 0.045
       yFactor = (width / frame.height) + 0.04
     } else { // Phone in landscape mode
       xFactor = (width / frame.width);
       yFactor = (height / frame.height) - 0.09;
     }
-    
+
     try {
       Object.keys(pose).forEach(v => {
         poseCopyObj[v] = {
@@ -110,7 +111,7 @@ export function Assessment(props: AssessmentProp) {
         };
       });
 
-    } catch (e) { console.error(Date() + " ", e)}
+    } catch (e) { console.error(Date() + " ", e) }
     poseSkeleton.value = poseCopyObj;
   }
 
@@ -154,27 +155,27 @@ export function Assessment(props: AssessmentProp) {
     // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
     console.error(Date() + "  " + error.message)
   }
-  
+
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   let default_options = {
     queryParams: queryParams, //{...props.connection.queryParams, queryParams}
     onOpen: () => console.log(Date() + ' WS Connection opened'),
-    onError: (e: any) => console.error(Date() + ' ',  e), // todo : proper error handling
+    onError: (e: any) => console.error(Date() + ' ', e), // todo : proper error handling
     //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (_closeEvent: any) => true,
     //To attempt to reconnect on error events,
     retryOnError: true,
   }
 
-  __DEV__ && console.log(Date()+" ", {WS_URL, default_options} )
+  __DEV__ && console.log(Date() + " ", { WS_URL, default_options })
 
- 
+
   const {
     sendJsonMessage,
     lastJsonMessage,
     // readyState,
     // getWebSocket
-  } = useWebSocket(WS_URL, default_options );
+  } = useWebSocket(WS_URL, default_options);
 
   // step-3: send data to server
   useEffect(() => {

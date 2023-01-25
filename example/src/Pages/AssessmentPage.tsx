@@ -11,7 +11,7 @@ LogBox.ignoreAllLogs();
 const PLATE_TAPPING_COORDINATION_RADIUS = 80;
 
 // cache variable
-let responseCache: any = {positiveReps: 0, negativeReps: 0, lastReps: 0};
+let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 
 export default function AssessmentPage({ route }: any) {
@@ -25,10 +25,9 @@ export default function AssessmentPage({ route }: any) {
 
   const assessmentName = selectedAssessment.split("-")[0];// assessmentDataList[0];
 
-  const left_Side_color = '#5588cf';  // blue color
-  const right_Side_color = '#55bacf'; // sky blue color
+  const leftSideColor = '#5588cf';  // blue color
+  const rightSideColor = '#55bacf'; // sky blue color
 
-  assessmentConfig.side_color = { left_Side_color, right_Side_color };
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump
@@ -49,11 +48,11 @@ export default function AssessmentPage({ route }: any) {
   let radius;
 
   if (assessmentName === 'PLATE_TAPPING_COORDINATION') {
-    leftPoint_y = centerPoint_y = rightPoint_y = height - (height* 37/100) // / 2.7;
-    const half = width/2;
-    leftPoint_x = (half - half*1/2);
+    leftPoint_y = centerPoint_y = rightPoint_y = height - (height * 37 / 100) // / 2.7;
+    const half = width / 2;
+    leftPoint_x = (half - half * 1 / 2);
     centerPoint_x = half    // center
-    rightPoint_x = (half+ half*1/2)
+    rightPoint_x = (half + half * 1 / 2)
 
     radius = PLATE_TAPPING_COORDINATION_RADIUS;
     ;
@@ -67,10 +66,10 @@ export default function AssessmentPage({ route }: any) {
     })();
   }, []);
 
-  React.useEffect(() => { 
+  React.useEffect(() => {
     // temp data for demo
     //initial define cache variable
-    responseCache = {positiveReps: 0, negativeReps: 0, lastReps: 0};
+    responseCache = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
   }, [])
 
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
@@ -98,15 +97,15 @@ export default function AssessmentPage({ route }: any) {
         break;
       case "V_SIT_AND_REACH-POSITIVE_NEGATIVE":
         // reps increase
-        if (additional_response.reps.total!= responseCache.lastReps) {
-          if (additional_response.in_pose){
-            responseCache.positiveReps ++;
-          }else{
-            responseCache.negativeReps ++;
+        if (additional_response.reps.total != responseCache.lastReps) {
+          if (additional_response.in_pose) {
+            responseCache.positiveReps++;
+          } else {
+            responseCache.negativeReps++;
           }
           responseCache.lastReps = additional_response.reps.total;
         }
-      
+
         setDisplayText(` Positive Reps: ${responseCache.positiveReps}; Negative reps: ${responseCache.negativeReps}`)
         break;
       default:
@@ -136,7 +135,7 @@ export default function AssessmentPage({ route }: any) {
     auth_token: authToken,
     assessment_config: assessmentConfig,
     user_config: userConfig,
-    session_id : null
+    session_id: null
   };
 
   const requestData = {
@@ -144,6 +143,7 @@ export default function AssessmentPage({ route }: any) {
   }
 
   const libData = {
+    sideColor: { leftSideColor, rightSideColor },
     onServerResponse,
     cameraPosition,
     showSkeleton
@@ -178,17 +178,17 @@ export default function AssessmentPage({ route }: any) {
               <>
                 {/* left */}
                 <View style={styles({ height, leftPoint_x, leftPoint_y, radius }).leftPoint} >
-                  <Text style={{fontSize: 40,textAlign: 'center', color: "black"}}>L</Text>
+                  <Text style={{ fontSize: 40, textAlign: 'center', color: "black" }}>L</Text>
                 </View>
 
                 {/* center */}
                 <View style={styles({ height, centerPoint_x, centerPoint_y, radius }).middlePoint} >
-                  <Text style={{fontSize: 40,textAlign: 'center', color: "black"}}>C</Text>
+                  <Text style={{ fontSize: 40, textAlign: 'center', color: "black" }}>C</Text>
                 </View>
 
                 {/* right */}
                 <View style={styles({ height, rightPoint_x, rightPoint_y, radius }).rightPoint}>
-                  <Text style={{fontSize: 40,textAlign: 'center', color: "black"}}>R</Text>
+                  <Text style={{ fontSize: 40, textAlign: 'center', color: "black" }}>R</Text>
                 </View>
               </>
 

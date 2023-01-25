@@ -102,7 +102,6 @@ export function Assessment(props: AssessmentProp) {
       yFactor = (height / frame.height) - 0.09;
     }
     
-
     try {
       Object.keys(pose).forEach(v => {
         poseCopyObj[v] = {
@@ -166,6 +165,9 @@ export function Assessment(props: AssessmentProp) {
     //To attempt to reconnect on error events,
     retryOnError: true,
   }
+
+  __DEV__ && console.log(Date()+" ", {WS_URL, default_options} )
+
  
   const {
     sendJsonMessage,

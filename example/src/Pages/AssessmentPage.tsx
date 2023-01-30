@@ -194,9 +194,21 @@ export default function AssessmentPage({ route }: any) {
 
             )
           }
-          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
-            {displayText}
-          </Text>
+          <View style={{ 
+              position: 'absolute',
+              top: 5
+            }} > 
+            <Text style={{ 
+                // backgroundColor: 'white', 
+                // textAlign: 'center', 
+                fontWeight: "bold", 
+                color: "black", 
+                fontSize: 30,  
+              }}>
+              {displayText}
+            </Text>
+          </View>
+
         </>
       ) : (
         <>

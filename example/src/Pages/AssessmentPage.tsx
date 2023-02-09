@@ -5,14 +5,13 @@ import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-reac
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
 
 // Disable all warning and error on screen
-import { LogBox } from 'react-native';
-LogBox.ignoreAllLogs();
+// import { LogBox } from 'react-native';
+// LogBox.ignoreAllLogs();
 
 const PLATE_TAPPING_COORDINATION_RADIUS = 80;
 
 // cache variable
 let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
-
 
 export default function AssessmentPage({ route }: any) {
   const authToken = "__AUTH_TOKEN__";

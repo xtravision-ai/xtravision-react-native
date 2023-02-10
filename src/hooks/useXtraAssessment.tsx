@@ -5,9 +5,9 @@ import useWebSocket from "react-native-use-websocket";
 import type {AssessmentConnectionData} from "./../components/assessment"
 
 
-// const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
 function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse: Function) : [Function, any]{
   const [responseData] = useState(null);
@@ -36,6 +36,7 @@ function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse:
   let default_options = {
     queryParams: queryParams, //queryParams, //{...props.connection.queryParams, queryParams}
     onOpen: () => console.log(Date() + ' XtraServer-AI Connection opened'),
+    //onClose: () =>  console.log(Date() + 'XtraServer-AI Connection closed'),
     onError: (e: any) => console.error(Date() + ' ', e), // todo : proper error handling
     //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (_closeEvent: any) => true,

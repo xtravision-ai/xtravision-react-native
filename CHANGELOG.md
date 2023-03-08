@@ -1,17 +1,19 @@
 
 # @xtravision/xtravision-react-native Changelog
 
+### v2.5.0: (Mar 08, 2023)
+- (SDK/fix) Restructure and clean-up the internal codebase so no need to suppress warnings/errors on the App side
 
-### v2.4.0: (Jan 25, 2022)
+### v2.4.0: (Jan 25, 2023)
 - (Demo-App/fix) Increase size of start-point for "Standing Broad Jump".
 - (Demo-App/fix) Cleanup code, proper display plates for "Plate Tapping Coordination".
 - (Demo-App/feature) Added support for "V-Sit-&-Reach" positive/negative reps.
 
-### v2.3.4: (Jan 23, 2022)
+### v2.3.4: (Jan 23, 2023)
 - (SDK/fix) disable repo dependency in SDK
 - (SDK/fix) disable height/width display in SDK
 
-### v2.3.1: (Jan 11, 2022)
+### v2.3.1: (Jan 11, 2023)
 - (Update) added query params and extra data in socket request data.
 
 ### v2.3.0: (30 Dec, 2022)

@@ -54,7 +54,7 @@ export default function App() {
   }
 
   // required prop:
-  const authToken = '__AUTH-TOKEN__';
+  const authToken = '__AUTH-TOKEN__'; //IMP: user specific auth token
   const assessmentName = '__ASSESSMENT_NAME__';
   const cameraPosition = 'back'; // front or back
 
@@ -62,8 +62,8 @@ export default function App() {
   const connectionData = {
     assessment_name,
     auth_token,
-    assessment_config = {},  // check document for more details
-    user_config = {}, // check document for more details
+    assessment_config: {},  // check document for more details
+    user_config:{}, // check document for more details
   };
 
   const requestData = {

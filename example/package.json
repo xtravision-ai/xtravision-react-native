@@ -1,7 +1,7 @@
 {
   "name": "xtravision-react-native-example",
   "description": "Example app for xtravision-react-native",
-  "version": "2.3.2",
+  "version": "2.5.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -38,6 +38,6 @@
     "metro-react-native-babel-preset": "^0.67.0",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
-    "react-native-flipper": "^0.174.0"
+    "react-native-flipper": "^0.179.0"
   }
 }

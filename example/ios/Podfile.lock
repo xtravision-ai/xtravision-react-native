@@ -454,7 +454,7 @@ PODS:
     - React
     - React-callinvoker
     - React-Core
-  - xtravision-react-native (2.5.0):
+  - xtravision-react-native (2.6.0):
     - GoogleMLKit/PoseDetection
     - React
   - Yoga (1.14.0)

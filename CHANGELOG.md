@@ -1,6 +1,9 @@
 
 # @xtravision/xtravision-react-native Changelog
 
+### v2.6.0: (Mar 29, 2023)
+- (SDK/fix) Disable unused code and added IOS support
+
 ### v2.5.0: (Mar 08, 2023)
 - (SDK/fix) Restructure and clean-up the internal codebase so no need to suppress warnings/errors on the App side
 

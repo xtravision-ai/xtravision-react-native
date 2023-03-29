@@ -80,7 +80,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 project.ext.react = [
     enableHermes: true,  // clean and rebuild if changing
-    entryFile: "index.tsx",
+    entryFile: "index.js",
     devDisabledInDev: true, // Disable dev server in dev release
     bundleInDebug: true, // add bundle to dev apk
 

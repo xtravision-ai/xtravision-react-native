@@ -195,7 +195,8 @@ export default function AssessmentPage({ route }: any) {
           }
           <View style={{ 
               position: 'absolute',
-              top: 5
+              top: 40
+              // bottom: 0, 
             }} > 
             <Text style={{ 
                 // backgroundColor: 'white', 

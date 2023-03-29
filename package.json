@@ -29,8 +29,12 @@
     "release": "release-it",
     "example": "yarn --cwd example",
     "android": "cd example && yarn android",
+    "ios": "cd example && yarn ios",
+    "pods": "pod-install --quiet",
     "setup": "yarn install && yarn example && yarn install && yarn android ",
-    "clean": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
+    "setup:ios": "yarn install && yarn example && yarn install && yarn ios ",
+    "clean:android": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
+    "clean:ios": "rm -rf yarn.lock && rm -rf node_modules && cd example &&  rm -rf yarn.lock && rm -rf node_modules && rm -rf ios/Podfile.lock && rm -rf ios/Pods && cd ..",
     "create:debugAPK": "cd example && yarn build:APK && yarn create:debugAPK",
     "//postinstall": "node scripts/fix-duplicate-resource/android-release-gradle-fix.js"
   },
@@ -71,7 +75,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^28.1.1",
-    "pod-install": "^0.1.0",
+    "pod-install": "^0.1.38",
     "prettier": "^2.0.5",
     "react": "^18.2.0",
     "react-native": "0.68.2",
@@ -88,7 +92,7 @@
     "react": "*",
     "react-native": "*",
     "react-native-reanimated": "^2.10.0",
-    "react-native-vision-camera": "2.13.0"
+    "react-native-vision-camera": "2.15.2"
   },
   "jest": {
     "preset": "react-native",

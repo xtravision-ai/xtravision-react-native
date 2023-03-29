@@ -8,9 +8,9 @@
     "ios": "react-native run-ios",
     "start": "react-native start --reset-cache",
     "pods": "pod-install --quiet",
-    "build:APK": "react-native bundle --platform android --dev false --entry-file index.tsx --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "//build:APK": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "create:debugAPK": "cd android && ./gradlew assembleDebug",
-    "build:ios": "react-native bundle --entry-file='index.tsx' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'",
+    "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'",
     "postinstall": "patch-package && node scripts/fix-duplicate-resource/android-release-gradle-fix.js"
   },
   "dependencies": {

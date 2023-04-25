@@ -6,7 +6,7 @@ git clone https://github.com/xtravision-ai/xtravision-react-native.git
 # Jump in to repo
 cd xtravision-react-native
 # Install all dependencies and build the package 
-yarn
+yarn install
 # Now jump into example folder to start testing
 cd example
 ```
@@ -23,7 +23,7 @@ const cameraPosition = 'back'; // Device camera back or front
 Once above changes are completed then you can run below command in `example` directory.
 ```sh
 # Install all dependencies and build the package 
-yarn
+yarn install
 # It will start your metro server (to see live logs), create android build and install in your connected Android Phone. Plz make sure your phone is already connected with your laptop with usb debugging mode. (Check with `adb devices` command)  
 yarn run android
 ```

@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, Text, useWindowDimensions, Image } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
-import FrameEdge from '../Components/FrameEdge';
 
 // Disable all warning and error on screen
 // import { LogBox } from 'react-native';
@@ -160,10 +159,12 @@ export default function AssessmentPage({ route }: any) {
             libData={libData}
           />
 
-          <FrameEdge width={width} height={height} />
-
-
-
+          <View style={styles({ width, height }).orangeFrame}>
+            <Image
+              source={require('../../assests/orange_frame.png')}
+              style={styles({ width, height }).frameImage}
+            />
+          </View>
           {
             // @ts-ignore:next-line
             assessmentName == "STANDING_BROAD_JUMP" &&
@@ -289,5 +290,19 @@ const styles = (orientation: any) => StyleSheet.create({
     top: orientation?.stand_y + 40,   // y axis
     left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable
     position: 'absolute',
-  }, 
+  },
+  orangeFrame: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  frameImage: {
+    height: orientation.height,
+    width: orientation.width,
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
+    flex: 1,
+    resizeMode: 'stretch',
+  }
 });

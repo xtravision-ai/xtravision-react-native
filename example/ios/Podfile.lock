@@ -526,7 +526,7 @@ DEPENDENCIES:
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/CocoaPods/Specs:
     - GoogleDataTransport
     - GoogleMLKit
     - GoogleToolboxForMac
@@ -700,10 +700,10 @@ SPEC CHECKSUMS:
   RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   VisionCamera: d011219ead7037dd6bd0c776ab20fa0874d95de0
-  xtravision-react-native: 92cd5abce94f5d52222a9cdd78b06b42c767d7d2
+  xtravision-react-native: 2936808fc10d57da20de634b16cd1c59d6bc9e9a
   Yoga: 99652481fcd320aefa4a7ef90095b95acd181952
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
 PODFILE CHECKSUM: 88a7c906c6f91ff5d47cb275149d587b88674114
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0

@@ -215,7 +215,6 @@ export default function AssessmentPage({ route }: any) {
               {displayText}
             </Text>
           </View>
-
         </>
       ) : (
         <>
@@ -295,14 +294,14 @@ const styles = (orientation: any) => StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
-  },
-  frameImage: {
-    height: orientation.height,
-    width: orientation.width,
     justifyContent: 'center',
     alignItems: 'center',
     display: 'flex',
-    flex: 1,
-    resizeMode: 'stretch',
+  },
+  frameImage: {
+    height: orientation.width > orientation.height ? orientation.width : orientation.height,
+    width: orientation.width > orientation.height ? orientation.height : orientation.width,
+    resizeMode: 'contain',
+    transform: orientation.width > orientation.height ? [{ rotate: '90deg' }] : [{ rotate: '0deg' }],
   }
 });

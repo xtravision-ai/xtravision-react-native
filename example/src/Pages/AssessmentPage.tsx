@@ -327,7 +327,7 @@ const styles = (orientation: any) => StyleSheet.create({
 
   repCounterText: {
     color: "white",
-    fontSize: 20, // or any other appropriate value
+    fontSize: 30, // or any other appropriate value
     textAlign: "center",
     textAlignVertical: "center",
     flex: 1

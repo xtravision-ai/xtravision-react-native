@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, Text, useWindowDimensions, Image } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
@@ -14,7 +14,7 @@ const PLATE_TAPPING_COORDINATION_RADIUS = 80;
 let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 export default function AssessmentPage({ route }: any) {
-  const authToken = "__AUTH_TOKEN__";
+  const authToken = "_AUTH_TOKEN_";
   const selectedAssessment = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
@@ -72,6 +72,7 @@ export default function AssessmentPage({ route }: any) {
   }, [])
 
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
+  const [reps, setReps] = React.useState(0);
 
   // required prop:
   const onServerResponse = (serverResponse: any) => {
@@ -84,12 +85,13 @@ export default function AssessmentPage({ route }: any) {
     console.log(Date() + ' Server Data:', serverResponse.data);
 
     const additional_response = serverResponse.data.additional_response
+    setReps(additional_response?.reps?.total ?? 0);
     switch (selectedAssessment) {
       case "SIDE_FLAMINGO":
         setDisplayText(`Current-Pose: ${additional_response?.in_pose};  In-Pose Time(sec): ${additional_response?.seconds};`)
         break;
       case "PLATE_TAPPING_COORDINATION":
-        setDisplayText(` Total Cycles: ${additional_response?.reps?.total};`)
+        setDisplayText(` Total Cycles: `)
         break;
       case "STANDING_BROAD_JUMP":
         setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
@@ -108,7 +110,7 @@ export default function AssessmentPage({ route }: any) {
         setDisplayText(` Positive Reps: ${responseCache.positiveReps}; Negative reps: ${responseCache.negativeReps}`)
         break;
       default:
-        setDisplayText(`Current-Pose: ${additional_response?.in_pose}; Reps: ${additional_response?.reps?.total};`)
+        setDisplayText(`Current-Pose: ${additional_response?.in_pose};`)
     }
 
   };
@@ -158,6 +160,13 @@ export default function AssessmentPage({ route }: any) {
             requestData={requestData}
             libData={libData}
           />
+
+          <View style={styles({ width, height }).orangeFrame}>
+            <Image
+              source={require('../../assests/orange_frame.png')}
+              style={styles({ width, height }).frameImage}
+            />
+          </View>
           {
             // @ts-ignore:next-line
             assessmentName == "STANDING_BROAD_JUMP" &&
@@ -193,20 +202,24 @@ export default function AssessmentPage({ route }: any) {
 
             )
           }
-          <View style={{ 
-              position: 'absolute',
-              top: 40
-              // bottom: 0, 
-            }} > 
-            <Text style={{ 
-                // backgroundColor: 'white', 
-                // textAlign: 'center', 
-                fontWeight: "bold", 
-                color: "black", 
-                fontSize: 30,  
-              }}>
+          <View style={{
+            position: 'absolute',
+            top: 40
+            // bottom: 0, 
+          }} >
+            <Text style={{
+              // backgroundColor: 'white', 
+              // textAlign: 'center', 
+              fontWeight: "bold",
+              color: "black",
+              fontSize: 30,
+            }}>
               {displayText}
             </Text>
+          </View>
+
+          <View style={styles({ width, height }).repCounter}>
+            <Text style={styles({ width, height }).repCounterText}>{reps}</Text>
           </View>
 
         </>
@@ -214,8 +227,9 @@ export default function AssessmentPage({ route }: any) {
         <>
           <Text>App don't have Permission</Text>
         </>
-      )}
-    </View>
+      )
+      }
+    </View >
   );
 }
 
@@ -282,5 +296,40 @@ const styles = (orientation: any) => StyleSheet.create({
     top: orientation?.stand_y + 40,   // y axis
     left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable
     position: 'absolute',
+  },
+  orangeFrame: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
+  },
+  frameImage: {
+    height: orientation.width > orientation.height ? orientation.width : orientation.height,
+    width: orientation.width > orientation.height ? orientation.height : orientation.width,
+    resizeMode: 'contain',
+    transform: orientation.width > orientation.height ? [{ rotate: '90deg' }] : [{ rotate: '0deg' }],
+  },
+  repCounter: {
+    border: "solid",
+    borderColor: "white",
+    borderRadius: 50,
+    borderWidth: 3,
+    backgroundColor: "#2196f3",
+    height: 80,
+    width: 80,
+    zIndex: 999,
+    position: "absolute",
+    right: 20,
+    top: 20,
+  },
+
+  repCounterText: {
+    color: "white",
+    fontSize: 30, // or any other appropriate value
+    textAlign: "center",
+    textAlignVertical: "center",
+    flex: 1
   }
 });

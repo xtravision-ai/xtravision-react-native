@@ -5,7 +5,7 @@ import { SelectList } from 'react-native-dropdown-select-list'
 export const AssessmentList = (props: any) => {
 
   const data = [
-    //{ key: "HALF_SQUAT", value: "HALF_SQUAT" },
+    { key: "HALF_SQUAT", value: "HALF_SQUAT" },
     { value: "Partial Curl-Up", key: "PARTIAL_CURL_UP" },
     { value: "Push Ups", key: "PUSH_UPS" },
     { value: "Plate Tapping", key: "PLATE_TAPPING_COORDINATION" },

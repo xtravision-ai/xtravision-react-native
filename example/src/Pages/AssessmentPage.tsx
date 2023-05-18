@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, useWindowDimensions, Image } from 'react-native';
+import { StyleSheet, View, Text, useWindowDimensions, Image, Pressable } from 'react-native';
 
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
+import { useNavigation } from '@react-navigation/native';
 
 // Disable all warning and error on screen
 // import { LogBox } from 'react-native';
@@ -21,6 +22,9 @@ export default function AssessmentPage({ route }: any) {
   const userHeight = route.params.userHeight;
   let assessmentConfig = {} as any;
   let userConfig = {} as any;
+
+  // navigation obj
+  const navi = useNavigation();
 
   const assessmentName = selectedAssessment.split("-")[0];// assessmentDataList[0];
 
@@ -222,6 +226,21 @@ export default function AssessmentPage({ route }: any) {
             <Text style={styles({ width, height }).repCounterText}>{reps}</Text>
           </View>
 
+          <View style={styles({ width, height }).backBtn}>
+            <Pressable onPress={() => {
+              navi.goBack();
+            }}>
+              <Text style={{
+                color: 'white',
+                padding: 10,
+                fontSize: 15,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>Back</Text>
+            </Pressable>
+
+          </View>
+
         </>
       ) : (
         <>
@@ -331,5 +350,21 @@ const styles = (orientation: any) => StyleSheet.create({
     textAlign: "center",
     textAlignVertical: "center",
     flex: 1
+  },
+
+  backBtn: {
+    position: 'absolute',
+    bottom: 50,
+    right: 10,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#488be2',
+    border: "solid",
+    borderColor: "white",
+    borderRadius: 20,
+    borderWidth: 1,
+    zIndex: 999,
+    width: 100,
   }
 });

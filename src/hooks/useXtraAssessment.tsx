@@ -2,14 +2,15 @@
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import useWebSocket from "react-native-use-websocket";
-import type {AssessmentConnectionData} from "./../components/assessment"
+import type { AssessmentConnectionData } from "./../components/assessment"
+import WebSocketOpenHandler from "./WebSocketOpenHandler";
 
 
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
+// const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
 // const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
 
-function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse: Function) : [Function, any]{
+function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse: Function): [Function, any] {
   const [responseData] = useState(null);
 
 
@@ -21,11 +22,11 @@ function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse:
   iQueryParams["auth_token"] = connectionData.auth_token;
 
   if (!_.isEmpty(connectionData.user_config)) {
-      iQueryParams['user_config'] = encodeURIComponent(`${JSON.stringify(connectionData.user_config)}`);
+    iQueryParams['user_config'] = encodeURIComponent(`${JSON.stringify(connectionData.user_config)}`);
   }
 
   if (!_.isEmpty(connectionData.assessment_config)) {
-      iQueryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(connectionData.assessment_config)}`);
+    iQueryParams['assessment_config'] = encodeURIComponent(`${JSON.stringify(connectionData.assessment_config)}`);
   }
 
   //Imp: Since component is rendering multiple times and query params have current time, 
@@ -35,7 +36,10 @@ function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse:
   // https://github.com/Sumit1993/react-native-use-websocket#readme
   let default_options = {
     queryParams: queryParams, //queryParams, //{...props.connection.queryParams, queryParams}
-    onOpen: () => console.log(Date() + ' XtraServer-AI Connection opened'),
+    onOpen: () => {
+      console.log(Date() + ' XtraServer-AI Connection opened')
+      WebSocketOpenHandler({ requestedAt: queryParams.requested_at, authToken: queryParams.auth_token });
+    },
     //onClose: () =>  console.log(Date() + 'XtraServer-AI Connection closed'),
     onError: (e: any) => console.error(Date() + ' ', e), // todo : proper error handling
     //Will attempt to reconnect on all close events, such as server shutting down
@@ -61,12 +65,12 @@ function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse:
     }
   }, [lastJsonMessage]);
 
-  const sendJsonData = (jsonData: any ) => {
+  const sendJsonData = (jsonData: any) => {
     sendJsonMessage(jsonData)
   }
 
 
-  
+
   return [sendJsonData, responseData]
 }
 

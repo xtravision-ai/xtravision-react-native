@@ -15,7 +15,7 @@ const PLATE_TAPPING_COORDINATION_RADIUS = 80;
 let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 export default function AssessmentPage({ route }: any) {
-  const authToken = "_AUTH_TOKEN_";
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MjZiY2E2Yi00MmNmLTQ0MDMtYjRiYS1lM2RmNjliYjk5OWUiLCJhcHBJZCI6Ijk1ZWFjZDQ1LTgyZjUtMTFlYy1hOWY1LWE0YmI2ZDZlZGM0ZSIsIm9yZ0lkIjoiZGQ4MzA1OWMtODJmMy0xMWVjLWE5ZjUtYTRiYjZkNmVkYzRlIiwiaWF0IjoxNjg1OTQwMDc3LCJleHAiOjE2ODg1MzIwNzd9.nv6dQqlrWIENVN0DiGZ5A2u52MX4clMiId2csKsDg6Y";
   const selectedAssessment = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false

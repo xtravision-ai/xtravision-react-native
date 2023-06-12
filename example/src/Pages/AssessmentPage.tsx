@@ -20,7 +20,9 @@ export default function AssessmentPage({ route }: any) {
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
   const userHeight = route.params.userHeight;
-  let assessmentConfig = {} as any;
+  let assessmentConfig = {
+    sets_threshold: -1 // set as -1 to disable sets
+  } as any;
   let userConfig = {} as any;
 
   // navigation obj

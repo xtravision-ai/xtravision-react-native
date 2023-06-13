@@ -86,32 +86,44 @@ export default function AssessmentPage({ route }: any) {
 
     const additional_response = serverResponse.data.additional_response
     setReps(additional_response?.reps?.total ?? 0);
-    switch (selectedAssessment) {
-      case "SIDE_FLAMINGO":
-        setDisplayText(`Current-Pose: ${additional_response?.in_pose};  In-Pose Time(sec): ${additional_response?.seconds};`)
-        break;
-      case "PLATE_TAPPING_COORDINATION":
-        setDisplayText(` Total Cycles: `)
-        break;
-      case "STANDING_BROAD_JUMP":
-        setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
-        break;
-      case "V_SIT_AND_REACH-POSITIVE_NEGATIVE":
-        // reps increase
-        if (additional_response.reps.total != responseCache.lastReps) {
-          if (additional_response.in_pose) {
-            responseCache.positiveReps++;
-          } else {
-            responseCache.negativeReps++;
-          }
-          responseCache.lastReps = additional_response.reps.total;
-        }
 
-        setDisplayText(` Positive Reps: ${responseCache.positiveReps}; Negative reps: ${responseCache.negativeReps}`)
-        break;
+    let displayAssessmentName = selectedAssessment
+    switch (selectedAssessment) {
+
+      case 'SQUATS_T2': displayAssessmentName = 'Squats'; break;
+      case 'BANDED_ALTERNATING_DIAGNOLS': displayAssessmentName = 'Banded Diagonal'; break;
+      case 'SIT_WALL': displayAssessmentName = 'Sit Wall'; break;
+      case 'PUSH_UPS': displayAssessmentName = 'Push Ups'; break;
+      case 'GLUTE_BRIDGE': displayAssessmentName = 'Glute Bridge'; break;
+      // case "SIDE_FLAMINGO":
+      //   setDisplayText(`Current-Pose: ${additional_response?.in_pose};  In-Pose Time(sec): ${additional_response?.seconds};`)
+      //   break;
+      // case "PLATE_TAPPING_COORDINATION":
+      //   setDisplayText(` Total Cycles: `)
+      //   break;
+      // case "STANDING_BROAD_JUMP":
+      //   setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
+      //   break;
+      // case "V_SIT_AND_REACH-POSITIVE_NEGATIVE":
+      //   // reps increase
+      //   if (additional_response.reps.total != responseCache.lastReps) {
+      //     if (additional_response.in_pose) {
+      //       responseCache.positiveReps++;
+      //     } else {
+      //       responseCache.negativeReps++;
+      //     }
+      //     responseCache.lastReps = additional_response.reps.total;
+      //   }
+
+      //   setDisplayText(` Positive Reps: ${responseCache.positiveReps}; Negative reps: ${responseCache.negativeReps}`)
+      //   break;
       default:
-        setDisplayText(`Current-Pose: ${additional_response?.in_pose};`)
+        // setDisplayText(`Current-Pose: ${additional_response?.in_pose};`)
+        setDisplayText(` ${selectedAssessment};`)
     }
+    
+    setDisplayText(`  ${displayAssessmentName}`)
+
 
   };
 
@@ -162,10 +174,10 @@ export default function AssessmentPage({ route }: any) {
           />
 
           <View style={styles({ width, height }).orangeFrame}>
-            <Image
+            {/* <Image
               source={require('../../assests/orange_frame.png')}
               style={styles({ width, height }).frameImage}
-            />
+            /> */}
           </View>
           {
             // @ts-ignore:next-line

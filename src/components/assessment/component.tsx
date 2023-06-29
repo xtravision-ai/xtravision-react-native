@@ -5,15 +5,15 @@ import React, { useCallback, useEffect } from 'react';
 import { Camera, useCameraDevices} from 'react-native-vision-camera';
 import { useFrameProcessor} from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import { runOnJS } from 'react-native-reanimated';
-// import { runOnJS, useSharedValue } from 'react-native-reanimated';
+// import { runOnJS } from 'react-native-reanimated';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
 import { scanPoseLandmarks } from './../../helper';
 
-// const defaultPose = getDefaultObject();
+const defaultPose = getDefaultObject();
 
 export function Assessment(props: AssessmentProp) {
 
@@ -25,49 +25,49 @@ export function Assessment(props: AssessmentProp) {
   const device = devices[props.libData.cameraPosition];
 
   //use for drawing skeleton
-  // const poseSkeleton: any = useSharedValue(defaultPose);
+  const poseSkeleton: any = useSharedValue(defaultPose);
 
   //WS Request Data: frame height/width, need to send to server
-  const dimensions = useWindowDimensions(); 
+  const dimensions = useWindowDimensions();
   const frameTempRef = React.useRef<any>({ frame_height: dimensions.height, frame_width: dimensions.width });
 
   //WS Request Data: landmarks
   const landmarksTempRef = React.useRef<any>({});
 
-  //WS Request Data: 
+  //WS Request Data:
   const updateWSEventData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
     frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
   }, [])
 
-  // const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
-  //   'worklet';
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
+    'worklet';
 
-  //   // default consideration: Phone in Portrait mode
-  //   const width = dimensions.width
-  //   const height = dimensions.height
+    // default consideration: Phone in Portrait mode
+    const width = dimensions.width
+    const height = dimensions.height
 
-  //   let xFactor: any, yFactor: any;
+    let xFactor: any, yFactor: any;
 
-  //   if (height > width) {
-  //     xFactor = (height / frame.width) - 0.045
-  //     yFactor = (width / frame.height) + 0.04
-  //   } else { // Phone in landscape mode
-  //     xFactor = (width / frame.width);
-  //     yFactor = (height / frame.height) - 0.09;
-  //   }
+    if (height > width) {
+      xFactor = (height / frame.width) - 0.045
+      yFactor = (width / frame.height) + 0.04
+    } else { // Phone in landscape mode
+      xFactor = (width / frame.width);
+      yFactor = (height / frame.height) - 0.09;
+    }
 
-  //   try {
-  //     Object.keys(pose).forEach(v => {
-  //       poseCopyObj[v] = {
-  //         x: pose[v].x * xFactor,
-  //         y: pose[v].y * yFactor,
-  //       };
-  //     });
+    try {
+      Object.keys(pose).forEach(v => {
+        poseCopyObj[v] = {
+          x: Math.floor(pose[v].x * xFactor),
+          y: Math.floor(pose[v].y * yFactor),
+        };
+      });
 
-  //   } catch (e) { console.error(Date() + " ", e) }
-  //   poseSkeleton.value = poseCopyObj;
-  // }
+    } catch (e) { console.error(Date() + " ", e) }
+    poseSkeleton.value = poseCopyObj;
+  }
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -101,7 +101,7 @@ export function Assessment(props: AssessmentProp) {
     });
 
     //draw skeleton
-    // calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
+    calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
     // Collect data for send data to server
     runOnJS(updateWSEventData)(now, Object.values(poseCopy), frame)
 

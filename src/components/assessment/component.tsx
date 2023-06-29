@@ -84,7 +84,7 @@ export function Assessment(props: AssessmentProp) {
     const now = Date.now();
     // normalize pose: process to convert pose object to required formate
     const poseCopy: any = getDefaultObject();
-    // const poseCopyObj: any = getDefaultObject();
+    const poseCopyObj: any = getDefaultObject();
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible

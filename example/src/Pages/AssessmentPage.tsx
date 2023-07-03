@@ -77,14 +77,11 @@ export default function AssessmentPage({ route }: any) {
 
     // Assessment Specific Handling
     if (selectedAssessment === 'RANGE_OF_MOTION') {
-
       const leftValue = serverResponse.data.angles.shoulder_left;
       const rightValue = serverResponse.data.angles.shoulder_right;
-
       setDisplayResponse({smallText: 'Shoulder Angle', bigText: `L: ${leftValue}\u00B0 R: ${rightValue}\u00B0`})
       return ;
     }
-
 
     // If POSE_BASED_REPS reps
     if (serverResponse.data.category == 'POSE_BASED_REPS') {
@@ -139,17 +136,18 @@ export default function AssessmentPage({ route }: any) {
     <View style={styles({}).container}>
       {hasPermission ? (
         <>
-          {/* <Text>App has Permission</Text> */}
           <Assessment
             connectionData={connectionData}
             requestData={requestData}
             libData={libData}
           />
 
+          {/* Show Assessment name on UI  */}
           <TextBox smallValue="Assessment" bigValue={displayText} style={styles({ width, height }).leftBox} />
-
+          {/* Show Server response data on UI  */} 
           <TextBox smallValue={displayResponse.smallText} bigValue={displayResponse.bigText} style={styles({ width, height }).rightBox} />
-
+          
+          {/* Show Back button on UI  */} 
           <View style={styles({ width, height }).backBtn}>
             <BackButton />
           </View>

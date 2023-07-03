@@ -4,6 +4,7 @@ import { StyleSheet, View, Text, useWindowDimensions, Image, Pressable } from 'r
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
 import { useNavigation } from '@react-navigation/native';
+import TextBox from '../Components/TextBox';
 
 // Disable all warning and error on screen
 // import { LogBox } from 'react-native';
@@ -15,7 +16,7 @@ const PLATE_TAPPING_COORDINATION_RADIUS = 80;
 let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 export default function AssessmentPage({ route }: any) {
-  const authToken = "_AUTH_TOKEN_";
+  const authToken = "__AUTH_TOKEN__";
   const selectedAssessment = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
@@ -52,6 +53,14 @@ export default function AssessmentPage({ route }: any) {
   let rightPoint_x, rightPoint_y;
   let radius;
 
+
+  const textFormatter = function(str: string){
+    str = str.replace(/_/g, ' ').toLowerCase();
+    return str.split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+  }
+
   if (assessmentName === 'PLATE_TAPPING_COORDINATION') {
     leftPoint_y = centerPoint_y = rightPoint_y = height - (height * 37 / 100) // / 2.7;
     const half = width / 2;
@@ -78,58 +87,56 @@ export default function AssessmentPage({ route }: any) {
   }, [])
 
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
-  const [reps, setReps] = React.useState(0);
+  const [displayResponse, setDisplayResponse] = React.useState({smallText: '-', bigText: '-'});
 
   // required prop:
   const onServerResponse = (serverResponse: any) => {
+
+    //dump server response in log
+    console.log(Date() + ' Server Data:', serverResponse.data);
+
+    // always check first is there any error
     if (serverResponse.errors.length) {
       console.error(Date() + ' Server Error Response:', serverResponse.errors);
       setDisplayText(` ERROR :=> ${serverResponse.errors[0].message}.`)
       return;
     }
 
-    console.log(Date() + ' Server Data:', serverResponse.data);
-
+    //show assessment name
+    setDisplayText(textFormatter(selectedAssessment));
     const additional_response = serverResponse.data.additional_response
-    setReps(additional_response?.reps?.total ?? 0);
 
-    let displayAssessmentName = selectedAssessment
-    switch (selectedAssessment) {
 
-      case 'SQUATS_T2': displayAssessmentName = 'Squats'; break;
-      case 'BANDED_ALTERNATING_DIAGNOLS': displayAssessmentName = 'Banded Diagonal'; break;
-      case 'SIT_WALL': displayAssessmentName = 'Sit Wall'; break;
-      case 'PUSH_UPS': displayAssessmentName = 'Push Ups'; break;
-      case 'GLUTE_BRIDGE': displayAssessmentName = 'Glute Bridge'; break;
-      // case "SIDE_FLAMINGO":
-      //   setDisplayText(`Current-Pose: ${additional_response?.in_pose};  In-Pose Time(sec): ${additional_response?.seconds};`)
-      //   break;
-      // case "PLATE_TAPPING_COORDINATION":
-      //   setDisplayText(` Total Cycles: `)
-      //   break;
-      // case "STANDING_BROAD_JUMP":
-      //   setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
-      //   break;
-      // case "V_SIT_AND_REACH-POSITIVE_NEGATIVE":
-      //   // reps increase
-      //   if (additional_response.reps.total != responseCache.lastReps) {
-      //     if (additional_response.in_pose) {
-      //       responseCache.positiveReps++;
-      //     } else {
-      //       responseCache.negativeReps++;
-      //     }
-      //     responseCache.lastReps = additional_response.reps.total;
-      //   }
+    // Assessment Specific Handling
+    if (selectedAssessment === 'RANGE_OF_MOTION') {
 
-      //   setDisplayText(` Positive Reps: ${responseCache.positiveReps}; Negative reps: ${responseCache.negativeReps}`)
-      //   break;
-      default:
-        // setDisplayText(`Current-Pose: ${additional_response?.in_pose};`)
-        setDisplayText(` ${selectedAssessment};`)
+      const leftValue = serverResponse.data.angles.shoulder_left;
+      const rightValue = serverResponse.data.angles.shoulder_right;
+
+      setDisplayResponse({smallText: 'Shoulder Angle', bigText: `L: ${leftValue}\u00B0 R: ${rightValue}\u00B0`})
+      return ;
     }
-    
-    setDisplayText(`  ${displayAssessmentName}`)
 
+
+    // If POSE_BASED_REPS reps
+    if (serverResponse.data.category == 'POSE_BASED_REPS') {
+      setDisplayResponse({smallText: 'Reps', bigText: additional_response?.reps?.total ?? 0})
+      return ;
+    }
+
+    // Time Based Assessment specific handling
+    if (serverResponse.data.category == 'TIME_BASED') {
+      setDisplayResponse({smallText: 'Seconds', bigText: additional_response?.seconds ?? 0})
+      return ;
+    }
+
+    //Time Based Reps specific handling
+    if (serverResponse.data.category == 'TIME_BASED_REPS') {
+      const reps = additional_response?.reps?.total ?? 0;
+      const seconds = additional_response?.seconds ?? 0;
+      setDisplayResponse({smallText: 'Reps  Seconds', bigText: `${reps}          ${seconds}`})
+      return ;
+    }
 
   };
 
@@ -152,7 +159,7 @@ export default function AssessmentPage({ route }: any) {
   const connectionData = {
     assessment_name: assessmentName,
     auth_token: authToken,
-    assessment_config: assessmentConfig,
+    assessment_config: { 'reps_threshold' : 2},
     user_config: userConfig,
     session_id: null
   };
@@ -179,12 +186,6 @@ export default function AssessmentPage({ route }: any) {
             libData={libData}
           />
 
-          <View style={styles({ width, height }).orangeFrame}>
-            {/* <Image
-              source={require('../../assests/orange_frame.png')}
-              style={styles({ width, height }).frameImage}
-            /> */}
-          </View>
           {
             // @ts-ignore:next-line
             assessmentName == "STANDING_BROAD_JUMP" &&
@@ -220,25 +221,13 @@ export default function AssessmentPage({ route }: any) {
 
             )
           }
-          <View style={{
-            position: 'absolute',
-            top: 40
-            // bottom: 0, 
-          }} >
-            <Text style={{
-              // backgroundColor: 'white', 
-              // textAlign: 'center', 
-              fontWeight: "bold",
-              color: "black",
-              fontSize: 30,
-            }}>
-              {displayText}
-            </Text>
-          </View>
 
-          <View style={styles({ width, height }).repCounter}>
-            <Text style={styles({ width, height }).repCounterText}>{reps}</Text>
-          </View>
+          <TextBox smallValue="Assessment" bigValue={displayText} style={styles({ width, height }).leftBox} />
+
+          <TextBox smallValue={displayResponse.smallText} bigValue={displayResponse.bigText} style={styles({ width, height }).rightBox} />
+
+
+
 
           <View style={styles({ width, height }).backBtn}>
             <Pressable onPress={() => {
@@ -267,6 +256,9 @@ export default function AssessmentPage({ route }: any) {
 }
 
 const styles = (orientation: any) => StyleSheet.create({
+  leftBox:{position: 'absolute', top: 50, left: 20},
+  rightBox:{position: 'absolute', top: 50, right: 20},
+
   container: {
     flex: 1,
     // alignItems: 'center',
@@ -344,27 +336,27 @@ const styles = (orientation: any) => StyleSheet.create({
     resizeMode: 'contain',
     transform: orientation.width > orientation.height ? [{ rotate: '90deg' }] : [{ rotate: '0deg' }],
   },
-  repCounter: {
-    border: "solid",
-    borderColor: "white",
-    borderRadius: 50,
-    borderWidth: 3,
-    backgroundColor: "#2196f3",
-    height: 80,
-    width: 80,
-    zIndex: 999,
-    position: "absolute",
-    right: 20,
-    top: 20,
-  },
+  // repCounter: {
+  //   border: "solid",
+  //   borderColor: "white",
+  //   borderRadius: 50,
+  //   borderWidth: 3,
+  //   backgroundColor: "#2196f3",
+  //   height: 80,
+  //   width: 80,
+  //   zIndex: 999,
+  //   position: "absolute",
+  //   right: 20,
+  //   top: 20,
+  // },
 
-  repCounterText: {
-    color: "white",
-    fontSize: 30, // or any other appropriate value
-    textAlign: "center",
-    textAlignVertical: "center",
-    flex: 1
-  },
+  // repCounterText: {
+  //   color: "white",
+  //   fontSize: 30, // or any other appropriate value
+  //   textAlign: "center",
+  //   textAlignVertical: "center",
+  //   flex: 1
+  // },
 
   backBtn: {
     position: 'absolute',

@@ -197,12 +197,12 @@ const styles = (orientation: any) => StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#488be2',
-    border: "solid",
-    borderColor: "white",
-    borderRadius: 20,
-    borderWidth: 1,
+    // backgroundColor: '#488be2',
+    // border: "solid",
+    // borderColor: "white",
+    // borderRadius: 20,
+    // borderWidth: 1,
     zIndex: 999,
-    width: 100,
+    // width: 100,
   }
 });

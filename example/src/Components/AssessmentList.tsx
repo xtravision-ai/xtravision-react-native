@@ -5,12 +5,12 @@ import { SelectList } from 'react-native-dropdown-select-list'
 export const AssessmentList = (props: any) => {
 
   const data = [
-    { key: "HALF_SQUAT", value: "Half Squat" },
-    { key: "BANDED_ALTERNATING_DIAGNOLS", value: "Banded Diagonal" },
-    { key: "SIT_WALL", value: "Sit Wall" },
-    { key: "PUSH_UPS", value: "Push Ups" },
-    { key: "SIT_AND_REACH_T2", value: "V Sit and Reach" },
-    { key: "SIT_UPS_T2", value: "Sit Ups" }
+    { value: "Banded Diagonal", key: "BANDED_ALTERNATING_DIAGNOLS" },
+    { value: "Glute Bridge", key: "GLUTE_BRIDGE" },
+    { value: "Plank", key: "PLANK" },
+    { value: "Push Ups", key: "PUSH_UPS" },
+    { value: "Squats", key: "SQUATS" },
+    { value: "Range Of Motion", key: "RANGE_OF_MOTION" },
   ]
 
   // testing

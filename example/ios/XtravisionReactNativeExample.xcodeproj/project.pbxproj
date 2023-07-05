@@ -286,10 +286,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DHD285Q4M6;
+				DEVELOPMENT_TEAM = S3V97MLHVW;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = XtravisionReactNativeExample/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = XtravisionReactNativeExample;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -323,9 +324,10 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DHD285Q4M6;
+				DEVELOPMENT_TEAM = S3V97MLHVW;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = XtravisionReactNativeExample/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = XtravisionReactNativeExample;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

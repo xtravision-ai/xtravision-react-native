@@ -1,14 +1,14 @@
 {
   "name": "xtravision-react-native-example",
   "description": "Example app for xtravision-react-native",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start --reset-cache",
     "pods": "pod-install --quiet",
-    "//build:APK": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "build:APK": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "create:debugAPK": "cd android && ./gradlew assembleDebug",
     "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'",
     "postinstall": "patch-package && node scripts/fix-duplicate-resource/android-release-gradle-fix.js"
@@ -24,8 +24,8 @@
     "react-native-safe-area-context": "^4.4.1",
     "react-native-screens": "^3.18.2",
     "react-native-simple-radio-button": "^2.7.4",
-    "react-native-vision-camera": "2.15.2",
-    "react-native-svg": "12.3.0"
+    "react-native-svg": "12.3.0",
+    "react-native-vision-camera": "2.15.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

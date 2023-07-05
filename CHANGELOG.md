@@ -1,6 +1,10 @@
 
 # @xtravision/xtravision-react-native Changelog
 
+### v2.7.0: (May 10, 2023)
+- (Demo-App/updates) Added Rep count UI and corner image
+- (Demo-App/updates) Added IOS App Icon
+
 ### v2.6.0: (Mar 29, 2023)
 - (SDK/fix) Disable unused code and added IOS support
 

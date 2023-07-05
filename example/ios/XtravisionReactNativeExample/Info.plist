@@ -53,5 +53,7 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>Example would like to access your camera</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

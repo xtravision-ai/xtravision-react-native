@@ -1,6 +1,11 @@
 
 # @xtravision/xtravision-react-native Changelog
 
+
+### 2.8.0: (Wed,Jul05,2023)
+- (Demo-App/updates) Added default assessment list for testing. 
+- (Demo-App/updates) Added come components to improve UI and error handling.
+
 ### v2.7.0: (May 10, 2023)
 - (Demo-App/updates) Added Rep count UI and corner image
 - (Demo-App/updates) Added IOS App Icon

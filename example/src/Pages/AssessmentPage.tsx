@@ -1,49 +1,53 @@
 import * as React from 'react';
 import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
-
 import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
 import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
+import TextBox from '../Components/TextBox';
+import { showError } from '../Components/Alert';
 
 // Disable all warning and error on screen
 import { LogBox } from 'react-native';
+import BackButton from '../Components/BackButton';
 LogBox.ignoreAllLogs();
 
+// cache variable
+// let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
+
 export default function AssessmentPage({ route }: any) {
-  const auth_token = "_AUTH_TOKEN_";
-  const assessment_name = route.params.assessmentName //'SIDE_FLAMINGO'; //, SIDE_FLAMINGO, PUSH_UPS, PLATE_TAPPING_COORDINATION, PARTIAL_CURL_UP, V_SIT_AND_REACH, SIT_UPS
+  const authToken = "__AUTH_TOKEN__";
+  const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
-  const userHeight = route.params.userHeight;
-  let assessment_config = {} as any;
-  let user_config = {} as any;
+  let assessmentConfig = {
+    sets_threshold: -1 // set as -1 to disable sets
+  } as any;
+  let userConfig = {} as any;
+
+  const assessmentName = selectedAssessment.split("-")[0];// assessmentDataList[0];
+
+  const leftSideColor = '#5588cf';  // blue color
+  const rightSideColor = '#55bacf'; // sky blue color
 
   const left_Side_color = '#5588cf';  // blue color
   const right_Side_color = '#55bacf'; // sky blue color
 
-  assessment_config.side_color = { left_Side_color, right_Side_color };
+  assessmentConfig.side_color = { left_Side_color, right_Side_color };
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump
   // (width, height) = Coordinates (x,y)
   const { width, height } = useWindowDimensions();
 
-  const stand_x = width - (width - width / 10) //100
-  const stand_y = height / (height / 250) //- 100
-  // const stand_y = height / (width / 500) //- 100
-  // const stand_x = (width - width / 5)
+  assessmentConfig.image_height = height;
+  assessmentConfig.image_width = width;
 
-  let point_1x, point_1y
-  let point_2x, point_2y;
-  let point_3x, point_3y;
-  let radius;
+  const textFormatter = function(str: string){
+    str = str.replace(/_/g, ' ').toLowerCase();
+    return str.split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+  }
 
-  if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
-    point_1y = point_2y = point_3y = height - height / 4;
-    point_1x = width / 3 - (width / 3) / 2;
-    point_2x = width / 2;
-    point_3x = width - width / 3 + (width / 3) / 2;
-    radius = 80;
-  };
 
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
@@ -53,65 +57,72 @@ export default function AssessmentPage({ route }: any) {
     })();
   }, []);
 
+
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
+  const [displayResponse, setDisplayResponse] = React.useState({smallText: '-', bigText: '-'});
 
   // required prop:
-  const onServerResponse = function (serverResponse: any) {
+  const onServerResponse = (serverResponse: any) => {
+
+    //dump server response in log
+    console.log(Date() + ' Server Data:', serverResponse.data);
+
+    // always check first is there any error
     if (serverResponse.errors.length) {
       console.error(Date() + ' Server Error Response:', serverResponse.errors);
-      setDisplayText(` ERROR :=> ${serverResponse.errors[0].message}.`)
+      showError("Error From Server", `${serverResponse.errors[0].message}.`);
       return;
     }
 
-    console.log(Date() + ' Server Data:', serverResponse.data);
-
+    //show assessment name
+    setDisplayText(textFormatter(selectedAssessment));
     const additional_response = serverResponse.data.additional_response
-    /* @ts-ignore:next-line */
-    switch (assessment_name) {
 
-      /* @ts-ignore:next-line */
-      case "SIDE_FLAMINGO":
-        setDisplayText(`Current-Pose: ${additional_response?.in_pose};  In-Pose Time(sec): ${additional_response?.seconds};`)
-        break;
-      // /* @ts-ignore:next-line */
-      case "PLATE_TAPPING_COORDINATION":
-        setDisplayText(` Total Cycles: ${additional_response?.reps?.total};`)
-        break;
-      case "STANDING_BROAD_JUMP":
-        setDisplayText(`is-at-start-position: ${serverResponse?.data?.additional_response?.is_at_start_position}; jump distance(cm): ${serverResponse?.data?.additional_response?.distance_cm}`)
-        break;
-      default:
-        setDisplayText(`Current-Pose: ${additional_response?.in_pose}; Reps: ${additional_response?.reps?.total};`)
+
+    // Assessment Specific Handling
+    if (selectedAssessment === 'RANGE_OF_MOTION') {
+      const leftValue = serverResponse.data.angles.shoulder_left;
+      const rightValue = serverResponse.data.angles.shoulder_right;
+      setDisplayResponse({smallText: 'Shoulder Angle', bigText: `L: ${leftValue}\u00B0 R: ${rightValue}\u00B0`})
+      return ;
+    }
+
+    // If POSE_BASED_REPS reps
+    if (serverResponse.data.category == 'POSE_BASED_REPS') {
+      setDisplayResponse({smallText: 'Reps', bigText: additional_response?.reps?.total ?? 0})
+      return ;
+    }
+
+    // Time Based Assessment specific handling
+    if (serverResponse.data.category == 'TIME_BASED') {
+      setDisplayResponse({smallText: 'Seconds', bigText: additional_response?.seconds ?? 0})
+      return ;
+    }
+
+    //Time Based Reps specific handling
+    if (serverResponse.data.category == 'TIME_BASED_REPS') {
+      const reps = additional_response?.reps?.total ?? 0;
+      const seconds = additional_response?.seconds ?? 0;
+      setDisplayResponse({smallText: 'Reps  Seconds', bigText: `${reps}          ${seconds}`})
+      return ;
     }
 
   };
 
-  // // @ts-ignore:next-line
-  if (assessment_name == 'STANDING_BROAD_JUMP') {
-    user_config.user_height = userHeight; // in Centimeter string
-    // Coordinates of start point
-    assessment_config.stand_x = stand_x;
-    assessment_config.stand_y = stand_y;
-    // // TODO: hardcoded part. auto calculate by frame or remove it
-    assessment_config.image_height = 720;
-    assessment_config.image_width = 1280;
+ /**
+  * See document for details of below parameter: 
+  *   - connectionData
+  *   - requestData
+  *   - libData
+  */
 
-  }
-
-  if (assessment_name === 'PLATE_TAPPING_COORDINATION') {
-    assessment_config.point_1 = { point_1x, point_1y };  // left
-    assessment_config.point_2 = { point_2x, point_2y };  // center
-    assessment_config.point_3 = { point_3x, point_3y };   // right
-    assessment_config.point_radius = radius;
-    assessment_config.image_height = height;
-    assessment_config.image_width = width;
-  }
-
+  // formatted data as required
   const connectionData = {
-    assessment_name,
-    auth_token,
-    assessment_config,
-    user_config,
+    assessment_name: assessmentName,
+    auth_token: authToken,
+    assessment_config: {  "reps_threshold": 10, "grace_time_threshold": 5, "sets_threshold": -1 }, // default values
+    user_config: userConfig,
+    session_id: null
   };
 
   const requestData = {
@@ -119,6 +130,7 @@ export default function AssessmentPage({ route }: any) {
   }
 
   const libData = {
+    sideColor: { leftSideColor, rightSideColor },
     onServerResponse,
     cameraPosition,
     showSkeleton
@@ -128,55 +140,37 @@ export default function AssessmentPage({ route }: any) {
     <View style={styles({}).container}>
       {hasPermission ? (
         <>
-          {/* <Text>App has Permission</Text> */}
           <Assessment
             connectionData={connectionData}
             requestData={requestData}
             libData={libData}
           />
-          {
-            // @ts-ignore:next-line
-            assessment_name == "STANDING_BROAD_JUMP" &&
-            (
-              <>
-                <View style={styles({ stand_x, stand_y }).point} />
-                <Text style={styles({ stand_x, stand_y }).startPoint}>Start Point</Text>
-              </>
 
-            )
-          }
+          {/* Show Assessment name on UI  */}
+          <TextBox smallValue="Assessment" bigValue={displayText} style={styles({ width, height }).leftBox} />
+          {/* Show Server response data on UI  */} 
+          <TextBox smallValue={displayResponse.smallText} bigValue={displayResponse.bigText} style={styles({ width, height }).rightBox} />
+          
+          {/* Show Back button on UI  */} 
+          <View style={styles({ width, height }).backBtn}>
+            <BackButton />
+          </View>
 
-          {
-            // @ts-ignore:next-line
-            assessment_name == "PLATE_TAPPING_COORDINATION" &&
-            (
-              <>
-                {/* left */}
-                <View style={styles({ height, point_1x, point_1y, radius }).leftPoint} />
-
-                {/* center */}
-                <View style={styles({ height, point_2x, point_2y, radius }).middlePoint} />
-
-                {/* right */}
-                <View style={styles({ height, point_3x, point_3y, radius }).rightPoint} />
-              </>
-
-            )
-          }
-          <Text style={{ backgroundColor: 'white', textAlign: 'center', fontWeight: "bold", color: "black", fontSize: 20 }}>
-            {displayText}
-          </Text>
         </>
       ) : (
         <>
           <Text>App don't have Permission</Text>
         </>
-      )}
-    </View>
+      )
+      }
+    </View >
   );
 }
 
 const styles = (orientation: any) => StyleSheet.create({
+  leftBox:{position: 'absolute', top: 50, left: 20},
+  rightBox:{position: 'absolute', top: 50, right: 20},
+
   container: {
     flex: 1,
     // alignItems: 'center',
@@ -184,58 +178,35 @@ const styles = (orientation: any) => StyleSheet.create({
     position: 'relative', //overlap on the camera
 
   },
-  verticalText: {
-    transform: [{ rotate: '270deg' }],
-    color: 'red',
-    fontWeight: 'bold'
-  },
-  point: {
-    width: 20,
-    height: 20,
-    borderRadius: orientation?.radius,
-    backgroundColor: '#fc0505',
-    top: orientation?.stand_y,   // y axis
-    left: orientation?.stand_x,     // x axis // TODO: make is configurable
-    position: 'absolute', //overlap on the camera
-    // // left: 280,     // x axis // TODO: make is configurable
-  },
-  leftPoint: {
-    width: 80,
-    height: 80,
-    borderRadius: orientation?.radius,
-    backgroundColor: '#fc0505',
-    top: orientation?.point_1y,   // y axis
-    left: orientation?.point_1x,     // x axis // TODO: make is configurable
-    position: 'absolute', //overlap on the camera
-    // // left: 280,     // x axis // TODO: make is configurable
-  },
-  middlePoint: {
-    width: 80,
-    height: 80,
-    borderRadius: orientation?.radius,
-    backgroundColor: '#fc0505',
-    top: orientation?.point_2y,   // y axis
-    left: orientation.point_2x,     // x axis // TODO: make is configurable
-    position: 'absolute', //overlap on the camera
-    // // left: 280,     // x axis // TODO: make is configurable
-  },
-  rightPoint: {
-    width: 80,
-    height: 80,
-    borderRadius: orientation?.radius,
-    backgroundColor: '#fc0505',
-    top: orientation?.point_3y,   // y axis
-    left: orientation?.point_3x,     // x axis // TODO: make is configurable
-    position: 'absolute', //overlap on the camera
-    // // left: 280,     // x axis // TODO: make is configurable
-  },
-  startPoint: {
-    // width: 20,
-    // height: 20,
-    // borderRadius: 20,........
-    // backgroundColor: '#fc0505',
-    top: orientation?.stand_y + 20,   // y axis
-    left: orientation?.stand_x - 15,     // x axis // TODO: make is configurable
+  
+  orangeFrame: {
+    width: '100%',
+    height: '100%',
     position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
+  },
+  frameImage: {
+    height: orientation.width > orientation.height ? orientation.width : orientation.height,
+    width: orientation.width > orientation.height ? orientation.height : orientation.width,
+    resizeMode: 'contain',
+    transform: orientation.width > orientation.height ? [{ rotate: '90deg' }] : [{ rotate: '0deg' }],
+  },
+  
+  backBtn: {
+    position: 'absolute',
+    bottom: 50,
+    right: 10,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: '#488be2',
+    // border: "solid",
+    // borderColor: "white",
+    // borderRadius: 20,
+    // borderWidth: 1,
+    zIndex: 999,
+    // width: 100,
   }
 });

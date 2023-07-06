@@ -14,7 +14,7 @@ LogBox.ignoreAllLogs();
 // let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 export default function AssessmentPage({ route }: any) {
-  const authToken = "__AUTH_TOKEN__";
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlNjk5ZTFkNi03ZDExLTRjMDQtYjhmMi05ODAzMTBlYWU4YzIiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjgxNzE4MzE2LCJleHAiOjE3MTMyNzU5MTZ9.JifCA8nlmmEFTidIDt9k15Uffoj-Px3YvFgX_T1zfiY";
   const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false

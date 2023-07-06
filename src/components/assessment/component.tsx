@@ -37,15 +37,17 @@ export function Assessment(props: AssessmentProp) {
   const updateWSEventData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
 
+    // default value
+    frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
+
+    // For Android: RN Vision Camera always provides same frame-data for both portrait and landscape mode. (Getting default data with landscape mode/aspect ratio 16:9)
+    // For IOS, it works fine. 
     if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width) ){
       frameTempRef.current = { frame_height: frame.width, frame_width: frame.height };
-    }else{
-      frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
     }
-
   }, [dimensions])
 
-  // const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
+  // const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions:  any) => {
   //   'worklet';
 
   //   // default consideration: Phone in Portrait mode
@@ -109,7 +111,7 @@ export function Assessment(props: AssessmentProp) {
           visibility: pose[v].visibility,
         };
 
-      }else{
+      } else{
 
         poseCopy[v] = {
           //TODO: why else case is different from Android

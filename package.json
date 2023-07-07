@@ -173,7 +173,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "react-native-svg": "12.3.0",
+    "react-native-svg": "^13.9.0",
     "react-native-use-websocket": "^0.2.6"
   },
   "directories": {

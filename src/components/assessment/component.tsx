@@ -1,19 +1,27 @@
 import 'react-native-reanimated';
-import {getStylesData} from './style'
+import { getStylesData } from './style'
 import { Text, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
-import { Camera, useCameraDevices} from 'react-native-vision-camera';
-import { useFrameProcessor} from 'react-native-vision-camera';
+import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { useFrameProcessor } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import { runOnJS } from 'react-native-reanimated';
-// import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
-import { scanPoseLandmarks } from './../../helper';
+import { generateSkeletonLines, scanPoseLandmarks } from './../../helper';
+import { Line, Circle, Svg } from 'react-native-svg';
 
-// const defaultPose = getDefaultObject();
+const defaultPose = getDefaultObject();
+
+const AnimatedLine = Animated.createAnimatedComponent(Line);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+const paint = {
+  left_Side_color: "blue",
+  right_Side_color: "red"
+}
 
 export function Assessment(props: AssessmentProp) {
 
@@ -25,10 +33,11 @@ export function Assessment(props: AssessmentProp) {
   const device = devices[props.libData.cameraPosition];
 
   //use for drawing skeleton
-  // const poseSkeleton: any = useSharedValue(defaultPose);
+  const poseSkeleton: any = useSharedValue(defaultPose);
+
 
   //WS Request Data: frame height/width, need to send to server
-  const dimensions = useWindowDimensions(); 
+  const dimensions = useWindowDimensions();
   const frameTempRef = React.useRef<any>({ frame_height: dimensions.height, frame_width: dimensions.width });
 
   //WS Request Data: landmarks
@@ -40,34 +49,37 @@ export function Assessment(props: AssessmentProp) {
     frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
   }, [])
 
-  // const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
-  //   'worklet';
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
+  const animatedCircleArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
 
-  //   // default consideration: Phone in Portrait mode
-  //   const width = dimensions.width
-  //   const height = dimensions.height
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
+    'worklet';
 
-  //   let xFactor: any, yFactor: any;
+    // default consideration: Phone in Portrait mode
+    const width = dimensions.width
+    const height = dimensions.height
 
-  //   if (height > width) {
-  //     xFactor = (height / frame.width) - 0.045
-  //     yFactor = (width / frame.height) + 0.04
-  //   } else { // Phone in landscape mode
-  //     xFactor = (width / frame.width);
-  //     yFactor = (height / frame.height) - 0.09;
-  //   }
+    let xFactor: any, yFactor: any;
 
-  //   try {
-  //     Object.keys(pose).forEach(v => {
-  //       poseCopyObj[v] = {
-  //         x: pose[v].x * xFactor,
-  //         y: pose[v].y * yFactor,
-  //       };
-  //     });
+    if (height > width) {
+      xFactor = (height / frame.width) - 0.045
+      yFactor = (width / frame.height) + 0.04
+    } else { // Phone in landscape mode
+      xFactor = (width / frame.width);
+      yFactor = (height / frame.height) - 0.09;
+    }
 
-  //   } catch (e) { console.error(Date() + " ", e) }
-  //   poseSkeleton.value = poseCopyObj;
-  // }
+    try {
+      Object.keys(pose).forEach(v => {
+        poseCopyObj[v] = {
+          x: pose[v].x * xFactor,
+          y: pose[v].y * yFactor,
+        };
+      });
+
+    } catch (e) { console.error(Date() + " ", e) }
+    poseSkeleton.value = poseCopyObj;
+  }
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -84,7 +96,7 @@ export function Assessment(props: AssessmentProp) {
     const now = Date.now();
     // normalize pose: process to convert pose object to required formate
     const poseCopy: any = getDefaultObject();
-    // const poseCopyObj: any = getDefaultObject();
+    const poseCopyObj: any = getDefaultObject();
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible
@@ -101,7 +113,7 @@ export function Assessment(props: AssessmentProp) {
     });
 
     //draw skeleton
-    // calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
+    calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
     // Collect data for send data to server
     runOnJS(updateWSEventData)(now, Object.values(poseCopy), frame)
 
@@ -171,25 +183,27 @@ export function Assessment(props: AssessmentProp) {
         onError={onError}
       />
 
-      {/* {props.libData.showSkeleton && (
+      {props.libData.showSkeleton && (
         //@ts-ignore
         <Svg
-          height={height}
-          width={width}
+          height={dimensions.height}
+          width={dimensions.width}
           style={getStylesData(dimensions).linesContainer}
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (
+              //@ts-ignore
               <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="2" key={key} />
             )
           })}
           {animatedCircleArray.map((element: any, key: any) => {
             return (
+              //@ts-ignore
               <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
             )
           })}
         </Svg>
-      )} */}
+      )}
     </>
   );
 }

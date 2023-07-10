@@ -5,7 +5,7 @@ import { SelectList } from 'react-native-dropdown-select-list'
 export const AssessmentList = (props: any) => {
 
   const data = [
-    // { value: "Banded Diagonal", key: "BANDED_ALTERNATING_DIAGNOLS" },
+    { value: "Banded Diagonal", key: "BANDED_ALTERNATING_DIAGNOLS" },
     { value: "Glute Bridge", key: "GLUTE_BRIDGE" },
     { value: "Plank", key: "PLANK" },
     { value: "Push Ups", key: "PUSH_UPS" },

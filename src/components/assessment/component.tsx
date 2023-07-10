@@ -2,8 +2,7 @@ import 'react-native-reanimated';
 import { getStylesData } from './style'
 import { Text, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
-import { useFrameProcessor } from 'react-native-vision-camera';
+import { Camera, useCameraDevices, useFrameProcessor } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
 import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
@@ -19,7 +18,7 @@ const AnimatedLine = Animated.createAnimatedComponent(Line);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export function Assessment(props: AssessmentProp) {
-  
+
   const paint = {
     left_Side_color: props?.libData?.sideColor?.leftSideColor || '#5588cf',
     right_Side_color: props?.libData?.sideColor?.rightSideColor || '#55bacf'
@@ -36,8 +35,13 @@ export function Assessment(props: AssessmentProp) {
   const poseSkeleton: any = useSharedValue(defaultPose);
 
 
+
   //WS Request Data: frame height/width, need to send to server
   const dimensions = useWindowDimensions();
+
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
+  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
+  
   const frameTempRef = React.useRef<any>({ frame_height: dimensions.height, frame_width: dimensions.width });
 
   //WS Request Data: landmarks
@@ -46,11 +50,15 @@ export function Assessment(props: AssessmentProp) {
   //WS Request Data: 
   const updateWSEventData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
+    // default value
     frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
-  }, [])
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
+    // For Android: RN Vision Camera always provides same frame-data for both portrait and landscape mode. (Getting default data with landscape mode/aspect ratio 16:9)
+    // For IOS, it works fine. 
+    if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)) {
+      frameTempRef.current = { frame_height: frame.width, frame_width: frame.height };
+    }
+  }, [dimensions])
 
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
     'worklet';
@@ -103,13 +111,30 @@ export function Assessment(props: AssessmentProp) {
       if (!pose[v]) {
         return;
       }
-      poseCopy[v] = {
-        //TODO: why else case is different from Android
-        x: props.libData.cameraPosition === 'back' ? pose[v].x / frame.width : (frame.width - pose[v].x) / frame.width,
-        y: pose[v].y / frame.height,
-        z: pose[v].z / frame.width,
-        visibility: pose[v].visibility,
-      };
+
+      // console.log("FRAME HEIGHT", frame.height, "WIDTH", frame.width)
+      // Handling Android issue in which the orientation of Frame is out of sync with device orientation
+      if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)) {
+
+        poseCopy[v] = {
+          //TODO: why else case is different from Android
+          x: pose[v].x / frame.height,
+          y: pose[v].y / frame.width,
+          z: pose[v].z / frame.height,
+          visibility: pose[v].visibility,
+        };
+
+      } else {
+
+        poseCopy[v] = {
+          //TODO: why else case is different from Android
+          x: pose[v].x / frame.width,
+          y: pose[v].y / frame.height,
+          z: pose[v].z / frame.width,
+          visibility: pose[v].visibility,
+        };
+      }
+
     });
 
     //draw skeleton

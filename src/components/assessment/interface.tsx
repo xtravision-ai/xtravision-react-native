@@ -13,7 +13,10 @@ export interface AssessmentProp {
       isPreJoin?: boolean;
     };
     libData: {
-      sideColor?: object;
+      sideColor?: {
+        leftSideColor: string,
+        rightSideColor: string
+      };
       onServerResponse(serverResponse: any): void;
       cameraPosition: 'front' | 'back';
       showSkeleton: boolean;

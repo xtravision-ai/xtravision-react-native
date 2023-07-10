@@ -28,10 +28,7 @@ export default function AssessmentPage({ route }: any) {
   const leftSideColor = '#5588cf';  // blue color
   const rightSideColor = '#55bacf'; // sky blue color
 
-  const left_Side_color = '#5588cf';  // blue color
-  const right_Side_color = '#55bacf'; // sky blue color
-
-  assessmentConfig.side_color = { left_Side_color, right_Side_color };
+  assessmentConfig.side_color = { leftSideColor, rightSideColor };
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump

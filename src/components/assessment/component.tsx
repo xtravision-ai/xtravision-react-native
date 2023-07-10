@@ -10,7 +10,7 @@ import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
-import { generateSkeletonLines, scanPoseLandmarks } from './../../helper';
+import { generateSkeletonCircle, generateSkeletonLines, scanPoseLandmarks } from './../../helper';
 import { Line, Circle, Svg } from 'react-native-svg';
 
 const defaultPose = getDefaultObject();
@@ -18,12 +18,12 @@ const defaultPose = getDefaultObject();
 const AnimatedLine = Animated.createAnimatedComponent(Line);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const paint = {
-  left_Side_color: "blue",
-  right_Side_color: "red"
-}
-
 export function Assessment(props: AssessmentProp) {
+  
+  const paint = {
+    left_Side_color: props?.libData?.sideColor?.leftSideColor || '#5588cf',
+    right_Side_color: props?.libData?.sideColor?.rightSideColor || '#55bacf'
+  }
 
   //connection will be initiated before setup camera and others
   const [sendJsonData] = useXtraAssessment(props.connectionData, props.libData.onServerResponse)
@@ -50,7 +50,7 @@ export function Assessment(props: AssessmentProp) {
   }, [])
 
   const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
-  const animatedCircleArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
+  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
 
   const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
     'worklet';

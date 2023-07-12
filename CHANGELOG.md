@@ -2,6 +2,10 @@
 # @xtravision/xtravision-react-native Changelog
 
 
+### 2.9.0: (Wed, Jul12,2023)
+- (SDK/fix) For Android: RN Vision Camera always provides same frame-data for both portrait and landscape mode. Handle it properly now.
+
+
 ### 2.8.0: (Wed,Jul05,2023)
 - (Demo-App/updates) Added default assessment list for testing. 
 - (Demo-App/updates) Added come components to improve UI and error handling.

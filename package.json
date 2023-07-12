@@ -1,6 +1,6 @@
 {
   "name": "@xtravision/xtravision-react-native",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "test",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

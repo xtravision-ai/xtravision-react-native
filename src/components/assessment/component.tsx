@@ -1,24 +1,24 @@
 import 'react-native-reanimated';
 import { getStylesData } from './style'
-import { Text, useWindowDimensions } from 'react-native';
+import { Text, View, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import { Camera, useCameraDevices, useFrameProcessor } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
+import  Animated, { runOnJS,  useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
+//@ts-ignore
 import { generateSkeletonCircle, generateSkeletonLines, scanPoseLandmarks } from './../../helper';
-import { Line, Circle, Svg } from 'react-native-svg';
-
-const defaultPose = getDefaultObject();
-
-const AnimatedLine = Animated.createAnimatedComponent(Line);
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+import { Line,  Svg } from 'react-native-svg';
 
 export function Assessment(props: AssessmentProp) {
 
+  const defaultPose = getDefaultObject();
+  // const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+  const AnimatedLine = Animated.createAnimatedComponent(Line);
+ 
   const paint = {
     left_Side_color: props?.libData?.sideColor?.leftSideColor || '#5588cf',
     right_Side_color: props?.libData?.sideColor?.rightSideColor || '#55bacf'
@@ -32,15 +32,14 @@ export function Assessment(props: AssessmentProp) {
   const device = devices[props.libData.cameraPosition];
 
   //use for drawing skeleton
-  const poseSkeleton: any = useSharedValue(defaultPose);
-
-
+  // const poseSkeleton: any = React.useRef<any>(useSharedValue(defaultPose));
+  const poseSkeleton = useSharedValue(defaultPose);
 
   //WS Request Data: frame height/width, need to send to server
   const dimensions = useWindowDimensions();
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
-  const animatedCircleArray = generateSkeletonCircle(poseSkeleton, props.libData.cameraPosition, dimensions.width, paint);
+  const animatedLinesArray = generateSkeletonLines(poseSkeleton.value, props.libData.cameraPosition, dimensions.width, paint);
+  // const animatedCircleArray = generateSkeletonCircle(poseSkeleton.value, props.libData.cameraPosition, dimensions.width, paint);
   
   const frameTempRef = React.useRef<any>({ frame_height: dimensions.height, frame_width: dimensions.width });
 
@@ -112,7 +111,6 @@ export function Assessment(props: AssessmentProp) {
         return;
       }
 
-      // console.log("FRAME HEIGHT", frame.height, "WIDTH", frame.width)
       // Handling Android issue in which the orientation of Frame is out of sync with device orientation
       if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)) {
 
@@ -197,18 +195,46 @@ export function Assessment(props: AssessmentProp) {
   return (
     <>
       {/* @ts-ignore */}
-      <Camera
-        style={getStylesData(dimensions).camera}
-        device={device}
-        isActive={true}
-        // isActive={isAppForeground}
-        frameProcessor={true ? frameProcessor : undefined}
-        fps={10}
-        frameProcessorFps={10}
-        onError={onError}
-      />
+      <View style={getStylesData(dimensions).container}>
+        {/* @ts-ignore */}
+        <Camera
+          style={getStylesData(dimensions).camera}
+          device={device}
+          isActive={true}
+          // isActive={isAppForeground}
+          frameProcessor={true ? frameProcessor : undefined}
+          fps={10}
+          frameProcessorFps={10}
+          onError={onError}
+        />
+        {/* @ts-ignore */}
+        <View style={getStylesData(dimensions).overlay}>
+          {/* <SkeletonView keyPoints={poseSkeleton.value} width={dimensions.width} height={dimensions.height} /> */}
+          
+          {/* //@ts-ignore */}
+            <Svg
+              height={dimensions.height}
+              width={dimensions.width}
+            >
+              {animatedLinesArray.map((element: any, key: any) => {
+                return (
+                  //@ts-ignore
+                  <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="3" key={key} />
+                )
+              })}
+              {/* {animatedCircleArray.map((element: any, key: any) => {
+                return (
+                  //@ts-ignore
+                  <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
+                )
+              })} */}
+        </Svg>
+         
+        </View>
+      </View>
 
-      {props.libData.showSkeleton && (
+      
+      {/* {props.libData.showSkeleton && false && (
         //@ts-ignore
         <Svg
           height={dimensions.height}
@@ -228,7 +254,7 @@ export function Assessment(props: AssessmentProp) {
             )
           })}
         </Svg>
-      )}
+      )} */}
     </>
   );
 }

@@ -16,15 +16,15 @@ export async function RequestCameraPermission() {
   return await Camera.requestCameraPermission()
 }
 
-export const usePositionLine = (poseLine: any, valueName1: any, valueName2: any, cameraOption: string, width: number, paint: any) => {
+export const usePositionLine = (poseLine: any, labelName1: any, labelName2: any, cameraOption: string, width: number, paint: any) => {
   try {
     if (cameraOption === 'front') {
       const res = useAnimatedStyle(
         () => ({
-          x1: width - poseLine.value[valueName1].x,
-          y1: poseLine.value[valueName1].y,
-          x2: width - poseLine.value[valueName2].x,
-          y2: poseLine.value[valueName2].y,
+          x1: width - poseLine[labelName1].x,
+          y1: poseLine[labelName1].y,
+          x2: width - poseLine[labelName2].x,
+          y2: poseLine[labelName2].y,
           paint: paint,
         } as any),
         [poseLine],
@@ -33,25 +33,25 @@ export const usePositionLine = (poseLine: any, valueName1: any, valueName2: any,
     }
     const res = useAnimatedStyle(
       () => ({
-        x1: poseLine.value[valueName1].x,
-        y1: poseLine.value[valueName1].y,
-        x2: poseLine.value[valueName2].x,
-        y2: poseLine.value[valueName2].y,
+        x1: poseLine[labelName1].x,
+        y1: poseLine[labelName1].y,
+        x2: poseLine[labelName2].x,
+        y2: poseLine[labelName2].y,
         paint: paint
       } as any),
       [poseLine],
     );
     return res;
-  } catch (e) { console.log(e) }
+  } catch (e) { console.error(e) }
 };
 
-export const usePositionCircle = (poseCircle: any, valueName1: any, cameraOption: string, width: number, paint: any) => {
+export const usePositionCircle = (poseCircle: any, labelName: any, cameraOption: string, width: number, paint: any) => {
   try {
     if (cameraOption === 'front') {
       const res = useAnimatedStyle(
         () => ({
-          cx: width - poseCircle.value[valueName1].x,
-          cy: poseCircle.value[valueName1].y,
+          cx: width - poseCircle[labelName].x,
+          cy: poseCircle[labelName].y,
           r: 7,
           paint: paint,
         } as any),
@@ -61,15 +61,17 @@ export const usePositionCircle = (poseCircle: any, valueName1: any, cameraOption
     }
     const res = useAnimatedStyle(
       () => ({
-        cx: poseCircle.value[valueName1].x,
-        cy: poseCircle.value[valueName1].y,
+        cx: poseCircle[labelName].x,
+        cy: poseCircle[labelName].y,
         r: 7,
         paint: paint,
       } as any),
       [poseCircle],
     );
     return res;
-  } catch (e) { console.log(e) }
+  } catch (e) { 
+    console.error(e) 
+  }
 };
 
 export const generateSkeletonLines = (poseLine: any, cameraPosition: any, width: any, paint: any) => {
@@ -146,11 +148,18 @@ export const generateSkeletonLines = (poseLine: any, cameraPosition: any, width:
 };
 
 export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, width: any, paint: any) => {
-  const leftEyeInner = usePositionCircle(poseCircle, 'leftEyeInner', cameraPosition, width, paint.left_Side_color);
-  const leftEye = usePositionCircle(poseCircle, 'leftEye', cameraPosition, width, paint.left_Side_color);
-  const leftEyeOuter = usePositionCircle(poseCircle, 'leftEyeOuter', cameraPosition, width, paint.left_Side_color);
-  const leftEar = usePositionCircle(poseCircle, 'leftEar', cameraPosition, width, paint.left_Side_color);
-  const mouthLeft = usePositionCircle(poseCircle, 'mouthLeft', cameraPosition, width, paint.left_Side_color);
+
+
+  if (!poseCircle){
+    return [];
+
+  }
+
+  // const leftEyeInner = usePositionCircle(poseCircle, 'leftEyeInner', cameraPosition, width, paint.left_Side_color);
+  // const leftEye = usePositionCircle(poseCircle, 'leftEye', cameraPosition, width, paint.left_Side_color);
+  // const leftEyeOuter = usePositionCircle(poseCircle, 'leftEyeOuter', cameraPosition, width, paint.left_Side_color);
+  // const leftEar = usePositionCircle(poseCircle, 'leftEar', cameraPosition, width, paint.left_Side_color);
+  // const mouthLeft = usePositionCircle(poseCircle, 'mouthLeft', cameraPosition, width, paint.left_Side_color);
   const leftShoulder = usePositionCircle(poseCircle, 'leftShoulder', cameraPosition, width, paint.left_Side_color);
   const leftElbow = usePositionCircle(poseCircle, 'leftElbow', cameraPosition, width, paint.left_Side_color);
   const leftWrist = usePositionCircle(poseCircle, 'leftWrist', cameraPosition, width, paint.left_Side_color);
@@ -174,13 +183,13 @@ export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, wid
   const rightThumb = usePositionCircle(poseCircle, 'rightThumb', cameraPosition, width, paint.right_Side_color);
   const rightHeel = usePositionCircle(poseCircle, 'rightHeel', cameraPosition, width, paint.right_Side_color);
   const rightToe = usePositionCircle(poseCircle, 'rightToe', cameraPosition, width, paint.right_Side_color);
-  const rightEyeInner = usePositionCircle(poseCircle, 'rightEyeInner', cameraPosition, width, paint.right_Side_color);
-  const rightEye = usePositionCircle(poseCircle, 'rightEye', cameraPosition, width, paint.right_Side_color);
-  const rightEyeOuter = usePositionCircle(poseCircle, 'rightEyeOuter', cameraPosition, width, paint.right_Side_color);
-  const rightEar = usePositionCircle(poseCircle, 'rightEar', cameraPosition, width, paint.right_Side_color);
-  const mouthRight = usePositionCircle(poseCircle, 'mouthRight', cameraPosition, width, paint.right_Side_color);
-
-  const nose = usePositionCircle(poseCircle, 'nose', cameraPosition, width, 'white');
+  
+  // const rightEyeInner = usePositionCircle(poseCircle, 'rightEyeInner', cameraPosition, width, paint.right_Side_color);
+  // const rightEye = usePositionCircle(poseCircle, 'rightEye', cameraPosition, width, paint.right_Side_color);
+  // const rightEyeOuter = usePositionCircle(poseCircle, 'rightEyeOuter', cameraPosition, width, paint.right_Side_color);
+  // const rightEar = usePositionCircle(poseCircle, 'rightEar', cameraPosition, width, paint.right_Side_color);
+  // const mouthRight = usePositionCircle(poseCircle, 'mouthRight', cameraPosition, width, paint.right_Side_color);
+  // const nose = usePositionCircle(poseCircle, 'nose', cameraPosition, width, 'white');
 
   return [
     leftShoulder,
@@ -206,16 +215,16 @@ export const generateSkeletonCircle = (poseCircle: any, cameraPosition: any, wid
     leftToe,
     rightToe,
 
-    nose,
-    leftEyeInner,
-    leftEye,
-    leftEyeOuter,
-    rightEyeInner,
-    rightEye,
-    rightEyeOuter,
-    leftEar,
-    rightEar,
-    mouthLeft,
-    mouthRight,
+    // nose,
+    // leftEyeInner,
+    // leftEye,
+    // leftEyeOuter,
+    // rightEyeInner,
+    // rightEye,
+    // rightEyeOuter,
+    // leftEar,
+    // rightEar,
+    // mouthLeft,
+    // mouthRight,
   ]
 };

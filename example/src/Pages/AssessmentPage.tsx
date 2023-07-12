@@ -84,6 +84,14 @@ export default function AssessmentPage({ route }: any) {
       return ;
     }
 
+    // Assessment Specific Handling
+    if (selectedAssessment === 'CARDIO') {
+      const caloryValue = serverResponse.data.calories_burnt;
+      const powerValue = serverResponse.data.power_list[0];
+      setDisplayResponse({smallText: 'Calory Power', bigText: `${caloryValue}   ${powerValue}`})
+      return ;
+    }
+
     // If POSE_BASED_REPS reps
     if (serverResponse.data.category == 'POSE_BASED_REPS') {
       setDisplayResponse({smallText: 'Reps', bigText: additional_response?.reps?.total ?? 0})

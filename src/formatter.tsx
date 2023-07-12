@@ -79,36 +79,43 @@ export function getDefaultObject() {
   'worklet';
   // IMP: DO NOT change any sequence
   return {
+    //------------ Start from 0 index
     nose: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftEye: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    //------------ Start from 5 index
     rightEye: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftEar: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightEar: { x: 0, y: 0, z: 0, visibility: 0.0 },
     mouthLeft: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    //------------ Start from 10 index
     mouthRight: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftElbow: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightElbow: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    //------------ Start from 15 index
     leftWrist: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightWrist: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    //------------ Start from 20 index
     rightIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftThumb: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightThumb: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftHip: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightHip: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    //------------ Start from 25 index
     leftKnee: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightKnee: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftHeel: { x: 0, y: 0, z: 0, visibility: 0.0 },
+    //------------ Start from 30 index
     rightHeel: { x: 0, y: 0, z: 0, visibility: 0.0 },
     leftToe: { x: 0, y: 0, z: 0, visibility: 0.0 },
     rightToe: { x: 0, y: 0, z: 0, visibility: 0.0 }

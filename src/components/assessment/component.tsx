@@ -4,25 +4,27 @@ import { Text, View, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import { Camera, useCameraDevices, useFrameProcessor } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import  Animated, { runOnJS,  useSharedValue } from 'react-native-reanimated';
+import  { runOnJS,  useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
 //@ts-ignore
-import { generateSkeletonCircle, generateSkeletonLines, scanPoseLandmarks } from './../../helper';
-import { Line,  Svg } from 'react-native-svg';
+import { generateSkeletonCircle, generateSkeletonLines, scanPoseLandmarks, buildSkeletonLines } from './../../helper';
+// import { Line,  Svg } from 'react-native-svg';
+import SkeletonView from '../SkeletonView';
+// import { CameraPosition } from 'src/constants';
 
 export function Assessment(props: AssessmentProp) {
 
   const defaultPose = getDefaultObject();
   // const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-  const AnimatedLine = Animated.createAnimatedComponent(Line);
+  // const AnimatedLine = Animated.createAnimatedComponent(Line);
  
-  const paint = {
-    left_Side_color: props?.libData?.sideColor?.leftSideColor || '#5588cf',
-    right_Side_color: props?.libData?.sideColor?.rightSideColor || '#55bacf'
-  }
+  // const paint = {
+  //   left_Side_color: props?.libData?.sideColor?.leftSideColor || '#5588cf',
+  //   right_Side_color: props?.libData?.sideColor?.rightSideColor || '#55bacf'
+  // }
 
   //connection will be initiated before setup camera and others
   const [sendJsonData] = useXtraAssessment(props.connectionData, props.libData.onServerResponse)
@@ -33,12 +35,12 @@ export function Assessment(props: AssessmentProp) {
 
   //use for drawing skeleton
   // const poseSkeleton: any = React.useRef<any>(useSharedValue(defaultPose));
-  const poseSkeleton = useSharedValue(defaultPose);
+  const poseSkeleton = useSharedValue(Object.values(defaultPose));
 
   //WS Request Data: frame height/width, need to send to server
   const dimensions = useWindowDimensions();
 
-  const animatedLinesArray = generateSkeletonLines(poseSkeleton.value, props.libData.cameraPosition, dimensions.width, paint);
+  // const animatedLinesArray = buildSkeletonLines(poseSkeleton.value, props.libData.cameraPosition, dimensions.width, paint);
   // const animatedCircleArray = generateSkeletonCircle(poseSkeleton.value, props.libData.cameraPosition, dimensions.width, paint);
   
   const frameTempRef = React.useRef<any>({ frame_height: dimensions.height, frame_width: dimensions.width });
@@ -85,7 +87,9 @@ export function Assessment(props: AssessmentProp) {
       });
 
     } catch (e) { console.error(Date() + " ", e) }
-    poseSkeleton.value = poseCopyObj;
+
+    // remove unnecessary labels to improve performance between UI-threads and JS Threads
+    poseSkeleton.value = Object.values(poseCopyObj);
   }
 
   // Step-1: using frame processor, extract body landmarks from Pose
@@ -207,30 +211,43 @@ export function Assessment(props: AssessmentProp) {
           frameProcessorFps={10}
           onError={onError}
         />
-        {/* @ts-ignore */}
-        <View style={getStylesData(dimensions).overlay}>
-          {/* <SkeletonView keyPoints={poseSkeleton.value} width={dimensions.width} height={dimensions.height} /> */}
+
+        {
+          props.libData.showSkeleton == "true" && (
+          /* @ts-ignore */
+          <View style={getStylesData(dimensions).overlay}>
+
+            <SkeletonView keyPoints={poseSkeleton.value} props={{
+              isFrontCamera: props.libData.cameraPosition == "front" ? true : false,
+              leftSideColor:props?.libData?.sideColor?.leftSideColor || '#5588cf',
+              rightSideColor: props?.libData?.sideColor?.rightSideColor || '#55bacf',
+              width: dimensions.width,
+              height: dimensions.height
+            }} />
+            
+
+            {/* //@ts-ignore */}
+              {/* <Svg
+                height={dimensions.height}
+                width={dimensions.width}
+              > */}
+                {/* {animatedLinesArray.map((element: any, key: any) => {
+                  return (
+                    //@ts-ignore
+                    <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="3" key={key} />
+                  )
+                })} */}
+                {/* {animatedCircleArray.map((element: any, key: any) => {
+                  return (
+                    //@ts-ignore
+                    <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
+                  )
+                })} */}
+          {/* </Svg> */}
           
-          {/* //@ts-ignore */}
-            <Svg
-              height={dimensions.height}
-              width={dimensions.width}
-            >
-              {animatedLinesArray.map((element: any, key: any) => {
-                return (
-                  //@ts-ignore
-                  <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="3" key={key} />
-                )
-              })}
-              {/* {animatedCircleArray.map((element: any, key: any) => {
-                return (
-                  //@ts-ignore
-                  <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
-                )
-              })} */}
-        </Svg>
-         
-        </View>
+          </View>)
+        }
+
       </View>
 
       

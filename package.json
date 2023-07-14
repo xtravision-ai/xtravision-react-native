@@ -36,6 +36,7 @@
     "pods": "pod-install --quiet",
     "setup": "yarn install && yarn example && yarn install && yarn android ",
     "setup:ios": "yarn install && yarn example && yarn install && yarn ios ",
+    "clean": "yarn clean:android",
     "clean:android": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
     "clean:ios": "rm -rf yarn.lock && rm -rf node_modules && cd example &&  rm -rf yarn.lock && rm -rf node_modules && rm -rf ios/Podfile.lock && rm -rf ios/Pods && cd ..",
     "create:debugAPK": "cd example && yarn build:APK && yarn create:debugAPK",

@@ -212,6 +212,7 @@ export function Assessment(props: AssessmentProp) {
         />
 
         {
+          //@ts-ignore
           props.libData.showSkeleton == "true" && (
           /* @ts-ignore */
           <View style={getStylesData(dimensions).overlay}>

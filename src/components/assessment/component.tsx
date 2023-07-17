@@ -1,20 +1,30 @@
 import 'react-native-reanimated';
-import {getStylesData} from './style'
-import { Text, useWindowDimensions } from 'react-native';
+import { getStylesData } from './style'
+import { Text, View, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import { Camera, useCameraDevices, useFrameProcessor} from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
-import { runOnJS } from 'react-native-reanimated';
-// import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import  { runOnJS,  useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
-import { scanPoseLandmarks } from './../../helper';
-
-// const defaultPose = getDefaultObject();
+//@ts-ignore
+import { generateSkeletonCircle, generateSkeletonLines, scanPoseLandmarks, buildSkeletonLines } from './../../helper';
+// import { Line,  Svg } from 'react-native-svg';
+import SkeletonView from '../SkeletonView';
+// import { CameraPosition } from 'src/constants';
 
 export function Assessment(props: AssessmentProp) {
+
+  const defaultPose = getDefaultObject();
+  // const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+  // const AnimatedLine = Animated.createAnimatedComponent(Line);
+ 
+  // const paint = {
+  //   left_Side_color: props?.libData?.sideColor?.leftSideColor || '#5588cf',
+  //   right_Side_color: props?.libData?.sideColor?.rightSideColor || '#55bacf'
+  // }
 
   //connection will be initiated before setup camera and others
   const [sendJsonData] = useXtraAssessment(props.connectionData, props.libData.onServerResponse)
@@ -24,10 +34,15 @@ export function Assessment(props: AssessmentProp) {
   const device = devices[props.libData.cameraPosition];
 
   //use for drawing skeleton
-  // const poseSkeleton: any = useSharedValue(defaultPose);
+  // const poseSkeleton: any = React.useRef<any>(useSharedValue(defaultPose));
+  const poseSkeleton = useSharedValue(Object.values(defaultPose));
 
   //WS Request Data: frame height/width, need to send to server
-  const dimensions = useWindowDimensions(); 
+  const dimensions = useWindowDimensions();
+
+  // const animatedLinesArray = buildSkeletonLines(poseSkeleton.value, props.libData.cameraPosition, dimensions.width, paint);
+  // const animatedCircleArray = generateSkeletonCircle(poseSkeleton.value, props.libData.cameraPosition, dimensions.width, paint);
+  
   const frameTempRef = React.useRef<any>({ frame_height: dimensions.height, frame_width: dimensions.width });
 
   //WS Request Data: landmarks
@@ -36,45 +51,46 @@ export function Assessment(props: AssessmentProp) {
   //WS Request Data: 
   const updateWSEventData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
-
     // default value
     frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
 
     // For Android: RN Vision Camera always provides same frame-data for both portrait and landscape mode. (Getting default data with landscape mode/aspect ratio 16:9)
     // For IOS, it works fine. 
-    if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width) ){
+    if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)) {
       frameTempRef.current = { frame_height: frame.width, frame_width: frame.height };
     }
   }, [dimensions])
 
-  // const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions:  any) => {
-  //   'worklet';
+  const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions: any) => {
+    'worklet';
 
-  //   // default consideration: Phone in Portrait mode
-  //   const width = dimensions.width
-  //   const height = dimensions.height
+    // default consideration: Phone in Portrait mode
+    const width = dimensions.width
+    const height = dimensions.height
 
-  //   let xFactor: any, yFactor: any;
+    let xFactor: any, yFactor: any;
 
-  //   if (height > width) {
-  //     xFactor = (height / frame.width) - 0.045
-  //     yFactor = (width / frame.height) + 0.04
-  //   } else { // Phone in landscape mode
-  //     xFactor = (width / frame.width);
-  //     yFactor = (height / frame.height) - 0.09;
-  //   }
+    if (height > width) {
+      xFactor = (height / frame.width) - 0.045
+      yFactor = (width / frame.height) + 0.04
+    } else { // Phone in landscape mode
+      xFactor = (width / frame.width);
+      yFactor = (height / frame.height) - 0.09;
+    }
 
-  //   try {
-  //     Object.keys(pose).forEach(v => {
-  //       poseCopyObj[v] = {
-  //         x: pose[v].x * xFactor,
-  //         y: pose[v].y * yFactor,
-  //       };
-  //     });
+    try {
+      Object.keys(pose).forEach(v => {
+        poseCopyObj[v] = {
+          x: pose[v].x * xFactor,
+          y: pose[v].y * yFactor,
+        };
+      });
 
-  //   } catch (e) { console.error(Date() + " ", e) }
-  //   poseSkeleton.value = poseCopyObj;
-  // }
+    } catch (e) { console.error(Date() + " ", e) }
+
+    // remove unnecessary labels to improve performance between UI-threads and JS Threads
+    poseSkeleton.value = Object.values(poseCopyObj);
+  }
 
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
@@ -91,17 +107,16 @@ export function Assessment(props: AssessmentProp) {
     const now = Date.now();
     // normalize pose: process to convert pose object to required formate
     const poseCopy: any = getDefaultObject();
-    // const poseCopyObj: any = getDefaultObject();
+    const poseCopyObj: any = getDefaultObject();
 
     Object.keys(poseCopy).forEach(v => {
       // do nothing, on specific any specific part is not visible
       if (!pose[v]) {
         return;
       }
-     
-      // console.log("FRAME HEIGHT", frame.height, "WIDTH", frame.width)
+
       // Handling Android issue in which the orientation of Frame is out of sync with device orientation
-      if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)){
+      if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)) {
 
         poseCopy[v] = {
           //TODO: why else case is different from Android
@@ -111,21 +126,20 @@ export function Assessment(props: AssessmentProp) {
           visibility: pose[v].visibility,
         };
 
-      } else{
+      } else {
 
         poseCopy[v] = {
           //TODO: why else case is different from Android
-          x: pose[v].x / frame.width ,
+          x: pose[v].x / frame.width,
           y: pose[v].y / frame.height,
           z: pose[v].z / frame.width,
           visibility: pose[v].visibility,
         };
       }
-      
     });
 
     //draw skeleton
-    // calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
+    calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
     // Collect data for send data to server
     runOnJS(updateWSEventData)(now, Object.values(poseCopy), frame)
 
@@ -184,31 +198,74 @@ export function Assessment(props: AssessmentProp) {
   return (
     <>
       {/* @ts-ignore */}
-      <Camera
-        style={getStylesData(dimensions).camera}
-        device={device}
-        isActive={true}
-        // isActive={isAppForeground}
-        frameProcessor={true ? frameProcessor : undefined}
-        fps={10}
-        frameProcessorFps={10}
-        onError={onError}
-      />
+      <View style={getStylesData(dimensions).container}>
+        {/* @ts-ignore */}
+        <Camera
+          style={getStylesData(dimensions).camera}
+          device={device}
+          isActive={true}
+          // isActive={isAppForeground}
+          frameProcessor={true ? frameProcessor : undefined}
+          fps={10}
+          frameProcessorFps={10}
+          onError={onError}
+        />
 
-      {/* {props.libData.showSkeleton && (
+        {
+          props.libData.showSkeleton == "true" && (
+          /* @ts-ignore */
+          <View style={getStylesData(dimensions).overlay}>
+
+            <SkeletonView keyPoints={poseSkeleton.value} props={{
+              isFrontCamera: props.libData.cameraPosition == "front" ? true : false,
+              leftSideColor:props?.libData?.sideColor?.leftSideColor || '#5588cf',
+              rightSideColor: props?.libData?.sideColor?.rightSideColor || '#55bacf',
+              width: dimensions.width,
+              height: dimensions.height
+            }} />
+            
+
+            {/* //@ts-ignore */}
+              {/* <Svg
+                height={dimensions.height}
+                width={dimensions.width}
+              > */}
+                {/* {animatedLinesArray.map((element: any, key: any) => {
+                  return (
+                    //@ts-ignore
+                    <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="3" key={key} />
+                  )
+                })} */}
+                {/* {animatedCircleArray.map((element: any, key: any) => {
+                  return (
+                    //@ts-ignore
+                    <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
+                  )
+                })} */}
+          {/* </Svg> */}
+          
+          </View>)
+        }
+
+      </View>
+
+      
+      {/* {props.libData.showSkeleton && false && (
         //@ts-ignore
         <Svg
-          height={height}
-          width={width}
+          height={dimensions.height}
+          width={dimensions.width}
           style={getStylesData(dimensions).linesContainer}
         >
           {animatedLinesArray.map((element: any, key: any) => {
             return (
+              //@ts-ignore
               <AnimatedLine animatedProps={element} stroke={element?.initial?.value.paint || 'red'} strokeWidth="2" key={key} />
             )
           })}
           {animatedCircleArray.map((element: any, key: any) => {
             return (
+              //@ts-ignore
               <AnimatedCircle animatedProps={element} stroke={element?.initial?.value.paint || 'red'} fill={element?.initial?.value.paint || 'red'} key={key} />
             )
           })}

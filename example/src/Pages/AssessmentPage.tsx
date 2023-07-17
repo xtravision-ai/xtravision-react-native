@@ -17,7 +17,7 @@ export default function AssessmentPage({ route }: any) {
   const authToken = "__AUTH_TOKEN__";
   const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  const showSkeleton = false; // true or false
+  const showSkeleton = route.params.showSkeleton; // true or false
   let assessmentConfig = {
     sets_threshold: -1 // set as -1 to disable sets
   } as any;
@@ -28,6 +28,7 @@ export default function AssessmentPage({ route }: any) {
   const leftSideColor = '#5588cf';  // blue color
   const rightSideColor = '#55bacf'; // sky blue color
 
+  assessmentConfig.side_color = { leftSideColor, rightSideColor };
 
   // TODO: Patching work. Cleanup required
   // Starting point of standing broad jump
@@ -80,6 +81,14 @@ export default function AssessmentPage({ route }: any) {
       const leftValue = serverResponse.data.angles.shoulder_left;
       const rightValue = serverResponse.data.angles.shoulder_right;
       setDisplayResponse({smallText: 'Shoulder Angle', bigText: `L: ${leftValue}\u00B0 R: ${rightValue}\u00B0`})
+      return ;
+    }
+
+    // Assessment Specific Handling
+    if (selectedAssessment === 'CARDIO') {
+      const caloryValue = serverResponse.data.calories_burnt;
+      const powerValue = serverResponse.data.power_list[0];
+      setDisplayResponse({smallText: 'Calory Power', bigText: `${caloryValue}   ${powerValue}`})
       return ;
     }
 

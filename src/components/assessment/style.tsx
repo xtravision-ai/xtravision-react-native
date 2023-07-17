@@ -6,11 +6,16 @@ export const getStylesData = function (orientation: any) {
           flex: 1,
           width: '100%',
         },
-        container: {
-          position: 'absolute', //overlap on the camera
-          left: 280,     // x axis // TODO: make is configurable
-          top: 650, // y axis
+        // container: {
+        //   position: 'absolute', //overlap on the camera
+        //   left: 280,     // x axis // TODO: make is configurable
+        //   top: 650, // y axis
       
+        // },
+        container: {
+          flex: 1,
+          flexDirection: 'column',
+          backgroundColor: 'black',
         },
         verticalText: {
           transform: [{ rotate: '270deg' }],
@@ -26,7 +31,7 @@ export const getStylesData = function (orientation: any) {
           // left: 280,     // x axis // TODO: make is configurable
           top: 20,   // y axis
         },
-        linesContainer: {
+        overlay: {
           position: 'absolute',
           top: 0,
           left: 0,

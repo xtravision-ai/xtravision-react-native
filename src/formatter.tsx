@@ -79,38 +79,39 @@ export function getDefaultObject() {
   'worklet';
   // IMP: DO NOT change any sequence
   return {
-    nose: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftEye: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightEye: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftEar: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightEar: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    mouthLeft: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    mouthRight: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftElbow: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightElbow: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftWrist: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightWrist: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftThumb: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightThumb: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftHip: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightHip: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftKnee: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightKnee: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftHeel: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightHeel: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    leftToe: { x: 0, y: 0, z: 0, visibility: 0.0 },
-    rightToe: { x: 0, y: 0, z: 0, visibility: 0.0 }
+    nose: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 0  for nose
+    leftEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 1 for leftEyeInner
+    leftEye: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 2 for leftEye
+    leftEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 3 for leftEyeOuter
+    rightEyeInner: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 4 for rightEyeInner
+    rightEye: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 5 for rightEye
+    rightEyeOuter: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 6 for rightEyeOuter
+    leftEar: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 7 for leftEar
+    rightEar: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 8 for rightEar
+    mouthLeft: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 9 for mouthLeft
+    mouthRight: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 10 for mouthRight
+    leftShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 11 for leftShoulder
+    rightShoulder: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 12 for rightShoulder
+    leftElbow: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 13 for leftElbow
+    rightElbow: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 14 for rightElbow
+    leftWrist: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 15 for leftWrist
+    rightWrist: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 16 for rightWrist
+    leftPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 17 for leftPinkyFinger
+    rightPinkyFinger: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 18 for rightPinkyFinger
+    leftIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 19 for leftIndexFinger
+    rightIndexFinger: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 20 for rightIndexFinger
+    leftThumb: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 21 for leftThumb
+    rightThumb: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 22 for rightThumb
+    leftHip: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 23 for leftHip
+    rightHip: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 24 for rightHip
+    leftKnee: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 25 for leftKnee
+    rightKnee: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 26 for rightKnee
+    leftAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 27 for leftAnkle
+    rightAnkle: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 28 for rightAnkle
+    leftHeel: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 29 for leftHeel
+    rightHeel: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 30 for rightHeel
+    leftToe: { x: 0, y: 0, z: 0, visibility: 0.0 }, // Index - 31 for leftToe
+    rightToe: { x: 0, y: 0, z: 0, visibility: 0.0 } // Index - 32 for rightToe
   }
+  
 }

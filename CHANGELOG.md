@@ -2,6 +2,11 @@
 # @xtravision/xtravision-react-native Changelog
 
 
+### 3.0.0-rc.1: (Tue, Jul18,2023)
+- (SDK/fix) Update the SDK's dependencies to be compatible with React Native 0.71.0.
+- (Demo-App/fix) Update the Demo App's dependencies to be compatible with React Native 0.71.0.
+
+
 ### 2.9.0: (Wed, Jul12,2023)
 - (SDK/fix) For Android: RN Vision Camera always provides same frame-data for both portrait and landscape mode. Handle it properly now.
 

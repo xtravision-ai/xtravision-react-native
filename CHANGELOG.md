@@ -2,9 +2,9 @@
 # @xtravision/xtravision-react-native Changelog
 
 
-### 3.0.0: (Wed, Jul19,2023)
-- (SDK/fix) Update the SDK's dependencies to be compatible with React Native 0.71.0.
-- (Demo-App/fix) Update the Demo App's dependencies to be compatible with React Native 0.71.0.
+### 3.1.0: (Wed, Jul19,2023)
+- (SDK/update) Stable release with React Native 0.71.
+- (Demo-App/update) Stable release with React Native 0.71.
 
 ### 3.0.0-rc.1: (Tue, Jul18,2023)
 - (SDK/fix) Update the SDK's dependencies to be compatible with React Native 0.71.0.

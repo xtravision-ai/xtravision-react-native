@@ -1,6 +1,6 @@
 {
   "name": "@xtravision/xtravision-react-native",
-  "version": "2.9.0",
+  "version": "3.1.0",
   "description": "test",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -40,7 +40,9 @@
     "clean:android": "cd example/android && ./gradlew clean && cd .. && rm -fr node_modules/ yarn.lock && cd .. && rm -fr node_modules/ yarn.lock && cd ..",
     "clean:ios": "rm -rf yarn.lock && rm -rf node_modules && cd example &&  rm -rf yarn.lock && rm -rf node_modules && rm -rf ios/Podfile.lock && rm -rf ios/Pods && cd ..",
     "create:debugAPK": "cd example && yarn build:APK && yarn create:debugAPK",
-    "//postinstall": "node scripts/fix-duplicate-resource/android-release-gradle-fix.js"
+    "//postinstall": "node scripts/fix-duplicate-resource/android-release-gradle-fix.js",
+    "create:APK": "yarn create:debugAPK",
+    "install:APK": "adb install example/android/app/build/outputs/apk/debug/app-debug.apk"
   },
   "keywords": [
     "xtravision",

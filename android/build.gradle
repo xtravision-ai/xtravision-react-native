@@ -23,9 +23,8 @@ android {
     defaultConfig {
         minSdkVersion safeExtGet('XtraVisionReactNative_minSdkVersion', 21)
         targetSdkVersion safeExtGet('XtraVisionReactNative_targetSdkVersion', 31)
-        versionCode 1
-        versionName "1.0"
-
+        versionCode 3
+        versionName "3.1.0"
     }
 
     buildTypes {

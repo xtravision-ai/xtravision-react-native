@@ -2,11 +2,13 @@
 "xtravision-react-native" SDK allows you to quickly and easily use the [xtravision.ai](https://xtravision.ai/) APIs via React Native.
 
 
-## Installation
+## Installation (RN >= 0.71)
 Use the following command to install SDK and its dependencies.
 ```sh
-yarn add react-native-reanimated@2.10.0 react-native-vision-camera@2.13.0 @xtravision/xtravision-react-native
+yarn add react-native-reanimated@^2.10.0 react-native-vision-camera@^2.15.4 @xtravision/xtravision-react-native@3.0.0
 ```
+> use SDK 2.x.x version for RN <= 0.70 
+
 
 Add the required plugin to your babel.config.js:
 ```js
@@ -22,7 +24,7 @@ module.exports = {
     ]
 }
 ```
-> Note: You have to restart metro-bundler for changes in the babel.config.js file to take effect.
+> Note: You have to restart metro-bundler for changes in the babel.config.js file to take effect. Best practice to start metro server with `--reset-cache`
 
 
 ## Usage
@@ -60,8 +62,8 @@ export default function App() {
 
 
   const connectionData = {
-    assessment_name,
-    auth_token,
+    assessment_name: assessmentName,
+    auth_token: authToken,
     assessment_config: {},  // check document for more details
     user_config:{}, // check document for more details
   };
@@ -96,15 +98,10 @@ export default function App() {
 ```
 
 
-### Assessment List
-1. PUSH_UPS
-2. SIT_UPS
-3. V_SIT_AND_REACH
-4. SIDE_FLAMINGO
-5. PLATE_TAPPING_COORDINATION, 
-6. PARTIAL_CURL_UP
 
-> Tested with Node:v16.10.0 and react-native: v0.68.2
+> Tested with Node:v16.14.0 and react-native: v0.71.0
+> Make sure you have added `kotlinVersion = "1.7.0"` (under buildToolsVersion) to `android/build.gradle`
+> Currently it's supporting only android devices only 
 
 ## License
 MIT

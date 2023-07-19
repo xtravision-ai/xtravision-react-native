@@ -6,7 +6,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  self.moduleName = @"xtravision-react-native-example";
+  self.moduleName = @"main";
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 

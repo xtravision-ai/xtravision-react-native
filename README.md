@@ -2,11 +2,13 @@
 "xtravision-react-native" SDK allows you to quickly and easily use the [xtravision.ai](https://xtravision.ai/) APIs via React Native.
 
 
-## Installation
+## Installation (RN >= 0.71)
 Use the following command to install SDK and its dependencies.
 ```sh
 yarn add react-native-reanimated@^2.10.0 react-native-vision-camera@^2.15.4 @xtravision/xtravision-react-native@3.0.0
 ```
+> use SDK 2.x.x version for RN <= 0.70 
+
 
 Add the required plugin to your babel.config.js:
 ```js

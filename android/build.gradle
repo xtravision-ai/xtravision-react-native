@@ -24,7 +24,7 @@ android {
         minSdkVersion safeExtGet('XtraVisionReactNative_minSdkVersion', 21)
         targetSdkVersion safeExtGet('XtraVisionReactNative_targetSdkVersion', 31)
         versionCode 3
-        versionName "3.0.0-rc.1"
+        versionName "3.0.0"
     }
 
     buildTypes {

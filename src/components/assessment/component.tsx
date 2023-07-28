@@ -169,7 +169,7 @@ export function Assessment(props: AssessmentProp) {
       // clean up  interval after component unmount
       cleanUp();
     };
-  }, []);
+  }, [props.requestData]);
 
   // if no camera found (front or back)
   if (device == null) {

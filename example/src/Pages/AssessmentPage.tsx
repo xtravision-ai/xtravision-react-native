@@ -15,7 +15,7 @@ LogBox.ignoreAllLogs();
 // let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 export default function AssessmentPage({ route }: any) {
-  const authToken = "__AUTH_TOKEN__";
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlNjk5ZTFkNi03ZDExLTRjMDQtYjhmMi05ODAzMTBlYWU4YzIiLCJhcHBJZCI6IjhkZWExNGJiLTRlYjMtMTFlZC04MjNiLTEyZmFiNGZmYWJlZCIsIm9yZ0lkIjoiODk5Y2I5NjAtNGViMy0xMWVkLTgyM2ItMTJmYWI0ZmZhYmVkIiwiaWF0IjoxNjgxNzE4MzE2LCJleHAiOjE3MTMyNzU5MTZ9.JifCA8nlmmEFTidIDt9k15Uffoj-Px3YvFgX_T1zfiY";
   const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
@@ -45,7 +45,6 @@ export default function AssessmentPage({ route }: any) {
     .join(' ');
   }
 
-
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
     (async () => {
@@ -58,15 +57,31 @@ export default function AssessmentPage({ route }: any) {
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
   const [displayResponse, setDisplayResponse] = React.useState({smallText: '-', bigText: '-'});
 
-
   const [displayRespMsg, setDisplayRespMsg] = React.useState('');
 
   const closeModal = () => {
     setDisplayRespMsg(''); // Set the message to an empty string to close the modal
   };
 
+
+  // set isPreJoin = true only if you are using education screen screen
+  const [requestData, setRequestData] = React.useState({ isPreJoin: true})
+
   // required prop:
   const onServerResponse = (serverResponse: any) => {
+
+    // Imp: use below code only purpose of Education screen.
+    // Else don't use this
+    if (requestData.isPreJoin || serverResponse?.code) {
+        console.log(Date() + ' Server Data For Education Screen:', serverResponse);
+  
+        // once body will be fully visible then start assessment.
+        if (serverResponse.isPassed){
+          return setRequestData({isPreJoin: false})
+        }
+        const msg = "Education Screen:  " + serverResponse.code
+        return setDisplayRespMsg(msg);  
+    }
 
     //dump server response in log
     console.log(Date() + ' Server Data:', serverResponse.data);
@@ -161,9 +176,11 @@ export default function AssessmentPage({ route }: any) {
     session_id: null
   };
 
-  const requestData = {
-    isPreJoin: false
-  }
+
+
+  // const requestData = {
+  //   isPreJoin: false
+  // }
 
   const libData = {
     sideColor: { leftSideColor, rightSideColor },

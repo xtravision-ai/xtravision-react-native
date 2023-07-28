@@ -5,15 +5,27 @@ import useWebSocket from "react-native-use-websocket";
 import type {AssessmentConnectionData} from "./../components/assessment"
 
 
-const WS_BASE_URL = 'wss://saasai.xtravision.ai/wss/v2';
-// const WS_BASE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
-// const WS_BASE_URL = 'ws://localhost:8000/wss/v2';
+const WS_PROD_URL = 'wss://saasai.xtravision.ai/wss/v2';
+const WS_STAGE_URL = 'wss://saasstagingai.xtravision.ai/wss/v2';
+const WS_LOCAL_URL = 'ws://localhost:8000/wss/v2';
 
-function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse: Function) : [Function, any]{
+function useXtraAssessment(connectionData: AssessmentConnectionData, onResponse: Function, libData: any) : [Function, any]{
+
+  let ws_base_url = WS_PROD_URL;
+  switch(libData?.serverEndpoint?.toLowerCase()){
+    case 'local':
+      ws_base_url = WS_LOCAL_URL;
+      break;
+    case 'stage':
+      ws_base_url = WS_STAGE_URL;
+      break;
+    case 'production':
+    default:
+      ws_base_url = WS_PROD_URL
+  }
   const [responseData] = useState(null);
 
-
-  const WS_URL = `${WS_BASE_URL}/assessment/fitness/${connectionData.assessment_name}`
+  const WS_URL = `${ws_base_url}/assessment/fitness/${connectionData.assessment_name}`
 
   let iQueryParams: { [key: string]: any } = {};
   iQueryParams['requested_at'] = Date.now();

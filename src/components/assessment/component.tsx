@@ -17,7 +17,7 @@ import { scanPoseLandmarks } from './../../helper';
 export function Assessment(props: AssessmentProp) {
 
   //connection will be initiated before setup camera and others
-  const [sendJsonData] = useXtraAssessment(props.connectionData, props.libData.onServerResponse)
+  const [sendJsonData] = useXtraAssessment(props.connectionData, props.libData.onServerResponse, props.libData)
 
   // define all required data
   const devices = useCameraDevices();

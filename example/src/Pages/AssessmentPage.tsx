@@ -70,6 +70,13 @@ export default function AssessmentPage({ route }: any) {
   // required prop:
   const onServerResponse = (serverResponse: any) => {
 
+    // always check first is there any error
+    if (serverResponse?.errors?.length) {
+      console.error(Date() + ' Server Error Response:', serverResponse.errors);
+      showError("Error From Server", `${serverResponse.errors[0].message}.`);
+      return;
+    }
+
     // Imp: use below code only purpose of Education screen.
     // Else don't use this
     if (requestData.isPreJoin || serverResponse?.code) {
@@ -85,13 +92,6 @@ export default function AssessmentPage({ route }: any) {
 
     //dump server response in log
     console.log(Date() + ' Server Data:', serverResponse.data);
-
-    // always check first is there any error
-    if (serverResponse.errors.length) {
-      console.error(Date() + ' Server Error Response:', serverResponse.errors);
-      showError("Error From Server", `${serverResponse.errors[0].message}.`);
-      return;
-    }
 
     //show assessment name
     setDisplayText(textFormatter(selectedAssessment));

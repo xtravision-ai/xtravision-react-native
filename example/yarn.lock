@@ -4011,10 +4011,10 @@ react-native-dropdown-select-list@^2.0.2:
   resolved "https://registry.yarnpkg.com/react-native-dropdown-select-list/-/react-native-dropdown-select-list-2.0.4.tgz#bd63d684dd9b840d50e022985f9d0fa69eee1c2a"
   integrity sha512-H7aRhhSHYvl5v+Ufy5CtXhaRHgrRQakWn+IexSFCP/+nUFu5yvwfmtbVEfIszMjr6szPuiabG15trrbswHlmCw==
 
-react-native-flipper@^0.179.0:
-  version "0.179.0"
-  resolved "https://registry.yarnpkg.com/react-native-flipper/-/react-native-flipper-0.179.0.tgz#501a4fd3d62215eeff677e35cc79b6faec5270c5"
-  integrity sha512-cgN6iSBYUpwpqea3anGtuCV2J/4Zqp7YufQpd+TYVZIQ53BFQ9yteC2yP2K4doVBVPQ/w0xNzV2R4k0dXDHHgQ==
+react-native-flipper@0.163.0:
+  version "0.163.0"
+  resolved "https://registry.yarnpkg.com/react-native-flipper/-/react-native-flipper-0.163.0.tgz#3ede9fed252555d0ac3c6212e7ed6e5af3c85604"
+  integrity sha512-RG0yMlEMe/fYqaoUkhvW2HrqBuRYtq1K3me9y52RBFwPWooZTmUlWjIWGKT9VYVS9T2GGrUV9tpBA8pY9g7CSg==
 
 react-native-gradle-plugin@^0.71.12:
   version "0.71.19"

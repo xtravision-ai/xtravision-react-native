@@ -2,6 +2,9 @@
 # @xtravision/xtravision-react-native Changelog
 
 
+### 3.2.1: (Mon, Jul31,2023)
+- (demo-app/fix) Update server response data in demo-app.
+
 ### 3.2.0: (Mon, Jul31,2023)
 - (SDK/fix) Enable support to change isPreJoin variable value in the ongoing session.
 - (Demo-App/feat)Add cardio assessment in Demo App

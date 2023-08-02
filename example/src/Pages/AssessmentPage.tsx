@@ -79,14 +79,14 @@ export default function AssessmentPage({ route }: any) {
 
     // Imp: use below code only purpose of Education screen.
     // Else don't use this
-    if (requestData.isPreJoin || serverResponse?.code) {
+    if (requestData.isPreJoin || serverResponse?.data?.code) {
         console.log(Date() + ' Server Data For Education Screen:', serverResponse);
   
         // once body will be fully visible then start assessment.
-        if (serverResponse.isPassed){
+        if (serverResponse.data.is_passed){
           return setRequestData({isPreJoin: false})
         }
-        const msg = "Education Screen:  " + serverResponse.code
+        const msg = "Education Screen:  " + serverResponse.data.code
         return setDisplayRespMsg(msg);  
     }
 

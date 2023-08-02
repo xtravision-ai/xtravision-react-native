@@ -5,7 +5,7 @@
 ## Installation (RN >= 0.71)
 Use the following command to install SDK and its dependencies.
 ```sh
-yarn add react-native-reanimated@^2.10.0 react-native-vision-camera@^2.15.4 @xtravision/xtravision-react-native@3.2.0
+yarn add react-native-reanimated@^2.10.0 react-native-vision-camera@^2.15.4 @xtravision/xtravision-react-native@3.2.1
 ```
 > use SDK 2.9.x version for RN <= 0.70 
 

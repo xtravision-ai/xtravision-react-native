@@ -16,6 +16,7 @@ LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
   const authToken = "__AUTH_TOKEN__";
+  // "__AUTH_TOKEN__";
   const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
@@ -65,7 +66,7 @@ export default function AssessmentPage({ route }: any) {
 
 
   // set isPreJoin = true only if you are using education screen screen
-  const [requestData, setRequestData] = React.useState({ isPreJoin: true})
+  const [requestData, setRequestData] = React.useState({ isPreJoin: false})
 
   // required prop:
   const onServerResponse = (serverResponse: any) => {

@@ -1,11 +1,11 @@
 {
   "name": "xtravision-react-native-example",
   "description": "Example app for xtravision-react-native",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "ios": "react-native run-ios --device 'Riddhi’s iPhone 11'",
     "start": "react-native start --reset-cache",
     "pods": "pod-install --quiet",
     "rm:debugAPK": "rm -fr android/app/build/outputs/apk/debug/app-debug.apk",
@@ -45,7 +45,7 @@
     "metro-react-native-babel-preset": "^0.73.7",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
-    "react-native-flipper": "^0.179.0",
+    "react-native-flipper": "0.163.0",
     "prettier": "^2.4.1",
     "typescript": "4.8.4"
 

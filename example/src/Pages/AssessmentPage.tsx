@@ -8,6 +8,7 @@ import { showError } from '../Components/Alert';
 // Disable all warning and error on screen
 import { LogBox } from 'react-native';
 import BackButton from '../Components/BackButton';
+import ModalComponent from '../Components/Modal';
 LogBox.ignoreAllLogs();
 
 // cache variable
@@ -45,7 +46,6 @@ export default function AssessmentPage({ route }: any) {
     .join(' ');
   }
 
-
   const [hasPermission, setHasPermission] = React.useState(false);
   React.useEffect(() => {
     (async () => {
@@ -58,29 +58,84 @@ export default function AssessmentPage({ route }: any) {
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
   const [displayResponse, setDisplayResponse] = React.useState({smallText: '-', bigText: '-'});
 
+  const [displayRespMsg, setDisplayRespMsg] = React.useState('');
+
+  const closeModal = () => {
+    setDisplayRespMsg(''); // Set the message to an empty string to close the modal
+  };
+
+
+  // set isPreJoin = true only if you are using education screen screen
+  const [requestData, setRequestData] = React.useState({ isPreJoin: true})
+
   // required prop:
   const onServerResponse = (serverResponse: any) => {
 
-    //dump server response in log
-    console.log(Date() + ' Server Data:', serverResponse.data);
-
     // always check first is there any error
-    if (serverResponse.errors.length) {
+    if (serverResponse?.errors?.length) {
       console.error(Date() + ' Server Error Response:', serverResponse.errors);
       showError("Error From Server", `${serverResponse.errors[0].message}.`);
       return;
     }
 
+    // Imp: use below code only purpose of Education screen.
+    // Else don't use this
+    if (requestData.isPreJoin || serverResponse?.data?.code) {
+        console.log(Date() + ' Server Data For Education Screen:', serverResponse);
+  
+        // once body will be fully visible then start assessment.
+        if (serverResponse.data.is_passed){
+          return setRequestData({isPreJoin: false})
+        }
+        const msg = "Education Screen:  " + serverResponse.data.code
+        return setDisplayRespMsg(msg);  
+    }
+
+    //dump server response in log
+    console.log(Date() + ' Server Data:', serverResponse.data);
+
     //show assessment name
     setDisplayText(textFormatter(selectedAssessment));
     const additional_response = serverResponse.data.additional_response
 
+    /**
+     * IMP: below method is very specific and may vary assessment wise. 
+     * Use wisely
+     */
+    const checkOutOfScreenFeedback = function(){
+        const outOfScreenCode = serverResponse.data?.out_of_screen_feedback?.code;
 
+        if (outOfScreenCode) {
+          let msgString = outOfScreenCode;
+          switch(outOfScreenCode) {
+            case 'HAND_IS_OUT_OF_THE_SCREEN':
+              msgString = 'Your hand is out of the screen'; break;
+            case 'FEET_IS_OUT_OF_THE_SCREEN':
+              msgString = 'Your feet is out of the screen'; break;
+            default:
+              msgString = outOfScreenCode
+          }
+          setDisplayRespMsg(msgString);
+        }else{
+          closeModal();
+        } 
+
+    }
+    
     // Assessment Specific Handling
     if (selectedAssessment === 'RANGE_OF_MOTION') {
       const leftValue = serverResponse.data.angles.shoulder_left;
       const rightValue = serverResponse.data.angles.shoulder_right;
       setDisplayResponse({smallText: 'Shoulder Angle', bigText: `L: ${leftValue}\u00B0 R: ${rightValue}\u00B0`})
+      return ;
+    }
+
+    // Assessment Specific Handling
+    if (selectedAssessment === 'CARDIO') {
+      checkOutOfScreenFeedback();
+      const caloryValue = serverResponse.data.calories_burnt;
+      const powerValue = serverResponse.data.power_list[0];
+      setDisplayResponse({smallText: 'Calory Power', bigText: `${caloryValue}   ${powerValue}`})
       return ;
     }
 
@@ -122,15 +177,18 @@ export default function AssessmentPage({ route }: any) {
     session_id: null
   };
 
-  const requestData = {
-    isPreJoin: false
-  }
+
+
+  // const requestData = {
+  //   isPreJoin: false
+  // }
 
   const libData = {
     sideColor: { leftSideColor, rightSideColor },
     onServerResponse,
     cameraPosition,
-    showSkeleton
+    showSkeleton,
+    // serverEndpoint:  'production'//'local'
   }
 
   return (
@@ -147,6 +205,8 @@ export default function AssessmentPage({ route }: any) {
           <TextBox smallValue="Assessment" bigValue={displayText} style={styles({ width, height }).leftBox} />
           {/* Show Server response data on UI  */} 
           <TextBox smallValue={displayResponse.smallText} bigValue={displayResponse.bigText} style={styles({ width, height }).rightBox} />
+          {/* Display Out of screen feedback */}
+          <ModalComponent message={displayRespMsg} closeModal={closeModal} />
           
           {/* Show Back button on UI  */} 
           <View style={styles({ width, height }).backBtn}>

@@ -17,5 +17,6 @@ export interface AssessmentProp {
       onServerResponse(serverResponse: any): void;
       cameraPosition: 'front' | 'back';
       showSkeleton: boolean;
+      serverEndpoints?: 'production' |  'stage' | 'local'
     }
   }

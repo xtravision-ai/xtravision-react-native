@@ -1,6 +1,8 @@
 
 # @xtravision/xtravision-react-native Changelog
 
+### 3.2.2: (Mon, Jul31,2023)
+- (SDK/HotFix) Upgrade RN vision camera for IOS compatible.
 
 ### 3.2.1: (Mon, Jul31,2023)
 - (demo-app/fix) Update server response data in demo-app.

@@ -6,10 +6,11 @@ import TextBox from '../Components/TextBox';
 import { showError } from '../Components/Alert';
 
 // Disable all warning and error on screen
-import { LogBox } from 'react-native';
+// import { LogBox } from 'react-native';
 import BackButton from '../Components/BackButton';
 import ModalComponent from '../Components/Modal';
-LogBox.ignoreAllLogs();
+// import { Camera } from 'react-native-vision-camera';
+// LogBox.ignoreAllLogs();
 
 // cache variable
 // let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
@@ -47,13 +48,21 @@ export default function AssessmentPage({ route }: any) {
   }
 
   const [hasPermission, setHasPermission] = React.useState(false);
+  // const [hasPermission, setHasPermission] = React.useState<CameraPermissionStatus>();
+
   React.useEffect(() => {
     (async () => {
       const status = await RequestCameraPermission();
       setHasPermission(status === CameraPermissionStatus.AUTHORIZED);
+      console.log("Camera status: " + status)
+
+      // Camera.getCameraPermissionStatus().then(setHasPermission);
+
+
+
+      
     })();
   }, []);
-
 
   const [displayText, setDisplayText] = React.useState('Waiting for server....');
   const [displayResponse, setDisplayResponse] = React.useState({smallText: '-', bigText: '-'});
@@ -63,7 +72,6 @@ export default function AssessmentPage({ route }: any) {
   const closeModal = () => {
     setDisplayRespMsg(''); // Set the message to an empty string to close the modal
   };
-
 
   // set isPreJoin = true only if you are using education screen screen
   const [requestData, setRequestData] = React.useState({ isPreJoin: false})
@@ -131,7 +139,7 @@ export default function AssessmentPage({ route }: any) {
     }
 
     // Assessment Specific Handling
-    if (selectedAssessment === 'CARDIO') {
+    if (selectedAssessment.includes('CARDIO')) {
       checkOutOfScreenFeedback();
       const caloryValue = serverResponse.data.calories_burnt;
       const powerValue = serverResponse.data.power_list[0];
@@ -176,12 +184,6 @@ export default function AssessmentPage({ route }: any) {
     user_config: userConfig,
     session_id: null
   };
-
-
-
-  // const requestData = {
-  //   isPreJoin: false
-  // }
 
   const libData = {
     sideColor: { leftSideColor, rightSideColor },

@@ -7,6 +7,8 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
+import com.mrousavy.camera.frameprocessor.FrameProcessorPluginRegistry;
+
 import com.xtravisionreactnative.xtravisionposeplugin.XtraVisionPosePluginPlugin;
 
 import java.util.Collections;
@@ -16,7 +18,9 @@ public class XtraVisionPosePluginPluginPackage implements ReactPackage {
   @NonNull
   @Override
   public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
-    FrameProcessorPlugin.register(new XtraVisionPosePluginPlugin());
+    FrameProcessorPluginRegistry.addFrameProcessorPlugin("scanPoseLandmarks", options -> new XtraVisionPosePluginPlugin());
+
+    // FrameProcessorPlugin.register(new XtraVisionPosePluginPlugin());
     return Collections.emptyList();
   }
 

@@ -68,5 +68,9 @@ public class MainApplication extends Application implements ReactApplication {
     }
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
 
+
+    // FrameProcessorPluginRegistry.addFrameProcessorPlugin("scanPoseLandmarks", options -> new XtraVisionPosePluginPlugin());
+
+
   }
 }

@@ -19,9 +19,24 @@ import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.PoseLandmark;
 import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
 
+import com.mrousavy.camera.frameprocessor.Frame;
 import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
 
 import java.util.List;
+import java.util.Map;
+
+import android.media.Image;
+import android.util.Log;
+
+import com.mrousavy.camera.frameprocessor.Frame;
+import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
 
@@ -35,44 +50,76 @@ public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
  
   PoseDetector poseDetector = PoseDetection.getClient(options);
 
-  @SuppressLint("NewApi")
+  // @SuppressLint("NewApi")
+  // @Override
+  // public Object callback(ImageProxy frame, Object[] params) { //Promise promise
   @Override
-  public Object callback(ImageProxy frame, Object[] params) { //Promise promise
-    @SuppressLint("UnsafeOptInUsageError")
-    Image mediaImage = frame.getImage();
-    WritableMap map =  new WritableNativeMap();
-//    Log.d("pose params", "pose params >> : " + params);
-//    System.out.println(params);
+  public Object callback(Frame frame, Map<String, Object> params) {
 
-    if (mediaImage != null) {
-      InputImage image = InputImage.fromMediaImage(mediaImage, frame.getImageInfo().getRotationDegrees());
-      Task<Pose> task = poseDetector.process(image);
-      try {
-        Pose pose = Tasks.await(task);
-        List<PoseLandmark> landmarks = pose.getAllPoseLandmarks();
-        for(PoseLandmark landmark: landmarks) {
-          WritableMap result = new WritableNativeMap();
-          String type = getTypeLabel(landmark.getLandmarkType());
-          PointF3D point = landmark.getPosition3D();
+    Log.d("ExamplePlugin", "----------------");
 
-          result.putDouble("visibility", landmark.getInFrameLikelihood());
-          result.putDouble("x", point.getX());
-          result.putDouble("y", point.getY());
-          result.putDouble("z", point.getZ());
-          map.putMap(type, result);
-        }
-      } catch (Exception e) {
-        Log.e(XtraVisionPosePluginPlugin.TAG, "Something is going wrong: " + e.getMessage());
-        e.printStackTrace();
-      }
-    }
 
-    return map;
+
+      // if (params == null) return null;
+      // Image image = frame.getImage();
+
+      // Log.d("ExamplePlugin", image.getWidth() + " x " + image.getHeight() + " Image with format #" + image.getFormat() + ". Logging " + params.size() + " parameters:");
+
+      // for (String key : params.keySet()) {
+      //     Object value = params.get(key);
+      //     Log.d("ExamplePlugin", "  -> " + (value == null ? "(null)" : value + " (" + value.getClass().getName() + ")"));
+      // }
+
+      Map<String, Object> map = new HashMap<>();
+      map.put("example_str", "Test");
+      map.put("example_bool", true);
+      map.put("example_double", 5.3);
+
+      List<Object> array = new ArrayList<>();
+      array.add("Hello!");
+      array.add(true);
+      array.add(17.38);
+
+      map.put("example_array", array);
+      return map;
+
+
+
+//     @SuppressLint("UnsafeOptInUsageError")
+//     Image mediaImage = frame.getImage();
+//     WritableMap map =  new WritableNativeMap();
+// //    Log.d("pose params", "pose params >> : " + params);
+// //    System.out.println(params);
+
+//     if (mediaImage != null) {
+//       InputImage image = InputImage.fromMediaImage(mediaImage, frame.getImageInfo().getRotationDegrees());
+//       Task<Pose> task = poseDetector.process(image);
+//       try {
+//         Pose pose = Tasks.await(task);
+//         List<PoseLandmark> landmarks = pose.getAllPoseLandmarks();
+//         for(PoseLandmark landmark: landmarks) {
+//           WritableMap result = new WritableNativeMap();
+//           String type = getTypeLabel(landmark.getLandmarkType());
+//           PointF3D point = landmark.getPosition3D();
+
+//           result.putDouble("visibility", landmark.getInFrameLikelihood());
+//           result.putDouble("x", point.getX());
+//           result.putDouble("y", point.getY());
+//           result.putDouble("z", point.getZ());
+//           map.putMap(type, result);
+//         }
+//       } catch (Exception e) {
+//         Log.e(XtraVisionPosePluginPlugin.TAG, "Something is going wrong: " + e.getMessage());
+//         e.printStackTrace();
+//       }
+//     }
+
+//     return map;
   }
 
 
   public XtraVisionPosePluginPlugin() {
-    super("scanPoseLandmarks");
+    // super("scanPoseLandmarks");
   }
 
   static String getTypeLabel(int landmarkType) {

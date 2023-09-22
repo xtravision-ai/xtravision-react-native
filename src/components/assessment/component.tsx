@@ -3,7 +3,7 @@ import {getStylesData} from './style'
 import { Text, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import { Camera, useCameraDevices, useFrameProcessor} from 'react-native-vision-camera';
-import type { Frame } from 'react-native-vision-camera';
+import type { CameraRuntimeError, Frame } from 'react-native-vision-camera';
 import { runOnJS } from 'react-native-reanimated';
 // import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
@@ -34,6 +34,7 @@ export function Assessment(props: AssessmentProp) {
   const landmarksTempRef = React.useRef<any>({});
 
   //WS Request Data: 
+  //@ts-expect-error
   const updateWSEventData = useCallback((now: any, landmarks: any, frame: any) => {
     landmarksTempRef.current[now] = { landmarks };
 
@@ -80,6 +81,9 @@ export function Assessment(props: AssessmentProp) {
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
 
+    console.log(`${frame.timestamp}: ${frame.width}x${frame.height} ${frame.pixelFormat} Frame (${frame.orientation})`);
+
+    return;
     const pose = scanPoseLandmarks(frame);
 
     if (Object.keys(pose).length == 0) {
@@ -131,10 +135,13 @@ export function Assessment(props: AssessmentProp) {
 
   }, [dimensions]);
 
-  const onError = function (error: any) {
-    // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
-    console.error(Date() + "  " + error.message)
-  }
+  // const onError = function (error: any) {
+  //   // https://github.com/mrousavy/react-native-vision-camera/blob/a65b8720bd7f2efffc5fb9061cc1e5ca5904bd27/src/CameraError.ts#L164
+  //   console.error(Date() + "  " + error.message)
+  // }
+  const onError = useCallback((error: CameraRuntimeError) => {
+    console.error(error);
+  }, []);
 
   // step-3: send data to server
   useEffect(() => {
@@ -190,9 +197,10 @@ export function Assessment(props: AssessmentProp) {
         isActive={true}
         // isActive={isAppForeground}
         frameProcessor={true ? frameProcessor : undefined}
-        fps={10}
-        frameProcessorFps={10}
+        fps={30} 
         onError={onError}
+        enableFpsGraph={true}
+
       />
 
       {/* {props.libData.showSkeleton && (

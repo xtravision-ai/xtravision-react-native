@@ -3,17 +3,38 @@ import { useAnimatedStyle } from 'react-native-reanimated';
 import type { Frame } from 'react-native-vision-camera';
 import { Camera } from 'react-native-vision-camera';
 
+import { VisionCameraProxy } from 'react-native-vision-camera';
+
+const plugin = VisionCameraProxy.getFrameProcessorPlugin('scanPoseLandmarks');
+
+console.log(plugin)
+
 export function scanPoseLandmarks(frame: Frame) {
   'worklet';
   // IMP: DO NOT PUT ANY JS CODE HERE
-  if (!_WORKLET) throw new Error('ScanPoseLandmarks method must be called from a frame processor!');
+  // if (!_WORKLET) throw new Error('ScanPoseLandmarks method must be called from a frame processor!');
+
+  if (plugin == null) throw new Error('Failed to load Frame Processor Plugin "scanPoseLandmarks"!');
+
+  return plugin.call(frame, {
+    someString: 'hello!',
+    someBoolean: true,
+    someNumber: 42,
+    someObject: { test: 0, second: 'test' },
+    someArray: ['another test', 5],
+  }) as string[];
+
+  /*
+    // @ts-expect-error Frame Processors are not typed.
 
   // @ts-expect-error Frame Processors are not typed.
-  return __scanPoseLandmarks(frame);
+  // return __scanPoseLandmarks(frame);
+  */
 }
 
 export async function RequestCameraPermission() {
-  return await Camera.requestCameraPermission()
+  // return await Camera.requestCameraPermission()
+  return await Camera.getCameraPermissionStatus()
 }
 
 export const usePositionLine = (poseLine: any, valueName1: any, valueName2: any, cameraOption: string, width: number, paint: any) => {

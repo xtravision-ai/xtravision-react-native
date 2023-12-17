@@ -18,7 +18,7 @@ public class XtraVisionPosePluginPluginPackage implements ReactPackage {
   @NonNull
   @Override
   public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
-    FrameProcessorPluginRegistry.addFrameProcessorPlugin("scanPoseLandmarks", options -> new XtraVisionPosePluginPlugin());
+    FrameProcessorPluginRegistry.addFrameProcessorPlugin("scanPoseLandmarks", options -> new XtraVisionPosePluginPlugin(options));
 
     // FrameProcessorPlugin.register(new XtraVisionPosePluginPlugin());
     return Collections.emptyList();

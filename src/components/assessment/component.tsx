@@ -2,26 +2,30 @@ import 'react-native-reanimated';
 import {getStylesData} from './style'
 import { Text, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
-import { Camera, useCameraDevices, useFrameProcessor} from 'react-native-vision-camera';
+import { Camera, useFrameProcessor} from 'react-native-vision-camera';
 import type { CameraRuntimeError, Frame } from 'react-native-vision-camera';
-import { runOnJS } from 'react-native-reanimated';
+// import { runOnJS } from 'react-native-reanimated';
 // import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
 import { scanPoseLandmarks } from './../../helper';
+import { Landmark } from './../../helper';
+import { Worklets } from 'react-native-worklets-core';
 
 // const defaultPose = getDefaultObject();
 
 export function Assessment(props: AssessmentProp) {
 
   //connection will be initiated before setup camera and others
+  //@ts-ignore
   const [sendJsonData] = useXtraAssessment(props.connectionData, props.libData.onServerResponse, props.libData)
 
   // define all required data
-  const devices = useCameraDevices();
-  const device = devices[props.libData.cameraPosition];
+  // const device = useCameraDevices(props.libData.cameraPosition);
+  const devices = Camera.getAvailableCameraDevices()
+  const device = devices.find((d) => d.position === props.libData.cameraPosition)
 
   //use for drawing skeleton
   // const poseSkeleton: any = useSharedValue(defaultPose);
@@ -34,9 +38,9 @@ export function Assessment(props: AssessmentProp) {
   const landmarksTempRef = React.useRef<any>({});
 
   //WS Request Data: 
-  //@ts-expect-error
-  const updateWSEventData = useCallback((now: any, landmarks: any, frame: any) => {
-    landmarksTempRef.current[now] = { landmarks };
+  const updateWSEventData = useCallback((now: number, landmarks: any, frame: any) => {
+    // Worklet function does not pass array of object. landmarks is object of landmarks so we need to convert them into array
+    landmarksTempRef.current[now] = { landmarks: Object.values(landmarks) };
 
     // default value
     frameTempRef.current = { frame_height: frame.height, frame_width: frame.width };
@@ -77,14 +81,16 @@ export function Assessment(props: AssessmentProp) {
   //   poseSkeleton.value = poseCopyObj;
   // }
 
+  const myFunctionJS = Worklets.createRunInJsFn(updateWSEventData)
+
   // Step-1: using frame processor, extract body landmarks from Pose
   const frameProcessor = useFrameProcessor((frame: Frame) => {
     'worklet';
 
-    console.log(`${frame.timestamp}: ${frame.width}x${frame.height} ${frame.pixelFormat} Frame (${frame.orientation})`);
+    // console.log(`${frame.timestamp}: ${frame.width}x${frame.height} ${frame.pixelFormat} Frame (${frame.orientation})`);
+    const pose = scanPoseLandmarks(frame) as Landmark[];
 
-    return;
-    const pose = scanPoseLandmarks(frame);
+    // console.log(pose)
 
     if (Object.keys(pose).length == 0) {
       __DEV__ && console.warn(Date() + " Body is not visible!")
@@ -97,7 +103,7 @@ export function Assessment(props: AssessmentProp) {
     const poseCopy: any = getDefaultObject();
     // const poseCopyObj: any = getDefaultObject();
 
-    Object.keys(poseCopy).forEach(v => {
+    Object.keys(poseCopy).forEach((v:any) => {
       // do nothing, on specific any specific part is not visible
       if (!pose[v]) {
         return;
@@ -106,32 +112,30 @@ export function Assessment(props: AssessmentProp) {
       // console.log("FRAME HEIGHT", frame.height, "WIDTH", frame.width)
       // Handling Android issue in which the orientation of Frame is out of sync with device orientation
       if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)){
-
         poseCopy[v] = {
-          //TODO: why else case is different from Android
-          x: pose[v].x / frame.height,
-          y: pose[v].y / frame.width,
-          z: pose[v].z / frame.height,
-          visibility: pose[v].visibility,
+          //@ts-ignore
+          x: pose[v].x / frame.height, y: pose[v].y / frame.width, z: pose[v].z / frame.height, visibility: pose[v].visibility,
         };
 
       } else{
-
+        //TODO: why else case is different from Android
         poseCopy[v] = {
-          //TODO: why else case is different from Android
-          x: pose[v].x / frame.width ,
-          y: pose[v].y / frame.height,
-          z: pose[v].z / frame.width,
-          visibility: pose[v].visibility,
+          //@ts-ignore
+          x: pose[v].x / frame.width, y: pose[v].y / frame.height, z: pose[v].z / frame.width,  visibility: pose[v].visibility,
         };
       }
       
     });
 
+    // console.log("----->>", poseCopy)
+
     //draw skeleton
     // calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
     // Collect data for send data to server
-    runOnJS(updateWSEventData)(now, Object.values(poseCopy), frame)
+    // runOnJS(updateWSEventData)(now, Object.values(poseCopy), frame)
+    // Object.values(poseCopy) is not working as expected so we pass full object
+    // myFunctionJS(now, Object.values(poseCopy), frame)
+    myFunctionJS(now, Object.values(poseCopy), frame)
 
   }, [dimensions]);
 
@@ -197,9 +201,10 @@ export function Assessment(props: AssessmentProp) {
         isActive={true}
         // isActive={isAppForeground}
         frameProcessor={true ? frameProcessor : undefined}
-        fps={30} 
+        fps={10} 
         onError={onError}
-        enableFpsGraph={true}
+        // enableFpsGraph={true}
+        pixelFormat='yuv'
 
       />
 

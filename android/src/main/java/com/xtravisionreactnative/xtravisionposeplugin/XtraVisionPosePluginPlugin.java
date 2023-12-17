@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.media.Image;
 import android.util.Log;
 
-import androidx.camera.core.ImageProxy;
+import androidx.exifinterface.media.ExifInterface;
 
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -22,21 +22,14 @@ import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
 import com.mrousavy.camera.frameprocessor.Frame;
 import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
-import android.media.Image;
-import android.util.Log;
-
-import com.mrousavy.camera.frameprocessor.Frame;
-import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
 
@@ -44,82 +37,96 @@ public class XtraVisionPosePluginPlugin extends FrameProcessorPlugin {
     new AccuratePoseDetectorOptions.Builder()
       .setDetectorMode(AccuratePoseDetectorOptions.STREAM_MODE)
       .build();
-      
+
   static final String TAG = "XtraVisionPosePluginPlugin";
 
- 
   PoseDetector poseDetector = PoseDetection.getClient(options);
 
-  // @SuppressLint("NewApi")
-  // @Override
-  // public Object callback(ImageProxy frame, Object[] params) { //Promise promise
+  @SuppressLint("LongLogTag")
   @Override
-  public Object callback(Frame frame, Map<String, Object> params) {
+  public Object callback(@NotNull Frame frame,  @Nullable Map<String, Object> params) {
+    @SuppressLint("UnsafeOptInUsageError")
+    Image mediaImage = frame.getImage();
+    WritableMap map =  new WritableNativeMap();
+//   Log.d(XtraVisionPosePluginPlugin.TAG, "pose params >> : " + params);
+     
+    if (mediaImage != null) {
+      try {
+//        InputImage image = InputImage.fromMediaImage(mediaImage, frame.getImageInfo().getRotationDegrees());
+//        InputImage image = InputImage.fromMediaImage(mediaImage, XtraVisionPosePluginPlugin.getRotationFromImage(mediaImage));
+        // TODO: for time being we put 0 in rotation
+        InputImage image = InputImage.fromMediaImage(mediaImage, 0);
+        Task<Pose> task = poseDetector.process(image);
 
-    Log.d("ExamplePlugin", "----------------");
+         Pose pose = Tasks.await(task);
+         List<PoseLandmark> landmarks = pose.getAllPoseLandmarks();
+         for(PoseLandmark landmark: landmarks) {
+           WritableMap result = new WritableNativeMap();
+           String type = getTypeLabel(landmark.getLandmarkType());
+           PointF3D point = landmark.getPosition3D();
 
+           result.putDouble("visibility", landmark.getInFrameLikelihood());
+           result.putDouble("x", point.getX());
+           result.putDouble("y", point.getY());
+           result.putDouble("z", point.getZ());
+           map.putMap(type, result);
+         }
+       } catch (Exception e) {
+         Log.e(XtraVisionPosePluginPlugin.TAG, "Something is going wrong: " + e.getMessage());
+         e.printStackTrace();
+       }
+    }
 
-
-      // if (params == null) return null;
-      // Image image = frame.getImage();
-
-      // Log.d("ExamplePlugin", image.getWidth() + " x " + image.getHeight() + " Image with format #" + image.getFormat() + ". Logging " + params.size() + " parameters:");
-
-      // for (String key : params.keySet()) {
-      //     Object value = params.get(key);
-      //     Log.d("ExamplePlugin", "  -> " + (value == null ? "(null)" : value + " (" + value.getClass().getName() + ")"));
-      // }
-
-      Map<String, Object> map = new HashMap<>();
-      map.put("example_str", "Test");
-      map.put("example_bool", true);
-      map.put("example_double", 5.3);
-
-      List<Object> array = new ArrayList<>();
-      array.add("Hello!");
-      array.add(true);
-      array.add(17.38);
-
-      map.put("example_array", array);
-      return map;
-
-
-
-//     @SuppressLint("UnsafeOptInUsageError")
-//     Image mediaImage = frame.getImage();
-//     WritableMap map =  new WritableNativeMap();
-// //    Log.d("pose params", "pose params >> : " + params);
-// //    System.out.println(params);
-
-//     if (mediaImage != null) {
-//       InputImage image = InputImage.fromMediaImage(mediaImage, frame.getImageInfo().getRotationDegrees());
-//       Task<Pose> task = poseDetector.process(image);
-//       try {
-//         Pose pose = Tasks.await(task);
-//         List<PoseLandmark> landmarks = pose.getAllPoseLandmarks();
-//         for(PoseLandmark landmark: landmarks) {
-//           WritableMap result = new WritableNativeMap();
-//           String type = getTypeLabel(landmark.getLandmarkType());
-//           PointF3D point = landmark.getPosition3D();
-
-//           result.putDouble("visibility", landmark.getInFrameLikelihood());
-//           result.putDouble("x", point.getX());
-//           result.putDouble("y", point.getY());
-//           result.putDouble("z", point.getZ());
-//           map.putMap(type, result);
-//         }
-//       } catch (Exception e) {
-//         Log.e(XtraVisionPosePluginPlugin.TAG, "Something is going wrong: " + e.getMessage());
-//         e.printStackTrace();
-//       }
-//     }
-
-//     return map;
+    return map.toHashMap();
   }
 
-
-  public XtraVisionPosePluginPlugin() {
+  @SuppressLint("LongLogTag")
+  public XtraVisionPosePluginPlugin(@Nullable Map<String, Object> options) {
     // super("scanPoseLandmarks");
+    super(options);
+    Log.d(XtraVisionPosePluginPlugin.TAG, "XtraVisionPosePluginPlugin initialized with options: " + options);
+  }
+
+  @SuppressLint("LongLogTag")
+  public static int getRotationFromImage(Image image)  {
+
+    ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+//    if (buffer.remaining() < ExifInterface.MIN_EXIF_SIZE) {
+//      // Not enough data to read Exif
+//      Log.w(XtraVisionPosePluginPlugin.TAG, "Image buffer too small for Exif data");
+//      return 0;
+//    }
+
+    try {
+//      ExifInterface exifInterface = new ExifInterface(buffer);
+      ExifInterface exifInterface = new ExifInterface(new ByteArrayInputStream(buffer.array()));
+
+      int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+      switch (orientation) {
+        case ExifInterface.ORIENTATION_ROTATE_90:
+          return 90;
+        case ExifInterface.ORIENTATION_ROTATE_180:
+          return 180;
+        case ExifInterface.ORIENTATION_ROTATE_270:
+          return 270;
+//        case ExifInterface.ORIENTATION_ROTATE_RIGHT:
+//          return 90; // Equivalent to 270 degrees clockwise rotation
+        case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+          // Handle horizontal flip (optional)
+          break;
+        default:
+          throw new IllegalArgumentException("Unexpected Exif orientation: " + orientation);
+      }
+    } catch (IndexOutOfBoundsException e) {
+      Log.e(XtraVisionPosePluginPlugin.TAG, "Error reading Exif data: Buffer too small", e);
+      return 0; // Default to 0 degrees if data incomplete
+    } catch (IOException e) {
+      Log.e(XtraVisionPosePluginPlugin.TAG, "Error reading Exif data", e);
+//      throw e; // Rethrow IOException for further handling
+    }
+
+    return 0; // Should never reach here if Exif data is valid
   }
 
   static String getTypeLabel(int landmarkType) {

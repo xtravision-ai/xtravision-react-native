@@ -7,7 +7,7 @@ export const showError = (title: string, message: string) => {
     [
       {
         text: "OK",
-        onPress: () => console.log("OK Pressed")
+        onPress: () =>  console.log("OK Pressed")
       }
     ]
   );

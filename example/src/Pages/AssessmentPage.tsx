@@ -16,8 +16,8 @@ import ModalComponent from '../Components/Modal';
 // let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 export default function AssessmentPage({ route }: any) {
-  const authToken = "__AUTH_TOKEN__";
-  // "__AUTH_TOKEN__";
+  //local
+  const authToken =  "__AUTH_TOKEN__";
   const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
@@ -57,9 +57,6 @@ export default function AssessmentPage({ route }: any) {
       console.log("Camera status: " + status)
 
       // Camera.getCameraPermissionStatus().then(setHasPermission);
-
-
-
       
     })();
   }, []);
@@ -190,7 +187,7 @@ export default function AssessmentPage({ route }: any) {
     onServerResponse,
     cameraPosition,
     showSkeleton,
-    // serverEndpoint:  'production'//'local'
+    // serverEndpoint:  'local' //'production'//'local'
   }
 
   return (

@@ -5,16 +5,30 @@ import { Camera } from 'react-native-vision-camera';
 
 import { VisionCameraProxy } from 'react-native-vision-camera';
 
-const plugin = VisionCameraProxy.getFrameProcessorPlugin('scanPoseLandmarks');
+const plugin = VisionCameraProxy.initFrameProcessorPlugin('scanPoseLandmarks');
 
-console.log(plugin)
+export type Landmark = {
+  x: number;
+  y: number;
+  z: number;
+  visibility: boolean;
+};
 
-export function scanPoseLandmarks(frame: Frame) {
+// export function scanPoseLandmarks(frame: Frame): Landmark[] | undefined {
+export function scanPoseLandmarks(frame: Frame): any {
   'worklet';
   // IMP: DO NOT PUT ANY JS CODE HERE
   // if (!_WORKLET) throw new Error('ScanPoseLandmarks method must be called from a frame processor!');
 
   if (plugin == null) throw new Error('Failed to load Frame Processor Plugin "scanPoseLandmarks"!');
+
+  // return plugin.call(frame, {
+  //   someString: 'hello!',
+  //   someBoolean: true,
+  //   someNumber: 42,
+  //   someObject: { test: 0, second: 'test' },
+  //   someArray: ['another test', 5],
+  // }) as string[];
 
   return plugin.call(frame, {
     someString: 'hello!',
@@ -22,14 +36,14 @@ export function scanPoseLandmarks(frame: Frame) {
     someNumber: 42,
     someObject: { test: 0, second: 'test' },
     someArray: ['another test', 5],
-  }) as string[];
-
-  /*
-    // @ts-expect-error Frame Processors are not typed.
-
+  })as unknown as Landmark[]
+/*
+  
+  //   @ts-expect-error Frame Processors are not typed.
   // @ts-expect-error Frame Processors are not typed.
   // return __scanPoseLandmarks(frame);
   */
+  
 }
 
 export async function RequestCameraPermission() {

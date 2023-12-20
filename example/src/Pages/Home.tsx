@@ -1,8 +1,7 @@
 import React from "react";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput } from "react-native";
-import { Button } from 'react-native';
-import { AssessmentList } from "../Components/AssessmentList";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import { AssessmentList, SelectAssessmentList } from "../Components/AssessmentList";
 import { CameraOption } from "../Components/CameraOption";
 // import { SkeletonOption } from "../Components/SkeletonOption";
 
@@ -30,12 +29,15 @@ export default function HomeScreen({ navigation }: any) {
     const onPressCameraOption = (value: any) => setCameraOption(value)
     // const onPressSkeletonOption = (value: any) => setShowSkeleton(value)
 
+    let assessmentObj = AssessmentList.find(o => o.key === assessmentName);
+    const formattedAssessmentName = assessmentObj? assessmentObj.value : ''
+
     return (
         <>
             <ScrollView style={styles.component}>
 
                 <Text style={styles.labelText}>Choose Assessment</Text>
-                <AssessmentList setSelectedOption={updateAssessmentName} />
+                <SelectAssessmentList setSelectedOption={updateAssessmentName} />
 
                 {assessmentName === 'STANDING_BROAD_JUMP' && (
                     <>
@@ -58,13 +60,26 @@ export default function HomeScreen({ navigation }: any) {
                 <CameraOption setSelectedOption={onPressCameraOption} />
 
                 <Text></Text>
-                <Button
-                    title={"Let's Start " + assessmentName}
-                    disabled={userHeight.length <= 1}
-                    onPress={() =>
+
+                <TouchableOpacity 
+                     onPress={() =>
                         navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight })
                     }
-                />
+                    style={{ 
+                        backgroundColor: 'blue', 
+                        padding: 10,
+                        borderRadius: 5,
+                        margin: 10,
+                        }}>
+                    <Text style={{ 
+                        color: 'white', 
+                        textTransform: 'none',
+                        textAlign: 'center',
+                        fontSize: 16,
+                        }}>
+                        {"Let's Start " + formattedAssessmentName}
+                    </Text>
+                </TouchableOpacity>
                 <Text style={{ marginBottom: 20 }}></Text>
             </ScrollView>
         </>

@@ -90,8 +90,6 @@ export function Assessment(props: AssessmentProp) {
     // console.log(`${frame.timestamp}: ${frame.width}x${frame.height} ${frame.pixelFormat} Frame (${frame.orientation})`);
     const pose = scanPoseLandmarks(frame) as Landmark[];
 
-    // console.log(pose)
-
     if (Object.keys(pose).length == 0) {
       __DEV__ && console.warn(Date() + " Body is not visible!")
       return;
@@ -109,7 +107,6 @@ export function Assessment(props: AssessmentProp) {
         return;
       }
      
-      // console.log("FRAME HEIGHT", frame.height, "WIDTH", frame.width)
       // Handling Android issue in which the orientation of Frame is out of sync with device orientation
       if ((dimensions.height > dimensions.width && frame.height < frame.width) || (dimensions.height < dimensions.width && frame.height > frame.width)){
         poseCopy[v] = {
@@ -126,8 +123,6 @@ export function Assessment(props: AssessmentProp) {
       }
       
     });
-
-    // console.log("----->>", poseCopy)
 
     //draw skeleton
     // calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
@@ -201,10 +196,10 @@ export function Assessment(props: AssessmentProp) {
         isActive={true}
         // isActive={isAppForeground}
         frameProcessor={true ? frameProcessor : undefined}
-        fps={10} 
+        fps={30} 
         onError={onError}
-        // enableFpsGraph={true}
-        pixelFormat='yuv'
+        //enableFpsGraph={true}
+        pixelFormat= 'yuv'
 
       />
 

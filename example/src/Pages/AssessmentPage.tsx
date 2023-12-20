@@ -1,23 +1,24 @@
-import * as React from 'react';
 import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
-import { RequestCameraPermission, Assessment } from '@xtravision/xtravision-react-native';
-import { CameraPermissionStatus } from '@xtravision/xtravision-react-native';
+import {  Assessment } from '@xtravision/xtravision-react-native';
 import TextBox from '../Components/TextBox';
 import { showError } from '../Components/Alert';
-
-// Disable all warning and error on screen
-// import { LogBox } from 'react-native';
 import BackButton from '../Components/BackButton';
 import ModalComponent from '../Components/Modal';
-// import { Camera } from 'react-native-vision-camera';
-// LogBox.ignoreAllLogs();
+
+import { useCameraPermission } from 'react-native-vision-camera';
+import { useEffect, useState } from 'react';
+import React from 'react';
+import { AssessmentList } from '../Components/AssessmentList';
+// Disable all warning and error on screen
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();
 
 // cache variable
 // let responseCache: any = { positiveReps: 0, negativeReps: 0, lastReps: 0 };
 
 export default function AssessmentPage({ route }: any) {
-  //local
-  const authToken =  "__AUTH_TOKEN__";
+  
+  // const authToken =  "__AUTH_TOKEN__";
   const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
   const showSkeleton = false; // true or false
@@ -40,38 +41,31 @@ export default function AssessmentPage({ route }: any) {
   assessmentConfig.image_height = height;
   assessmentConfig.image_width = width;
 
-  const textFormatter = function(str: string){
-    str = str.replace(/_/g, ' ').toLowerCase();
-    return str.split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-  }
+  // display text while checking camera permission
+  const [appText, setAppText] = useState('Waiting...')
 
-  const [hasPermission, setHasPermission] = React.useState(false);
-  // const [hasPermission, setHasPermission] = React.useState<CameraPermissionStatus>();
+  // Check Camera Permission
+  const { hasPermission, requestPermission } = useCameraPermission()
+  useEffect(() =>{
+    if (hasPermission){
+      console.log('Camera Access granted!')
+      return 
+    }
+    setAppText("Checking Camera-Permission.....")
+    requestPermission()
+  },[])
 
-  React.useEffect(() => {
-    (async () => {
-      const status = await RequestCameraPermission();
-      setHasPermission(status === CameraPermissionStatus.AUTHORIZED);
-      console.log("Camera status: " + status)
 
-      // Camera.getCameraPermissionStatus().then(setHasPermission);
-      
-    })();
-  }, []);
-
-  const [displayText, setDisplayText] = React.useState('Waiting for server....');
-  const [displayResponse, setDisplayResponse] = React.useState({smallText: '-', bigText: '-'});
-
-  const [displayRespMsg, setDisplayRespMsg] = React.useState('');
+  const [displayText, setDisplayText] = useState('Waiting for server....');
+  const [displayResponse, setDisplayResponse] = useState({smallText: '-', bigText: '-'});
+  const [displayRespMsg, setDisplayRespMsg] = useState('');
 
   const closeModal = () => {
     setDisplayRespMsg(''); // Set the message to an empty string to close the modal
   };
 
   // set isPreJoin = true only if you are using education screen screen
-  const [requestData, setRequestData] = React.useState({ isPreJoin: false})
+  const [requestData, setRequestData] = useState({ isPreJoin: false})
 
   // required prop:
   const onServerResponse = (serverResponse: any) => {
@@ -100,7 +94,10 @@ export default function AssessmentPage({ route }: any) {
     console.log(Date() + ' Server Data:', serverResponse.data);
 
     //show assessment name
-    setDisplayText(textFormatter(selectedAssessment));
+    let assessmentObj = AssessmentList.find(o => o.key === selectedAssessment);
+    const assessmentName = assessmentObj? assessmentObj.value : ''
+
+    setDisplayText(assessmentName);
     const additional_response = serverResponse.data.additional_response
 
     /**
@@ -143,6 +140,35 @@ export default function AssessmentPage({ route }: any) {
       setDisplayResponse({smallText: 'Calory Power', bigText: `${caloryValue}   ${powerValue}`})
       return ;
     }
+
+    // Assessment Specific Handling
+    if (selectedAssessment.includes('BACK_EXTENSION')) {
+      const angle = additional_response?.back_extension;
+      setDisplayResponse({smallText: 'Angle', bigText: `${angle}°`})
+      return ;
+    }
+    // Assessment Specific Handling
+    if (selectedAssessment.includes('BACK_FLEXION')) {
+      const angle = additional_response?.back_flexion;
+      setDisplayResponse({smallText: 'Angle', bigText: `${angle}°`})
+      return ;
+    }
+     // Assessment Specific Handling
+     if (selectedAssessment.includes('BACK_LATERAL_FLEXION')) {
+      const leftAngle = additional_response?.lateral_left_flexion;
+      const rightAngle = additional_response?.lateral_right_flexion;
+      setDisplayResponse({smallText: 'Left   Right', bigText: `${leftAngle}°  ${rightAngle}°`})
+      return ;
+    }
+
+    // Assessment Specific Handling
+    if (selectedAssessment.includes('SHOULDER_ABDUCTION')) {
+    const leftAngle = additional_response?.left_shoulder_abduction;
+    const rightAngle = additional_response?.right_shoulder_abduction;
+    setDisplayResponse({smallText: 'Left   Right', bigText: `${leftAngle}°  ${rightAngle}°`})
+    return ;
+  }
+    
 
     // If POSE_BASED_REPS reps
     if (serverResponse.data.category == 'POSE_BASED_REPS') {
@@ -191,7 +217,7 @@ export default function AssessmentPage({ route }: any) {
   }
 
   return (
-    <View style={styles({}).container}>
+    <View style={styles().container}>
       {hasPermission ? (
         <>
           <Assessment
@@ -201,21 +227,21 @@ export default function AssessmentPage({ route }: any) {
           />
 
           {/* Show Assessment name on UI  */}
-          <TextBox smallValue="Assessment" bigValue={displayText} style={styles({ width, height }).leftBox} />
+          <TextBox smallValue="Assessment" bigValue={displayText} style={styles().leftBox} />
           {/* Show Server response data on UI  */} 
-          <TextBox smallValue={displayResponse.smallText} bigValue={displayResponse.bigText} style={styles({ width, height }).rightBox} />
+          <TextBox smallValue={displayResponse.smallText} bigValue={displayResponse.bigText} style={styles().rightBox} />
           {/* Display Out of screen feedback */}
           <ModalComponent message={displayRespMsg} closeModal={closeModal} />
           
           {/* Show Back button on UI  */} 
-          <View style={styles({ width, height }).backBtn}>
+          <View style={styles().backBtn}>
             <BackButton />
           </View>
 
         </>
       ) : (
         <>
-          <Text>App don't have Permission</Text>
+          <Text>{appText}</Text>
         </>
       )
       }
@@ -223,7 +249,7 @@ export default function AssessmentPage({ route }: any) {
   );
 }
 
-const styles = (orientation: any) => StyleSheet.create({
+const styles = () => StyleSheet.create({
   leftBox:{position: 'absolute', top: 50, left: 20},
   rightBox:{position: 'absolute', top: 50, right: 20},
 
@@ -235,20 +261,20 @@ const styles = (orientation: any) => StyleSheet.create({
 
   },
   
-  orangeFrame: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    display: 'flex',
-  },
-  frameImage: {
-    height: orientation.width > orientation.height ? orientation.width : orientation.height,
-    width: orientation.width > orientation.height ? orientation.height : orientation.width,
-    resizeMode: 'contain',
-    transform: orientation.width > orientation.height ? [{ rotate: '90deg' }] : [{ rotate: '0deg' }],
-  },
+  // orangeFrame: {
+  //   width: '100%',
+  //   height: '100%',
+  //   position: 'absolute',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   display: 'flex',
+  // },
+  // frameImage: {
+  //   height: orientation.width > orientation.height ? orientation.width : orientation.height,
+  //   width: orientation.width > orientation.height ? orientation.height : orientation.width,
+  //   resizeMode: 'contain',
+  //   transform: orientation.width > orientation.height ? [{ rotate: '90deg' }] : [{ rotate: '0deg' }],
+  // },
   
   backBtn: {
     position: 'absolute',

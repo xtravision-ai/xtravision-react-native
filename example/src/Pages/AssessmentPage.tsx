@@ -18,10 +18,12 @@ LogBox.ignoreAllLogs();
 
 export default function AssessmentPage({ route }: any) {
   
-  // const authToken =  "__AUTH_TOKEN__";
+  // testing
+  const authToken =  "__AUTH_TOKEN__";
   const selectedAssessment = route.params.assessmentName 
   const cameraPosition = route.params.cameraOption // 'front'; // back or front
-  const showSkeleton = false; // true or false
+  const showSkeleton = route.params.showSkeleton; // true or false
+  
   let assessmentConfig = {
     sets_threshold: -1 // set as -1 to disable sets
   } as any;

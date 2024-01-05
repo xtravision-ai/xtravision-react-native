@@ -3,14 +3,13 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 import { AssessmentList, SelectAssessmentList } from "../Components/AssessmentList";
 import { CameraOption } from "../Components/CameraOption";
-// import { SkeletonOption } from "../Components/SkeletonOption";
+import { SkeletonOption } from "../Components/SkeletonOption";
 
 export default function HomeScreen({ navigation }: any) {
     const [assessmentName, setAssessmentName] = useState("");
     const [cameraOption, setCameraOption] = useState("front");
     const [userHeight, onChangeUserHeight] = React.useState('160');
-    // const [showSkeleton, setShowSkeleton] = useState("false");
-    // const [showSkeleton] = useState("false");
+    const [showSkeleton, setShowSkeleton] = useState("false");
 
     const styles = StyleSheet.create({
         component: { margin: 30, padding: 25, },
@@ -27,7 +26,7 @@ export default function HomeScreen({ navigation }: any) {
 
     const updateAssessmentName = (value: any) => setAssessmentName(value)
     const onPressCameraOption = (value: any) => setCameraOption(value)
-    // const onPressSkeletonOption = (value: any) => setShowSkeleton(value)
+    const onPressSkeletonOption = (value: any) => setShowSkeleton(value)
 
     let assessmentObj = AssessmentList.find(o => o.key === assessmentName);
     const formattedAssessmentName = assessmentObj? assessmentObj.value : ''
@@ -53,8 +52,8 @@ export default function HomeScreen({ navigation }: any) {
 
                 )}
 
-                {/* <Text style={styles.labelText}>Display Skeleton </Text>
-                <SkeletonOption setSelectedOption={onPressSkeletonOption} /> */}
+                <Text style={styles.labelText}>Display Skeleton </Text>
+                <SkeletonOption setSelectedOption={onPressSkeletonOption} />
 
                 <Text style={styles.labelText}>Choose  Camera </Text>
                 <CameraOption setSelectedOption={onPressCameraOption} />
@@ -63,7 +62,7 @@ export default function HomeScreen({ navigation }: any) {
 
                 <TouchableOpacity 
                      onPress={() =>
-                        navigation.navigate('AssessmentPage', { assessmentName, cameraOption, userHeight })
+                        navigation.navigate('AssessmentPage', { assessmentName, showSkeleton, cameraOption, userHeight })
                     }
                     style={{ 
                         backgroundColor: 'blue', 

@@ -5,17 +5,21 @@ import React, { useCallback, useEffect } from 'react';
 import { Camera, useFrameProcessor } from 'react-native-vision-camera';
 import type { CameraRuntimeError, Frame } from 'react-native-vision-camera';
 // import { runOnJS } from 'react-native-reanimated';
-// import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { runOnJS } from 'react-native-reanimated';
 import { getDefaultObject } from '../../formatter';
 import _ from 'lodash';
 import type { AssessmentProp } from './interface';
 import useXtraAssessment from './../../hooks/useXtraAssessment';
-import { scanPoseLandmarks } from './../../helper';
+import {
+  generateSkeletonLines,
+  scanPoseLandmarks,
+  generateSkeletonCircle,
+} from './../../helper';
 import { Landmark } from './../../helper';
-import { Worklets } from 'react-native-worklets-core';
-import { Canvas, Group, Circle } from '@shopify/react-native-skia';
+import { Worklets, useSharedValue } from 'react-native-worklets-core';
+import { Canvas, Group, Line, vec } from '@shopify/react-native-skia';
 
-// const defaultPose = getDefaultObject();
+const defaultPose = getDefaultObject();
 
 export function Assessment(props: AssessmentProp) {
   //connection will be initiated before setup camera and others
@@ -33,15 +37,35 @@ export function Assessment(props: AssessmentProp) {
     (d) => d.position === props.libData.cameraPosition
   );
 
-  //use for drawing skeleton
-  // const poseSkeleton: any = useSharedValue(defaultPose);
-
   //WS Request Data: frame height/width, need to send to server
   const dimensions = useWindowDimensions();
   const frameTempRef = React.useRef<any>({
     frame_height: dimensions.height,
     frame_width: dimensions.width,
   });
+
+  //use for drawing skeleton
+  const paint = {
+    left_Side_color: 'blue',
+    right_Side_color: 'red',
+  };
+
+  const poseSkeleton: any = useSharedValue(defaultPose);
+  const animatedLinesArray = generateSkeletonLines(
+    poseSkeleton,
+    props.libData.cameraPosition,
+    dimensions.width,
+    paint
+  );
+  const animatedCircleArray = generateSkeletonCircle(
+    poseSkeleton,
+    props.libData.cameraPosition,
+    dimensions.width,
+    paint
+  );
+
+  console.log('0------------------------animatedLinesArray: ', animatedLinesArray);
+  // console.log('animatedCircleArray: ', animatedCircleArray);
 
   //WS Request Data: landmarks
   const landmarksTempRef = React.useRef<any>({});
@@ -73,34 +97,42 @@ export function Assessment(props: AssessmentProp) {
     [dimensions]
   );
 
-  // const calculatePoseSkeleton = (poseCopyObj: any, pose: any, frame: any, dimensions:  any) => {
-  //   'worklet';
+  const calculatePoseSkeleton = (
+    poseCopyObj: any,
+    pose: any,
+    frame: any,
+    dimensions: any
+  ) => {
+    'worklet';
 
-  //   // default consideration: Phone in Portrait mode
-  //   const width = dimensions.width
-  //   const height = dimensions.height
+    // default consideration: Phone in Portrait mode
+    const width = dimensions.width;
+    const height = dimensions.height;
 
-  //   let xFactor: any, yFactor: any;
+    let xFactor: any, yFactor: any;
 
-  //   if (height > width) {
-  //     xFactor = (height / frame.width) - 0.045
-  //     yFactor = (width / frame.height) + 0.04
-  //   } else { // Phone in landscape mode
-  //     xFactor = (width / frame.width);
-  //     yFactor = (height / frame.height) - 0.09;
-  //   }
+    if (height > width) {
+      xFactor = height / frame.width - 0.045;
+      yFactor = width / frame.height + 0.04;
+    } else {
+      // Phone in landscape mode
+      xFactor = width / frame.width;
+      yFactor = height / frame.height - 0.09;
+    }
 
-  //   try {
-  //     Object.keys(pose).forEach(v => {
-  //       poseCopyObj[v] = {
-  //         x: pose[v].x * xFactor,
-  //         y: pose[v].y * yFactor,
-  //       };
-  //     });
+    try {
+      Object.keys(pose).forEach((v) => {
+        poseCopyObj[v] = {
+          x: pose[v].x * xFactor,
+          y: pose[v].y * yFactor,
+        };
+      });
+    } catch (e) {
+      console.log(Date() + ' ', e);
+    }
 
-  //   } catch (e) { console.error(Date() + " ", e) }
-  //   poseSkeleton.value = poseCopyObj;
-  // }
+    poseSkeleton.value = poseCopyObj;
+  };
 
   const myFunctionJS = Worklets.createRunInJsFn(updateWSEventData);
 
@@ -121,7 +153,8 @@ export function Assessment(props: AssessmentProp) {
       const now = Date.now();
       // normalize pose: process to convert pose object to required formate
       const poseCopy: any = getDefaultObject();
-      // const poseCopyObj: any = getDefaultObject();
+      // copy of pose obj to store the kp data for drawing
+      const poseCopyObj: any = getDefaultObject();
 
       Object.keys(poseCopy).forEach((v: any) => {
         // do nothing, on specific any specific part is not visible
@@ -161,11 +194,11 @@ export function Assessment(props: AssessmentProp) {
       });
 
       //draw skeleton
-      // calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
+
+      calculatePoseSkeleton(poseCopyObj, pose, frame, dimensions);
       // Collect data for send data to server
-      // runOnJS(updateWSEventData)(now, Object.values(poseCopy), frame)
+      runOnJS(updateWSEventData)(now, Object.values(poseCopy), frame)
       // Object.values(poseCopy) is not working as expected so we pass full object
-      // myFunctionJS(now, Object.values(poseCopy), frame)
       myFunctionJS(now, Object.values(poseCopy), frame);
     },
     [dimensions]
@@ -237,12 +270,26 @@ export function Assessment(props: AssessmentProp) {
         pixelFormat="yuv"
       />
 
-
       {/* testing */}
 
-      <Canvas style={{ width: dimensions.width, height: dimensions.height }}>
-        
-      </Canvas>
+      {props.libData.showSkeleton && (
+        <Canvas style={getStylesData(dimensions).linesContainer}>
+          <Group>
+            <Group>
+              {/* {linePaths.map((path: any) => {
+                <Line
+                  p1={vec(path.x1, path.y1)}
+                  p2={vec(path.x2, path.y2)}
+                  color="lightblue"
+                  style="stroke"
+                  strokeWidth={4}
+                />;
+              })} */}
+            </Group>
+            <Group></Group>
+          </Group>
+        </Canvas>
+      )}
 
       {/* {props.libData.showSkeleton && (
         //@ts-ignore
